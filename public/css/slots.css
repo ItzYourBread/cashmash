@@ -152,22 +152,149 @@ html, body {
 /* ==========================================
    MODAL (Desktop)
    ========================================== */
+/* ===============================
+   CASHMASH Modal (Improved)
+   =============================== */
+
 .modal {
-  display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center;
+  display: none;
+  position: fixed;
+  z-index: 999;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 5, 30, 0.85); /* darker navy glass */
+  backdrop-filter: blur(5px);
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .modal-content {
-  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
-  padding: 30px 40px; color: #fff; width: 350px; text-align: left;
-  box-shadow: 0 0 25px rgba(245,197,66,0.2);
+  background: rgba(5, 10, 40, 0.95); /* deeper blue base */
+  border: 2px solid rgba(245, 197, 66, 0.4);
+  border-radius: 20px;
+  padding: 40px 45px;
+  color: #fff;
+  width: 400px;
+  max-width: 90%;
+  text-align: left;
+  box-shadow: 0 0 30px rgba(245, 197, 66, 0.3);
+  position: relative;
+  animation: popIn 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
-.close-btn { float: right; font-size: 1.5em; cursor: pointer; color: #f5c542; }
-.close-btn:hover { color: #fff; }
-.modal-content h2 { color: #f5c542; margin-bottom: 10px; }
-.modal-content ul { margin: 10px 0 10px 15px; list-style: none; }
-.modal-content li::before { content: '★ '; color: #f5c542; }
+@keyframes popIn {
+  0% { transform: translateY(-15px) scale(0.95); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 1.8em;
+  cursor: pointer;
+  color: #f5c542;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.modal-content h2 {
+  color: #f5c542;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 1.6em;
+  font-weight: 700;
+}
+
+.modal-content ul {
+  margin: 15px 0 10px 5px;
+  list-style: none;
+  padding: 0;
+}
+
+.modal-content li {
+  margin-bottom: 8px;
+  padding-left: 10px;
+  font-size: 1.05em;
+  border-left: 3px solid rgba(245,197,66,0.3);
+  transition: all 0.2s ease;
+}
+
+.modal-content li:hover {
+  transform: translateX(4px);
+  border-left-color: #f5c542;
+}
+
+.modal-content li::before {
+  content: '★ ';
+  color: #f5c542;
+  font-size: 1.2em;
+}
+
+/* Mini slot symbol inside modal */
+.mini-symbol {
+  width: 25px;
+  height: 25px;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* Win message centered on reels */
+.win-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3em;
+  font-weight: 800;
+  color: #FFD700;
+  text-shadow: 0 0 10px #fff, 0 0 20px #FFD700, 0 0 30px #FFD700;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 999;
+}
+
+/* Fade in/out animations */
+@keyframes winFadeIn {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes winFadeOut {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
+}
+
+/* Confetti for win */
+.confetti {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: confettiDrop 1.2s forwards;
+  z-index: 998;
+}
+
+@keyframes confettiDrop {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(250px) rotate(720deg); opacity: 0; }
+}
+
 
 /* ==========================================
    MOBILE OPTIMIZATION (< 600px)

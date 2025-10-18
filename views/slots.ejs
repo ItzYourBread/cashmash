@@ -14,19 +14,20 @@
 
   <div class="slot-header">
     <div class="neon-title">
-      <span class="flicker">🎰</span> Classic Slots
+      Classic Slots
     </div>
   </div>
 
   <div class="user-panel">
     <div class="user-info">
-      <span>👤 <strong><%= user.username || 'Player1' %></strong></span>
-      <span>💰 Chips: <strong id="balance"><%= user.chips || 1000 %></strong></span> 
+      <span>👤 <strong><%= user.username %></strong></span>
+      <span>💰 Chips: <strong id="balance"><%= user.chips %></strong></span> 
     </div>
   </div>
 
   <div class="slot-machine">
     <div class="reels" id="reels"></div>
+        <div id="winMessage" class="win-message"></div>
 
     <div class="controls">
       <div class="bet-section">
@@ -44,17 +45,27 @@
 <div id="infoModal" class="modal">
   <div class="modal-content">
     <span class="close-btn">&times;</span>
-    <h2>Winning Info 💡</h2>
-    <p>5-of-a-kind wins on any payline. High chance of low-value wins!</p>
+    <h2>Winning Info</h2>
+    <p>Payouts require 5-of-a-kind on any of the 14 active paylines (horizontal, diagonal, and zig-zag).</p>
+
+    <h3>Multipliers (5-of-a-Kind)</h3>
     <ul>
-      <li>🍒 Cherry: x0.5 (Net Loss)</li>
-      <li>🍋 Lemon: x1 (Break Even)</li>
-      <li>🌟 Star: x5</li>
-      <li>👑 Jackpot: x50 (Rare!)</li>
+      <li><img src="/images/SlotsClassic/cherry.png" alt="Cherry" class="mini-symbol"/> Cherry: x1 (Returns bet)</li>
+      <li><img src="/images/SlotsClassic/lemon.png" alt="Lemon" class="mini-symbol"/> Lemon: x1 (Returns bet)</li>
+      <li><img src="/images/SlotsClassic/orange.png" alt="Orange" class="mini-symbol"/> Orange: x1.5</li>
+      <li><img src="/images/SlotsClassic/watermelon.png" alt="Watermelon" class="mini-symbol"/> Watermelon: x2</li>
+      <li><img src="/images/SlotsClassic/grapes.png" alt="Grapes" class="mini-symbol"/> Grapes: x4</li>
+      <li><img src="/images/SlotsClassic/star.png" alt="Star" class="mini-symbol"/> Star: x5</li>
+      <li><img src="/images/SlotsClassic/diamond.png" alt="Diamond" class="mini-symbol"/> Diamond: x8</li>
+      <li><img src="/images/SlotsClassic/red7.png" alt="Red 7" class="mini-symbol"/> Red 7: x12</li>
+      <li><img src="/images/SlotsClassic/bar.png" alt="Bar" class="mini-symbol"/> Bar: x20</li>
+      <li><img src="/images/SlotsClassic/jackpot.png" alt="Jackpot" class="mini-symbol"/> Jackpot: x100 (Rare!)</li>
     </ul>
-    <p>14 active paylines including horizontals, diagonals, and zig-zags.</p>
+
+    <p style="font-size: 0.9em; margin-top: 15px;">**Note:** The high frequency of low-paying symbols contributes to a high "hit rate" while maintaining profitability.</p>
   </div>
 </div>
+
 
 <%- include('partials/footer') %>
 <script type="module" src="/js/slots.js"></script>
