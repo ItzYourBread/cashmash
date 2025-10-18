@@ -1,130 +1,251 @@
+/* slots.css - FINAL (Centering, Visuals, and Mobile Optimization) */
+
 /* ==========================================
-   CASHMASH SLOTS - CLASSIC
+   CASHMASH SLOTS - CLASSIC BASE (Desktop/Base)
    ========================================== */
 
-/* Slots Section */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
 .slots-section {
   text-align: center;
-  padding: 10px 10px;
-  min-height: 80vh;
+  padding: 40px 10px;
+  position: relative;
+  
+  /* PERFECT CENTERING */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Balance Display */
-.balance {
-  font-size: 1.6em;
-  margin-bottom: 35px;
+/* ===== Animated Header ===== */
+.slot-header { margin-bottom: 25px; }
+
+.neon-title {
+  font-size: 3em;
+  font-weight: 700;
   color: #f5c542;
-  font-weight: 600;
+  text-shadow: 0 0 10px #f5c542, 0 0 20px #f5c542, 0 0 30px #f5c542, 0 0 40px #ffd966;
+  animation: pulseGlow 3s infinite;
 }
 
-/* Slot Machine Box */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966; }
+  50% { opacity: 0.8; text-shadow: 0 0 5px #f5c542, 0 0 10px #fff; }
+}
+
+/* ===== User Panel ===== */
+.user-panel { margin-bottom: 20px; display: flex; justify-content: center; }
+
+.user-info {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 30px;
+  border-radius: 30px;
+  display: flex;
+  gap: 40px;
+  font-size: 1.1em;
+  font-weight: 500;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(245,197,66,0.15);
+}
+
+/* ===== Slot Machine Casing ===== */
 .slot-machine {
   background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  padding: 70px;
+  padding: 20px; /* Base padding */
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
-  box-shadow: 0 0 40px rgba(245, 197, 66, 0.3);
+  gap: 35px;
+  box-shadow: 0 0 45px rgba(0, 0, 0, 0.25);
 }
 
-/* Reels Container */
+/* ==========================================
+   REELS & ANIMATION (Desktop)
+   ========================================== */
+
 .reels {
+  position: relative;
   display: flex;
   justify-content: center;
-  gap: 5px;
+  align-items: flex-start;
+  max-width: 650px; 
+  width: 100%;
+  margin: 0 auto;
 }
 
-/* Each Reel Column */
 .reel-col {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   overflow: hidden;
-  height: 430px; /* 4 symbols visible */
-  border: 2px solid #f5c542;
-  border-radius: 20px;
-  background: rgba(0,0,0,0.25);
-  position: relative;
-  box-shadow: inset 0 0 20px rgba(245,197,66,0.1);
+  
+  /* Fixed Dimensions (Base Size) */
+  width: 114px; 
+  height: 472px; 
+  flex-shrink: 0; 
+  flex-grow: 0;
+  
+  /* Visuals */
+  border: 4px solid #f5c542; 
+  border-radius: 12px;
+  background: #000b38; 
+  box-shadow: inset 0 0 15px rgba(245, 197, 66, 0.5), 0 4px 6px rgba(0, 0, 0, 0.5);
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
 }
 
-/* Reel Images */
+.reel-col.spinning { transition: none; }
+.reel-col.win { border-color: #fff; }
+
 .reel-img {
-  width: 100px;
-  height: 100px;
-  border-radius: 15px;
-  transition: transform 0.1s linear;
+  width: 110px; /* Base Image Size */
+  height: 110px;
+  border-radius: 8px;
+  flex-shrink: 0; 
+  
+  /* Image Polish */
+  border: 1px solid #fff; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); 
 }
 
-/* Spin Animation */
-.reel-img.spin {
-  animation: reelSpin 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
-}
-
-@keyframes reelSpin {
-  0% { transform: translateY(-400%); }
-  100% { transform: translateY(0); }
-}
-
-/* Controls Section */
+/* ==========================================
+   CONTROLS & RESULTS (Desktop)
+   ========================================== */
 .controls {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-top: 20px;
+  display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;
 }
+
+.bet-section { display: flex; gap: 10px; align-items: center; }
 
 #betAmount {
-  padding: 14px 24px;
-  font-size: 1.2em;
-  border-radius: 25px;
-  border: none;
-  outline: none;
-  width: 160px;
-  text-align: center;
+  padding: 14px 20px; font-size: 1.1em; border-radius: 30px; border: none; outline: none; width: 130px;
+  text-align: center; background: rgba(255, 255, 255, 0.1); color: #fff;
 }
 
 #spinBtn {
-  cursor: pointer;
-  padding: 18px 60px;
-  font-size: 1.3em;
-  border-radius: 35px;
-  border: none;
-  background: #f5c542;
-  color: #000b38;
-  font-weight: bold;
-  transition: 0.3s;
+  padding: 15px 50px; font-size: 1.2em; border-radius: 35px; border: none;
+  background: #f5c542; color: #000b38; font-weight: bold; transition: 0.3s; cursor: pointer;
 }
 
-#spinBtn:hover {
-  background: #fff;
-  box-shadow: 0 0 20px rgba(245,197,66,0.5);
+#spinBtn:hover { background: #fff; box-shadow: 0 0 20px rgba(245,197,66,0.5); }
+
+.info-icon {
+  width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: rgba(245, 197, 66, 0.8); color: #000b38; font-weight: bold; cursor: pointer;
+  box-shadow: 0 0 10px rgba(245,197,66,0.5); transition: 0.3s;
 }
+
+.info-icon:hover { transform: scale(1.1); background: #fff; }
 
 #result {
-  font-size: 1.5em;
-  color: #f5c542;
-  min-height: 32px;
-  margin-top: 15px;
-  font-weight: 600;
+  font-size: 1.4em; color: #f5c542; min-height: 32px; font-weight: 600;
 }
 
-/* Responsive Adjustments */
-@media(max-width: 1024px){
-  .reel-col { height: 320px; }
-  .reel-img { width: 80px; height: 80px; }
-  .slot-machine { padding: 50px; max-width: 100%; }
-  #betAmount { width: 100px; }
+/* ==========================================
+   MODAL (Desktop)
+   ========================================== */
+.modal {
+  display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center;
 }
 
-@media(max-width: 768px){
-  .reel-col { height: 255px; gap: 3px; }
-  .reel-img { width: 60px; height: 60px; }
-  .slot-machine { padding: 30px; }
-  #betAmount { width: 100px; font-size: 1em; }
+.modal-content {
+  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
+  padding: 30px 40px; color: #fff; width: 350px; text-align: left;
+  box-shadow: 0 0 25px rgba(245,197,66,0.2);
+}
+
+.close-btn { float: right; font-size: 1.5em; cursor: pointer; color: #f5c542; }
+.close-btn:hover { color: #fff; }
+.modal-content h2 { color: #f5c542; margin-bottom: 10px; }
+.modal-content ul { margin: 10px 0 10px 15px; list-style: none; }
+.modal-content li::before { content: '★ '; color: #f5c542; }
+
+/* ==========================================
+   MOBILE OPTIMIZATION (< 600px)
+   ========================================== */
+
+@media (max-width: 600px) {
+  
+  /* Global/Containers */
+  .slots-section { padding: 20px 5px; }
+  
+  .neon-title { font-size: 2em; }
+
+  .user-info { 
+    gap: 20px; 
+    font-size: 1em;
+    padding: 10px 20px;
+  }
+  
+  .slot-machine {
+    padding: 20px 15px; /* Reduce casing size */
+    gap: 20px;
+  }
+
+  /* Reels (The most important part to shrink) */
+  .reels {
+    max-width: 380px; /* Constrain container for smaller reels */
+    gap: 2px; /* Reduce gap between reels */
+  }
+
+  /* New Reel/Image Dimensions for Mobile (e.g., 60px size) */
+  .reel-img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  /* Reel Column Adjustment */
+  .reel-col {
+    width: 64px; /* 60px image + 4px border */
+    height: 260px; /* 4 rows * 60px + 3 gaps * 5px + 4px border = 240 + 15 + 4 = 259. Use 260px */
+    gap: 5px; /* Use the smaller gap */
+    border-width: 2px; /* Thinner border */
+  }
+
+  /* Controls */
+  .controls {
+    flex-direction: column; /* Stack controls vertically */
+    gap: 15px;
+  }
+
+  .bet-section {
+    width: 100%; /* Make bet section take full width of container */
+    justify-content: space-between;
+  }
+
+  #betAmount {
+    padding: 10px 15px;
+    font-size: 1em;
+    width: 100px;
+  }
+
+  #spinBtn {
+    padding: 10px 30px;
+    font-size: 1em;
+  }
+  
+  .info-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9em;
+  }
+  
+  #result {
+    font-size: 1.1em;
+  }
+  
+  /* Modal adjustment for smaller screens */
+  .modal-content {
+    width: 90%;
+    padding: 20px;
+  }
 }
