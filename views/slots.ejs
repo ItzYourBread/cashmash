@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SlotsClassic | CashMash</title>
+<link rel="stylesheet" href="/css/style.css"/>
+<link rel="stylesheet" href="/css/slots.css"/>
+</head>
+<body>
+<%- include('partials/header') %>
+
+<section class="slots-section">
+  <h1>🎰 SlotsClassic</h1>
+  <p class="balance">Balance: <strong id="balance"><%= user.chips %></strong> Chips</p>
+
+  <div class="slot-machine">
+    <div class="reels" id="reels"></div>
+
+    <div class="controls">
+      <input type="number" id="betAmount" placeholder="Bet chips" min="1" max="<%= user.chips %>"/>
+      <button id="spinBtn" class="btn gold big">Spin</button>
+    </div>
+
+    <p id="result"></p>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
+<script type="module" src="/js/slots.js"></script></body>
+</html>

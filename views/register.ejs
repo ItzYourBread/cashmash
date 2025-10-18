@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register | CashMash</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/auth.css" />
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <section class="auth-section">
+    <form action="/register" method="POST" class="auth-form">
+      <h2>Create Your Account</h2>
+      
+      <input type="text" name="username" placeholder="Username" required/>
+      <input type="email" name="email" placeholder="Email" required/>
+      <input type="tel" name="phone" placeholder="Phone Number (BD)" required
+             pattern="^(?:\+8801|01)[3-9][0-9]{8}$"
+             title="Enter a valid Bangladeshi phone number, e.g., 01XXXXXXXXX or +8801XXXXXXXXX"/>
+      <input type="password" name="password" placeholder="Password" required/>
+      
+      <button type="submit" class="btn gold big">Register</button>
+      <p>Already have an account? <a href="/login">Login</a></p>
+    </form>
+  </section>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

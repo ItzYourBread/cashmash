@@ -1,0 +1,130 @@
+/* ==========================================
+   CASHMASH SLOTS - CLASSIC
+   ========================================== */
+
+/* Slots Section */
+.slots-section {
+  text-align: center;
+  padding: 10px 10px;
+  min-height: 80vh;
+}
+
+/* Balance Display */
+.balance {
+  font-size: 1.6em;
+  margin-bottom: 35px;
+  color: #f5c542;
+  font-weight: 600;
+}
+
+/* Slot Machine Box */
+.slot-machine {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  padding: 70px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  box-shadow: 0 0 40px rgba(245, 197, 66, 0.3);
+}
+
+/* Reels Container */
+.reels {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* Each Reel Column */
+.reel-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  height: 430px; /* 4 symbols visible */
+  border: 2px solid #f5c542;
+  border-radius: 20px;
+  background: rgba(0,0,0,0.25);
+  position: relative;
+  box-shadow: inset 0 0 20px rgba(245,197,66,0.1);
+}
+
+/* Reel Images */
+.reel-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 15px;
+  transition: transform 0.1s linear;
+}
+
+/* Spin Animation */
+.reel-img.spin {
+  animation: reelSpin 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes reelSpin {
+  0% { transform: translateY(-400%); }
+  100% { transform: translateY(0); }
+}
+
+/* Controls Section */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+#betAmount {
+  padding: 14px 24px;
+  font-size: 1.2em;
+  border-radius: 25px;
+  border: none;
+  outline: none;
+  width: 160px;
+  text-align: center;
+}
+
+#spinBtn {
+  cursor: pointer;
+  padding: 18px 60px;
+  font-size: 1.3em;
+  border-radius: 35px;
+  border: none;
+  background: #f5c542;
+  color: #000b38;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+#spinBtn:hover {
+  background: #fff;
+  box-shadow: 0 0 20px rgba(245,197,66,0.5);
+}
+
+#result {
+  font-size: 1.5em;
+  color: #f5c542;
+  min-height: 32px;
+  margin-top: 15px;
+  font-weight: 600;
+}
+
+/* Responsive Adjustments */
+@media(max-width: 1024px){
+  .reel-col { height: 320px; }
+  .reel-img { width: 80px; height: 80px; }
+  .slot-machine { padding: 50px; max-width: 100%; }
+  #betAmount { width: 100px; }
+}
+
+@media(max-width: 768px){
+  .reel-col { height: 255px; gap: 3px; }
+  .reel-img { width: 60px; height: 60px; }
+  .slot-machine { padding: 30px; }
+  #betAmount { width: 100px; font-size: 1em; }
+}

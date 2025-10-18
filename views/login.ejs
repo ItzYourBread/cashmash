@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | CashMash</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/auth.css" />
+</head>
+<body>
+  <%- include('partials/header') %>
+  <section class="auth-section">
+    <form action="/login" method="POST" class="auth-form">
+      <h2>Login to CashMash</h2>
+      <input type="email" name="email" placeholder="Email" required/>
+      <input type="password" name="password" placeholder="Password" required/>
+      <button type="submit" class="btn gold big">Login</button>
+      <p>Don't have an account? <a href="/register">Sign Up</a></p>
+    </form>
+  </section>
+  <%- include('partials/footer') %>
+</body>
+</html>

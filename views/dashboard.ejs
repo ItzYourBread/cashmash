@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | CashMash</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/dashboard.css"/>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <section class="dashboard">
+    <div class="dashboard-header">
+      <h1>Welcome, <%= user.username %> 👋</h1>
+      <p>Balance: <strong><%= user.chips %> Chips</strong></p>
+    </div>
+
+    <!-- 🎰 SLOTS CATEGORY -->
+    <div class="category">
+      <h2>🎰 Slots</h2>
+      <div class="game-grid">
+        <div class="game-card" onclick="window.location.href='/slots'">
+          <img src="/images/classic-slots.jpg" alt="Classic Slots"/>
+          <div class="overlay">Classic Slots</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎡 ROULETTE CATEGORY -->
+    <div class="category">
+      <h2>🎡 Roulette</h2>
+      <div class="game-grid">
+        <div class="game-card" onclick="window.location.href='/roulette/royal'">
+          <img src="/images/roulette.jpg" alt="Royal Roulette"/>
+          <div class="overlay">Royal Roulette</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🃏 BLACKJACK CATEGORY -->
+    <div class="category">
+      <h2>🃏 Blackjack</h2>
+      <div class="game-grid">
+        <div class="game-card" onclick="window.location.href='/blackjack/deluxe'">
+          <img src="/images/blackjack.jpg" alt="Blackjack"/>
+          <div class="overlay">Blackjack</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <%- include('partials/footer') %>
+</body>
+</html>
