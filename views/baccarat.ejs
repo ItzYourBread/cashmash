@@ -34,7 +34,17 @@
           <div class="score" id="playerScore">0</div>
         </div>
 
-        <div class="controls">
+        <div class="seat banker-seat">
+          <div class="label">BANKER</div>
+          <div class="hand" id="bankerHand">
+            <div class="card-slot card-placeholder"></div>
+            <div class="card-slot card-placeholder"></div>
+          </div>
+          <div class="score" id="bankerScore">0</div>
+        </div>
+      </div>
+
+      <div class="controls">
           <div class="bet-controls">
             <input id="betAmount" type="number" min="1" value="10" />
             <select id="betOn">
@@ -50,16 +60,6 @@
 
           <div class="result" id="resultText">Place your bet and deal.</div>
         </div>
-
-        <div class="seat banker-seat">
-          <div class="label">BANKER</div>
-          <div class="hand" id="bankerHand">
-            <div class="card-slot card-placeholder"></div>
-            <div class="card-slot card-placeholder"></div>
-          </div>
-          <div class="score" id="bankerScore">0</div>
-        </div>
-      </div>
 
       <div class="history" id="history"></div>
     </div>
