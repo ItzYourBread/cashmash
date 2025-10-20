@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Baccarat | CashMash</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/baccarat.css" />
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <section class="baccarat-section">
+    <div class="baccarat-header">
+      <div class="neon-title">CashMash Baccarat</div>
+    </div>
+
+    <div class="user-panel">
+      <div class="user-info">
+        <span>👤 <strong><%= user.username %></strong></span>
+        <span>💰 Chips: <strong id="balance"><%= user.chips %></strong></span>
+      </div>
+    </div>
+
+    <div class="baccarat-table">
+      
+      <div class="table-top">
+        <div class="seat player-seat">
+          <div class="label">PLAYER</div>
+          <div class="hand" id="playerHand">
+             <div class="card-slot card-placeholder"></div>
+             <div class="card-slot card-placeholder"></div>
+          </div>
+          <div class="score" id="playerScore">0</div>
+        </div>
+
+        <div class="controls">
+          <div class="bet-controls">
+            <input id="betAmount" type="number" min="1" value="10" />
+            <select id="betOn">
+              <option value="player">Bet Player (1:1)</option>
+              <option value="banker">Bet Banker (0.95:1)</option>
+              <option value="tie">Bet Tie (8:1)</option>
+            </select>
+          </div>
+
+          <div class="buttons">
+            <button id="dealBtn" class="btn gold big">Deal</button>
+          </div>
+
+          <div class="result" id="resultText">Place your bet and deal.</div>
+        </div>
+
+        <div class="seat banker-seat">
+          <div class="label">BANKER</div>
+          <div class="hand" id="bankerHand">
+            <div class="card-slot card-placeholder"></div>
+            <div class="card-slot card-placeholder"></div>
+          </div>
+          <div class="score" id="bankerScore">0</div>
+        </div>
+      </div>
+
+      <div class="history" id="history"></div>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+  <script src="/js/baccarat.js"></script>
+</body>
+</html>

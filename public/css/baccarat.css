@@ -1,0 +1,217 @@
+/* baccarat.css - CashMash Baccarat styling (theme matched) */
+
+/* Page + header */
+.baccarat-section {
+  text-align: center;
+  padding: 40px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.neon-title {
+  font-size: 2.6em;
+  font-weight: 700;
+  color: #f5c542;
+  text-shadow: 0 0 10px #f5c542, 0 0 20px #ffd966;
+  margin-bottom: 18px;
+  animation: pulseGlow 3s infinite;
+}
+
+@keyframes pulseGlow {
+  0%,100% { opacity:1; text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966; }
+  50% { opacity:0.85; text-shadow: 0 0 6px #f5c542; }
+}
+
+.user-panel { margin-bottom: 14px; }
+.user-info {
+  background: rgba(255,255,255,0.03);
+  padding: 8px 20px;
+  border-radius: 30px;
+  display: inline-flex;
+  gap: 18px;
+  align-items: center;
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+}
+
+/* Table wrapper */
+.baccarat-table {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(245,197,66,0.06);
+  padding: 18px;
+  border-radius: 14px;
+  max-width: 1080px;
+  width: 100%;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.45);
+  position: relative; /* Needed for absolute positioning if any */
+}
+
+/* Top area - player, controls, banker */
+.table-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+
+/* Seats */
+.seat {
+  flex: 1 1 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+}
+
+.label {
+  font-weight: 900;
+  color: #f5c542;
+  letter-spacing: 1px;
+}
+
+/* card hand */
+.hand {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px; /* Ensure space for cards */
+}
+
+/* Card Slot for Flipping */
+.card-slot {
+    width: 92px; /* Card width */
+    height: 138px; /* Card height - adjusted to be slightly taller for better look */
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s; /* The flip transition */
+    transform: rotateY(0deg); /* Initial state */
+    perspective: 1000px; /* For a 3D effect on the flip */
+}
+
+/* Card images inside the slot */
+.card {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+    backface-visibility: hidden; /* Crucial: Hides the back of the card during flip */
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.card-placeholder {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    box-shadow: none;
+}
+
+.card-slot:hover {
+    transform: rotateY(0deg) translateY(-6px); /* Still allow hover effect */
+}
+
+
+/* score badges */
+.score {
+  background: rgba(0,0,0,0.35);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 800;
+  color: #fff;
+  margin-top: 6px;
+  min-width: 44px;
+  text-align: center;
+}
+
+/* center controls */
+.controls {
+  flex: 0 0 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.bet-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#betAmount, #betOn {
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  font-size: 1em;
+}
+
+/* buttons */
+.buttons { display: flex; gap: 10px; justify-content: center; }
+.btn.gold.big {
+  padding: 12px 28px;
+  background: linear-gradient(135deg,#f5c542,#dca000);
+  color: #000b38;
+  border-radius: 30px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(245,197,66,0.15);
+}
+
+/* result text */
+.result {
+  color: #f5c542;
+  font-weight: 700;
+  margin-top: 6px;
+  min-height: 22px;
+}
+
+/* history row */
+.history {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ... (rest of history, result, media query styles are unchanged) */
+
+.history-badge {
+  display: inline-block;
+  margin: 3px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+.hist-player { background: #2196f3; }
+.hist-banker { background: #e53935; }
+.hist-tie { background: #ffc107; }
+
+
+/* small screens */
+@media (max-width: 900px) {
+  .table-top { flex-direction: column; align-items: stretch; }
+  .controls { order: 2; width: 100%; margin-top: 10px; }
+  .seat { width: 100%; align-items: center; }
+  .card-slot { width: 72px; height: 108px; } /* Smaller cards */
+  .btn.gold.big { width: 100%; }
+  #betAmount { width: 100px; }
+}
+
+@media (max-width: 480px) {
+  .card-slot { width: 56px; height: 84px; } /* Even smaller cards */
+  #betAmount { width: 80px; }
+  .neon-title { font-size: 1.6em; }
+  .controls { padding: 6px; }
+  .history-badge { font-size: 0.9em; padding: 6px 8px; }
+}

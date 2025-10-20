@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { spin } = require('../controllers/slotsController');
 const minesController = require('../controllers/minesController');
+const baccaratController = require("../controllers/baccaratController");
 
 // ensureAuth middleware (same as your earlier code)
 function ensureAuth(req, res, next) {
@@ -25,5 +26,11 @@ router.get('/mines', ensureAuth, (req, res) => {
 router.post('/mines/start', ensureAuth, minesController.start);
 router.post('/mines/reveal', ensureAuth, minesController.reveal);
 router.post('/mines/cashout', ensureAuth, minesController.cashout);
+
+router.get('/baccarat', ensureAuth, (req, res) => {
+  res.render('baccarat', { user: req.user });
+});
+
+router.post("/baccarat/play", baccaratController.playBaccarat);
 
 module.exports = router;
