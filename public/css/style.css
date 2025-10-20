@@ -211,6 +211,22 @@ footer {
   to { transform: translateY(0); opacity: 0.4; }
 }
 
+/* ===== User Panel ===== */
+.user-panel { margin-bottom: 20px; display: flex; justify-content: center; }
+
+.user-info {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 30px;
+  border-radius: 30px;
+  display: flex;
+  gap: 40px;
+  font-size: 1.1em;
+  font-weight: 500;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(245,197,66,0.15);
+}
+
 
 /* ==========================================
    RESPONSIVE

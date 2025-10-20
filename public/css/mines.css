@@ -1,0 +1,218 @@
+.mines-section {
+  text-align: center;
+  padding: 40px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.neon-title {
+  font-size: 3em;
+  font-weight: 700;
+  color: #f5c542;
+  text-shadow: 0 0 10px #f5c542, 0 0 20px #f5c542, 0 0 40px #ffd966;
+  animation: pulseGlow 3s infinite;
+}
+
+.mine-header { margin-bottom: 25px; }
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966; }
+  50% { opacity: 0.8; text-shadow: 0 0 5px #f5c542, 0 0 10px #fff; }
+}
+
+.mines-game {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 25px;
+  border-radius: 20px;
+  max-width: 600px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+}
+
+.game-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.bet-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.bet-controls input, .bet-controls select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 1em;
+  width: 80px;
+  text-align: center;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn.gold {
+  background: linear-gradient(135deg, #f5c542, #dca000);
+  color: #000;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn.gold:hover {
+  background: #fff;
+  color: #000;
+  box-shadow: 0 0 20px rgba(245,197,66,0.4);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  justify-content: center;
+}
+
+.tile {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #141b2f, #0a0f1f);
+  border: 2px solid #f5c54233;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #f5c542;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.tile:hover {
+  transform: scale(1.05);
+  background: linear-gradient(145deg, #1c2442, #0f162c);
+}
+
+.tile.safe {
+  background: linear-gradient(145deg, #1f3a20, #102913);
+  border-color: #00ff9066;
+  color: #fff;
+}
+
+.tile.mine {
+  background: linear-gradient(145deg, #411717, #2b0e0e);
+  color: #ff4b4b;
+  border-color: #ff000066;
+}
+
+.status {
+  color: #f5c542;
+  font-weight: 600;
+  margin-top: 15px;
+  font-size: 1.1em;
+}
+
+/* ==========================================
+   Popup Message (Same feel as slot pop)
+   ========================================== */
+.popup-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: rgba(245, 197, 66, 0.1);
+  border: 1px solid rgba(245, 197, 66, 0.3);
+  padding: 12px 20px;
+  border-radius: 10px;
+  color: #f5c542;
+  font-size: 1.1em;
+  font-weight: 600;
+  text-shadow: 0 0 10px #f5c542;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 10;
+}
+
+.popup-message.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+
+/* ==========================================
+   MOBILE OPTIMIZATION (< 600px)
+   ========================================== */
+@media (max-width: 600px) {
+
+  /* Section + Layout adjustments */
+  .mines-section {
+    padding: 20px 5px;
+  }
+
+  .neon-title {
+    font-size: 2em;
+  }
+
+  .mines-game {
+    padding: 15px;
+    border-radius: 15px;
+    max-width: 95%;
+  }
+
+  .game-controls {
+    gap: 10px;
+  }
+
+  .bet-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .bet-controls input,
+  .bet-controls select {
+    width: 100%;
+    font-size: 0.9em;
+    padding: 8px;
+  }
+
+  .buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn.gold {
+    width: 100%;
+    font-size: 1em;
+    padding: 10px;
+  }
+
+  /* Grid shrink */
+  .grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+
+  .tile {
+    width: 55px;
+    height: 55px;
+    font-size: 24px;
+    border-radius: 10px;
+  }
+
+  .status {
+    font-size: 1em;
+    margin-top: 10px;
+  }
+}

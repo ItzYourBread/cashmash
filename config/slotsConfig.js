@@ -1,19 +1,19 @@
 const slotsConfig = {
-  SlotsClassic: {
+  ClassicSlot: {
     symbols: [
       // Low-paying symbols (high frequency, low or negative return)
-      { name: 'cherry', file: '/images/SlotsClassic/cherry.png', multiplier: 1 },
-      { name: 'lemon', file: '/images/SlotsClassic/lemon.png', multiplier: 1 },    
-      { name: 'orange', file: '/images/SlotsClassic/orange.png', multiplier: 1.5 },
-      { name: 'watermelon', file: '/images/SlotsClassic/watermelon.png', multiplier: 2 },
+      { name: 'cherry', file: '/images/ClassicSlot/cherry.png', multiplier: 1 },
+      { name: 'lemon', file: '/images/ClassicSlot/lemon.png', multiplier: 1 },    
+      { name: 'orange', file: '/images/ClassicSlot/orange.png', multiplier: 1.5 },
+      { name: 'watermelon', file: '/images/ClassicSlot/watermelon.png', multiplier: 2 },
       
       // High-paying symbols (low frequency, high return)
-      { name: 'grapes', file: '/images/SlotsClassic/grapes.png', multiplier: 4 },
-      { name: 'star', file: '/images/SlotsClassic/star.png', multiplier: 5 },
-      { name: 'red7', file: '/images/SlotsClassic/red7.png', multiplier: 12 },
-      { name: 'diamond', file: '/images/SlotsClassic/diamond.png', multiplier: 8 },
-      { name: 'bar', file: '/images/SlotsClassic/bar.png', multiplier: 20 },
-      { name: 'jackpot', file: '/images/SlotsClassic/jackpot.png', multiplier: 100 },
+      { name: 'grapes', file: '/images/ClassicSlot/grapes.png', multiplier: 4 },
+      { name: 'star', file: '/images/ClassicSlot/star.png', multiplier: 5 },
+      { name: 'red7', file: '/images/ClassicSlot/red7.png', multiplier: 12 },
+      { name: 'diamond', file: '/images/ClassicSlot/diamond.png', multiplier: 8 },
+      { name: 'bar', file: '/images/ClassicSlot/bar.png', multiplier: 20 },
+      { name: 'jackpot', file: '/images/ClassicSlot/jackpot.png', multiplier: 100 },
     ],
 
     reels: 5,
@@ -22,16 +22,16 @@ const slotsConfig = {
     // Chance configuration: Total weight is 143.
     // Cherry and Lemon now account for over 70% of the weights to force a win frequency near 35%.
     symbolChances: {
-      cherry: 60,       // Highest chance, very low payout
-      lemon: 40,        // High chance, break-even payout
-      orange: 15,
-      watermelon: 8,
-      grapes: 6,
-      star: 5,
-      red7: 3,
-      diamond: 3,
-      bar: 2,
-      jackpot: 1        // Lowest chance for max profit on the big prize
+      cherry: 50,       // Highest chance, very low payout
+      lemon: 30,        // High chance, break-even payout
+      orange: 17,
+      watermelon: 9,
+      grapes: 7,
+      star: 6,
+      red7: 4,
+      diamond: 4,
+      bar: 3,
+      jackpot: 2        // Lowest chance for max profit on the big prize
     },
 
     // slotsConfig.js - Complete Legit Paylines Array
@@ -64,4 +64,4 @@ const slotsConfig = {
   }
 };
 
-export default slotsConfig;
+module.exports = slotsConfig;
