@@ -4,6 +4,8 @@ const router = express.Router();
 const { spin } = require('../controllers/slotsController');
 const minesController = require('../controllers/minesController');
 const baccaratController = require("../controllers/baccaratController");
+const blackjackController = require('../controllers/blackjackController');
+
 
 // ensureAuth middleware (same as your earlier code)
 function ensureAuth(req, res, next) {
@@ -32,5 +34,14 @@ router.get('/baccarat', ensureAuth, (req, res) => {
 });
 
 router.post("/baccarat/play", baccaratController.playBaccarat);
+
+
+router.get('/blackjack', ensureAuth, (req, res) => {
+  res.render('blackjack', { user: req.user });
+});
+
+router.get('/blackjack/start', blackjackController.startGame);
+router.post('/blackjack/hit', blackjackController.hit);
+router.post('/blackjack/stand', blackjackController.stand);
 
 module.exports = router;
