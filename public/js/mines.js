@@ -6,8 +6,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const profitDisplay = document.getElementById("profitDisplay");
     const cashOutBtn = document.getElementById("cashOutBtn");
     const newGameBtn = document.getElementById("newGameBtn");
-    const balanceDisplay = document.getElementById("balance"); // 🪙 Your correct ID
+    const balanceDisplay = document.getElementById("balance");
     const popupMessage = document.getElementById('popupMessage');
+
+    // --- Image paths ---
+    const MINE_IMAGE = "images/Mines/bomb.png";
+    const SAFE_IMAGE = "images/Mines/green-diamond.png";
+    const UNREVEALED_TEXT = "❔"; // Keeping text for unrevealed, as no image was provided for it.
+    // -------------------
 
     function showPopup(message, duration = 1500) {
         popupMessage.textContent = message;
@@ -30,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
         for (let i = 0; i < 25; i++) {
             const tile = document.createElement("div");
             tile.classList.add("tile", "disabled");
-            tile.textContent = "❔";
+            tile.textContent = UNREVEALED_TEXT;
             grid.appendChild(tile);
         }
     }
@@ -39,6 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // ⚡ Update balance display smoothly
     function updateBalanceDisplay() {
         balanceDisplay.textContent = balance.toFixed(2);
+    }
+
+    // Function to set the content of a tile to an image
+    function setTileImage(tile, src) {
+        tile.innerHTML = `<img src="${src}" alt="Tile Content" style="width: 80%; height: 80%; object-fit: contain;">`;
     }
 
     // 🎮 Start Game
@@ -64,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
             balance -= bet;
             updateBalanceDisplay();
 
-            showPopup("🎮 Game Started!");
+            showPopup("Game Started!");
 
             // ✅ Reset state
             gameId = data.gameId;
@@ -74,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
             multiplierDisplay.textContent = "1.00x";
             profitDisplay.textContent = "0";
             cashOutBtn.disabled = false;
-            newGameBtn.textContent = "🎮 In Progress...";
+            newGameBtn.textContent = "In Progress...";
             newGameBtn.disabled = true;
 
             // Unlock grid
@@ -83,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
             for (let i = 0; i < data.gridSize; i++) {
                 const tile = document.createElement("div");
                 tile.classList.add("tile");
+                tile.textContent = UNREVEALED_TEXT; // Initial unrevealed look
                 tile.addEventListener("click", () => revealTile(i, tile));
                 grid.appendChild(tile);
                 tiles.push(tile);
@@ -107,16 +119,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!data.ok) {
                 if (data.hitMine) {
-                    // 💣 Hit mine
+                    // 💣 Hit mine - USE BOMB IMAGE
                     tile.classList.add("mine");
-                    tile.textContent = "💣";
+                    setTileImage(tile, MINE_IMAGE);
                     revealAllMines(data.mines);
                     gameActive = false;
                     cashOutBtn.disabled = true;
-                    newGameBtn.textContent = "🔄 Next Game";
+                    newGameBtn.textContent = "Next Game";
                     newGameBtn.disabled = false;
                     grid.classList.add("locked");
-showPopup("💥 Boom! You hit a mine!");
+                    showPopup("Boom! You hit a mine!");
                     updateBalanceDisplay();
                 } else {
                     alert(data.error);
@@ -124,9 +136,9 @@ showPopup("💥 Boom! You hit a mine!");
                 return;
             }
 
-            // Safe click
+            // Safe click - USE SAFE IMAGE (green diamond)
             tile.classList.add("safe");
-            tile.textContent = "💎";
+            setTileImage(tile, SAFE_IMAGE);
             multiplier = data.multiplier;
             updateStats();
         } catch (err) {
@@ -147,7 +159,8 @@ showPopup("💥 Boom! You hit a mine!");
         mines.forEach(i => {
             if (tiles[i].classList.contains("safe")) return;
             tiles[i].classList.add("mine");
-            tiles[i].textContent = "💣";
+            // Set image for all unrevealed mines
+            setTileImage(tiles[i], MINE_IMAGE);
         });
     }
 
@@ -168,10 +181,10 @@ showPopup("💥 Boom! You hit a mine!");
             balance += data.winnings;
             updateBalanceDisplay();
 
-            showPopup(`💰 You Cashed Out ${data.winnings} chips!!`);
+            showPopup(`You Cashed Out ${data.winnings} chips!!`);
             gameActive = false;
             cashOutBtn.disabled = true;
-            newGameBtn.textContent = "🔄 Next Game";
+            newGameBtn.textContent = "Next Game";
             newGameBtn.disabled = false;
             grid.classList.add("locked");
         } catch (err) {
