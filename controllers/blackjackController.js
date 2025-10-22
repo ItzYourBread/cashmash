@@ -34,18 +34,20 @@ function createDeck() {
 
 // --- Global game state per session (simple in-memory) ---
 let gameState = {}; 
-// (for production: replace with user-session or Redis based game state)
 
 // --- Start Game ---
 exports.startGame = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     const bet = parseFloat(req.body.bet);
-    // ... validation ...
+    
+    // Validation
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (isNaN(bet) || bet <= 0) return res.status(400).json({ message: 'Invalid bet amount' });
+    if (bet > user.chips) return res.status(400).json({ message: 'Insufficient chips' });
 
     // Deduct bet from user
     user.chips -= bet;
-    // NOTE: Save is delayed until the end to ensure all chip operations are grouped.
 
     // Create new deck and deal cards
     const deck = createDeck();
@@ -62,33 +64,58 @@ exports.startGame = async (req, res) => {
     };
 
     const playerScore = calculateScore(playerHand);
-    const dealerScore = getCardValue(dealerHand[0]);
+    const dealerScore = calculateScore(dealerHand); // Calculate full dealer score for checks
     let result = null;
-    let balanceChange = 0; // For immediate chip refund/payout
 
-    // Check for immediate Player Blackjack
+    // Check for immediate Blackjack
     if (playerScore === 21 && playerHand.length === 2) {
-      // Blackjack Payout (2.5x total return, so 1.5x win)
-      const payout = bet * 2.5; 
-      user.chips += payout;
-      result = 'Blackjack! You win 💰';
-      gameState[req.user._id].gameOver = true;
-      gameState[req.user._id].result = result;
-      // balanceChange for logging/immediate display if needed
+        let dealerHiddenCardRevealed = false;
+        
+        if (dealerScore === 21) {
+            // Push (Player and Dealer Blackjack)
+            user.chips += bet; // Refund bet
+            result = 'Push: Both Blackjack 🤝';
+            gameState[req.user._id].gameOver = true;
+            dealerHiddenCardRevealed = true;
+        } else {
+            // Player Blackjack Win (1.5x profit, 2.5x total return)
+            const payout = bet * 2.5; 
+            user.chips += payout;
+            result = 'Blackjack! You win 💰';
+            gameState[req.user._id].gameOver = true;
+            dealerHiddenCardRevealed = true; // Dealer reveals card
+        }
+        gameState[req.user._id].result = result;
+        
+        // If game ended, return full dealer hand
+        if (gameState[req.user._id].gameOver) {
+            await user.save();
+            delete gameState[req.user._id]; // Clear state immediately
+            return res.json({
+                playerHand,
+                dealerHand, // Full hand revealed
+                playerScore,
+                dealerScore,
+                balance: user.chips,
+                result
+            });
+        }
     }
 
-    await user.save(); // Save after bet deduction and potential blackjack payout
+    await user.save(); // Save after bet deduction
 
     res.json({
       playerHand,
-      dealerHand: [dealerHand[0], { hidden: true }],
+      // Return the second dealer card marked as hidden for the frontend
+      dealerHand: [dealerHand[0], { rank: dealerHand[1].rank, suit: dealerHand[1].suit, hidden: true }],
       playerScore,
-      dealerScore,
+      dealerScore: getCardValue(dealerHand[0]), // Only show the value of the visible card
       balance: user.chips,
       result // Send the immediate result (Blackjack) to the frontend
     });
   } catch (err) {
-// ... error handling ...
+    console.error('Start error:', err);
+    res.status(500).json({ message: 'Error starting game' });
   }
 };
 
@@ -102,16 +129,27 @@ exports.hit = async (req, res) => {
     const { deck, playerHand } = state;
     playerHand.push(deck.pop());
     const playerScore = calculateScore(playerHand);
+    
+    let result = null;
+    let newBalance = null;
 
     if (playerScore > 21) {
-      state.result = 'Bust! Dealer Wins!';
+      state.result = 'Bust! Dealer Wins ❌';
       state.gameOver = true;
+      result = state.result;
+      
+      // Since game is over (Bust), save and clear state
+      const user = await User.findById(req.user._id);
+      newBalance = user.chips; // Chip deduction already happened in startGame (no refund)
+      await user.save();
+      delete gameState[req.user._id];
     }
 
     res.json({
       playerHand,
       playerScore,
-      result: state.gameOver ? state.result : null
+      result,
+      balance: newBalance
     });
   } catch (err) {
     res.status(500).json({ message: 'Error hitting card' });
@@ -123,63 +161,62 @@ exports.stand = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     const state = gameState[req.user._id];
-    // ... validation ...
+
+    if (!state || state.gameOver)
+        return res.status(400).json({ message: 'Game not active or already finished' });
+    
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     let { deck, playerHand, dealerHand, bet } = state;
 
     let dealerScore = calculateScore(dealerHand);
-    const playerScore = calculateScore(playerHand);
-    const playerHasBlackjack = (playerScore === 21 && playerHand.length === 2); // Should only be true if not caught in startGame
+    const finalPlayerScore = calculateScore(playerHand);
 
     // Dealer hits until 17+
     while (dealerScore < 17) {
       dealerHand.push(deck.pop());
       dealerScore = calculateScore(dealerHand);
     }
-
-    // Recalculate player score after dealer play (in case of server-side re-check)
-    const finalPlayerScore = calculateScore(playerHand);
-
-    let payout = 0;
+    
+    let amountToReturn = 0;
     let result = '';
 
     if (finalPlayerScore > 21) {
+      // This should have been caught in hit() but is a safety check
       result = 'You bust! Dealer wins ❌';
     } else if (dealerScore > 21) {
       result = 'Dealer busts! You win 💰';
-      // Regular win payout
-      payout = bet * 2; 
+      amountToReturn = bet * 2; // Win: Return original bet (1x) + Profit (1x)
     } else if (finalPlayerScore > dealerScore) {
       result = 'You win 💰';
-      // Regular win payout (should use 2x because we didn't check playerHasBlackjack here)
-      payout = bet * 2; 
+      amountToReturn = bet * 2; // Win: Return original bet (1x) + Profit (1x)
     } else if (finalPlayerScore < dealerScore) {
       result = 'Dealer wins ❌';
+      amountToReturn = 0; // Loss: Original bet is already deducted
     } else { // Push
       result = 'Push 🤝';
-      payout = bet; // Refund bet
+      amountToReturn = bet * 1; // Push: Refund original bet
     }
     
-    // Apply payout
-    if (payout > 0) {
-      user.chips += payout;
-    }
+    // Apply payout/refund (amountToReturn includes the original bet)
+    user.chips += amountToReturn;
     
-    // Save state
+    // Save state and clear
     state.gameOver = true;
     state.result = result;
-
-    await user.save(); // Save changes to chips
+    await user.save(); 
+    delete gameState[req.user._id]; // Clear state after round end
 
     res.json({
-      dealerHand,
+      dealerHand, // Full, final dealer hand
       dealerScore,
       playerScore: finalPlayerScore,
       result,
-      payout,
+      payout: amountToReturn,
       balance: user.chips
     });
   } catch (err) {
-// ... error handling ...
+    console.error('Stand error:', err);
+    res.status(500).json({ message: 'Error during stand/dealer play' });
   }
 };

@@ -24,7 +24,6 @@ let currentBet = 0;
 let balance = parseFloat(balanceEl.textContent) || 0; 
 
 // --- UTILITY: Server Endpoint Configuration ---
-// NOTE: These endpoints must be correctly set up in your Express router
 const API_URL = '/blackjack';
 const ENDPOINTS = {
     start: `${API_URL}/start`,
@@ -36,10 +35,7 @@ const ENDPOINTS = {
 // --------------------------------------------------
 // CARD / SCORE UTILS (Kept for local display purposes)
 // --------------------------------------------------
-// NOTE: createDeck function is no longer needed on the frontend.
-
 function cardValue(card) {
-  // Frontend cards from backend use 'rank' and 'suit', not 'val' and 'suit'
   const val = card.rank || card.val; 
   if (['J','Q','K'].includes(val)) return 10;
   if (val === 'A') return 11;
@@ -57,21 +53,18 @@ function calcScore(cards) {
 }
 
 function getCardFilename(card) {
-  // Convert backend format (rank/suit) to filename format
   const v = { J: 'jack', Q: 'queen', K: 'king', A: 'ace' }[card.rank || card.val] || (card.rank || card.val);
-  const s = card.suit.toLowerCase(); // Backend suits are 'hearts', 'spades', etc.
+  const s = card.suit.toLowerCase();
   return `${v}_of_${s}.svg`;
 }
 
 // --------------------------------------------------
-// RENDER
+// RENDER (FIXED)
 // --------------------------------------------------
-// ... (renderCard function remains the same) ...
 function renderCard(card, container, hidden = false, delay = 0) {
   const div = document.createElement('div');
   div.classList.add('card');
   
-  // Flag for placeholder cards (mostly for initial table setup)
   if (card.placeholder) div.classList.add('placeholder-card'); 
 
   const inner = document.createElement('div');
@@ -84,32 +77,37 @@ function renderCard(card, container, hidden = false, delay = 0) {
 
   const front = document.createElement('div');
   front.classList.add('card-front');
-  
-  // Handle hidden cards from the backend
-  if (card.hidden) {
-    div.classList.add('hidden-dealer-card');
-  } else if (!card.placeholder) {
-    front.innerHTML = `<img src="/images/playing-cards/${getCardFilename(card)}" alt="${card.rank} of ${card.suit}">`;
-  }
   inner.appendChild(front);
+
+  // 🚨 FIX: Set the image source for all non-placeholder cards
+  if (!card.placeholder) {
+    const filename = getCardFilename(card);
+    front.innerHTML = `<img src="/images/playing-cards/${filename}" alt="${card.rank} of ${card.suit}">`;
+  }
+
+  // 🚨 FIX: Handle hidden cards (should only be the dealer's initial second card)
+  // If the server explicitly marks it as hidden, or if 'hidden' flag is passed (for initial dealer card)
+  if (card.hidden || hidden) {
+    div.classList.add('hidden-dealer-card');
+  }
 
   container.appendChild(div);
 
   setTimeout(() => {
-    if (!hidden && !card.hidden) div.classList.add('flipped');
+    // 🚨 FIX: Flip the card only if it's NOT supposed to be hidden
+    if (!card.hidden && !hidden) div.classList.add('flipped');
   }, delay);
+  
+  return div; // Return the card element for later use (like flipping hidden card)
 }
 
 
 // --------------------------------------------------
-// SCORE / BALANCE DISPLAY
+// SCORE / BALANCE DISPLAY (Remains the same)
 // --------------------------------------------------
 function updateScores(hideDealer = true) {
-  // Use local card arrays for display score
   playerScoreEl.textContent = `Player: ${calcScore(playerCards)}`;
   
-  // NOTE: Dealer score calculation is simplified here for display purposes.
-  // The backend determines the true, final dealer score.
   if (hideDealer) {
     const visibleCard = dealerCards.find(c => !c.hidden);
     const visibleScore = visibleCard ? cardValue(visibleCard) : '?';
@@ -119,15 +117,13 @@ function updateScores(hideDealer = true) {
   }
 }
 
-// ⚠️ IMPORTANT: updateBalanceDisplay is simplified as the backend is authoritative
 function updateBalanceDisplay(newBalance) {
   balance = parseFloat(newBalance.toFixed(2));
   balanceEl.textContent = balance;
-  // NOTE: Removed balance glow class toggling and timeout
 }
 
 // --------------------------------------------------
-// MAIN GAME FLOW
+// MAIN GAME FLOW (Remains the same)
 // --------------------------------------------------
 placeBetBtn.onclick = () => {
   const bet = parseFloat(betAmountEl.value);
@@ -135,27 +131,22 @@ placeBetBtn.onclick = () => {
     resultText.textContent = 'Invalid bet amount.';
     return;
   }
-  // No need to check balance here, the backend will handle the final validation.
   currentBet = bet;
   resultText.textContent = `Bet set to: ${bet} 💰. Click Deal.`;
   dealBtn.disabled = false;
 };
 
-// --------------------------------------------------
-// DEAL CARDS (Now initiates the game via API)
-// --------------------------------------------------
+// DEAL CARDS (Remains the same)
 dealBtn.onclick = async () => {
   if (currentBet <= 0) {
     resultText.textContent = 'Place your bet first.';
     return;
   }
 
-  // UI Setup
   dealerHand.innerHTML = '';
   playerHand.innerHTML = '';
   resultText.textContent = 'Contacting server...';
   
-  // Disable buttons while waiting for API
   hitBtn.disabled = true;
   standBtn.disabled = true;
   dealBtn.disabled = true;
@@ -170,32 +161,28 @@ dealBtn.onclick = async () => {
     const data = await response.json();
 
     if (response.status !== 200) {
-      // Re-enable bet if start failed (e.g., insufficient funds)
       resultText.textContent = data.message || 'Error starting game.';
       dealBtn.disabled = false;
       return;
     }
 
-    // Update local state from server
     playerCards = data.playerHand;
     dealerCards = data.dealerHand;
-    updateBalanceDisplay(data.balance); // Deducted bet is reflected here
+    updateBalanceDisplay(data.balance);
     gameActive = true;
 
     resultText.textContent = 'Dealing...';
 
     // Render cards based on server state
-    // Dealer's second card is marked { hidden: true } by the server
+    // Note: data.dealerHand[1] should have { hidden: true } from the server
     renderCard(playerCards[0], playerHand, false, 200);
     renderCard(dealerCards[0], dealerHand, false, 500);
     renderCard(playerCards[1], playerHand, false, 800);
-    renderCard(dealerCards[1], dealerHand, true, 1100);
+    renderCard(dealerCards[1], dealerHand, true, 1100); // Pass true to use local 'hidden-dealer-card' class
 
     setTimeout(() => {
         updateScores(true);
-        // Check for immediate Blackjack (handled by backend logic now)
         if (data.result) {
-             // result will be set to 'Blackjack! You win 💰' if applicable
             endGame(data.result, data.result.includes('win') ? 'win' : 'loss', data.balance);
         } else {
             resultText.textContent = 'Hit or Stand?';
@@ -211,9 +198,7 @@ dealBtn.onclick = async () => {
   }
 };
 
-// --------------------------------------------------
-// PLAYER ACTIONS (Now call API)
-// --------------------------------------------------
+// PLAYER ACTIONS (Remains the same)
 hitBtn.onclick = async () => {
   if (!gameActive) return;
 
@@ -231,17 +216,14 @@ hitBtn.onclick = async () => {
       return;
     }
 
-    // Add the new card to local state and render it
     const newCard = data.playerHand[data.playerHand.length - 1];
     playerCards.push(newCard);
     renderCard(newCard, playerHand, false, 150);
     updateScores(true);
 
     if (data.result) {
-      // Game over (Bust)
-      endGame(data.result, 'loss'); // Backend only returns 'Bust!' on loss
+      endGame(data.result, 'loss', data.balance); // Pass balance for immediate bust/end
     } else {
-      // Game continues
       hitBtn.disabled = false;
       standBtn.disabled = false;
     }
@@ -273,13 +255,21 @@ standBtn.onclick = async () => {
     // Flip the hidden dealer card
     const hiddenCardEl = dealerHand.querySelector('.hidden-dealer-card');
     if (hiddenCardEl) {
+        // Find the index of the hidden card (should be the second card)
+        const hiddenCardIndex = dealerCards.findIndex(c => c.hidden);
+        
+        // Update local dealerCards state *before* flipping
+        // The server response `data.dealerHand` contains the now-revealed card.
+        dealerCards = data.dealerHand;
+        
+        // Remove the hidden class and add the flipped class
         hiddenCardEl.classList.remove('hidden-dealer-card');
-        hiddenCardEl.classList.add('flipped');
+        setTimeout(() => hiddenCardEl.classList.add('flipped'), 10);
+        
+        // Update score now that the first two cards are visible
+        updateScores(false); 
     }
     
-    // Update local dealer cards to show the flipped card and any subsequent hits
-    dealerCards = data.dealerHand; 
-
     // Animate the dealer's play and then end the game
     await playDealerSequence(data);
 
@@ -291,38 +281,45 @@ standBtn.onclick = async () => {
 };
 
 // --------------------------------------------------
-// DEALER LOGIC (Mostly for animation now)
+// DEALER LOGIC (FIXED)
 // --------------------------------------------------
 async function playDealerSequence(data) {
-    const initialDealerCount = dealerCards.length;
-    let currentCardsToRender = initialDealerCount;
+    // We already rendered the first two cards. Start rendering from the third card (index 2).
+    const startRenderIndex = 2; 
+
+    // data.dealerHand is the FINAL array of dealer cards from the server
+    const newCards = data.dealerHand.slice(startRenderIndex);
+    
+    // Update local state (already done in standBtn.onclick, but safe to re-assign)
+    dealerCards = data.dealerHand; 
 
     const loop = (i) => new Promise(resolve => {
-        if (i >= data.dealerHand.length) {
-            resolve(); // All cards rendered
+        if (i >= newCards.length) {
+            resolve(); // All new cards rendered
             return;
         }
 
-        const newCard = data.dealerHand[i];
-        renderCard(newCard, dealerHand, false, 200);
+        const cardToRender = newCards[i];
         
-        // Use the final score from the backend for the score display update
-        dealerScoreEl.textContent = `Dealer: ${data.dealerScore}`;
+        // 🚨 FIX: Render the card. It will automatically flip due to renderCard fix.
+        renderCard(cardToRender, dealerHand, false, 200); 
+        
+        // Update score for each hit
+        dealerScoreEl.textContent = `Dealer: ${calcScore(dealerCards.slice(0, startRenderIndex + i + 1))}`;
 
         setTimeout(() => {
             loop(i + 1).then(resolve);
         }, 800); // Wait for card flip animation
     });
 
-    // Start rendering from the 3rd card (index 2), as the first two are already drawn
-    await loop(initialDealerCount); 
+    await loop(0); // Start the loop for the new cards
     
     // Once the dealer's turn is complete, finalize the round
     endGame(data.result, data.result.includes('win') ? 'win' : data.result.includes('loss') ? 'loss' : 'push', data.balance);
 }
 
 // --------------------------------------------------
-// END GAME + PAYOUTS (Payout is now handled by backend)
+// END GAME + PAYOUTS (Remains the same)
 // --------------------------------------------------
 function endGame(message, resultType, newBalance) {
   gameActive = false;
@@ -330,33 +327,26 @@ function endGame(message, resultType, newBalance) {
   standBtn.disabled = true;
   dealBtn.disabled = false;
   
-  // Show final scores
   updateScores(false); 
 
-  // Update balance with the authoritative figure from the last API call
   if (newBalance !== undefined) {
     updateBalanceDisplay(newBalance);
   }
 
-  // Current bet is reset regardless of outcome, as the round is over
   currentBet = 0; 
   
-  // Display result message
   resultText.classList.remove('show-result');
-  void resultText.offsetWidth; // restart animation
+  void resultText.offsetWidth;
   resultText.textContent = message;
   resultText.classList.add('show-result');
 }
 
 // --------------------------------------------------
-// INITIALIZATION
+// INITIALIZATION (Remains the same)
 // --------------------------------------------------
 function initializeTable() {
-    // ... (same as before) ...
-    // Create a dummy card object that the renderer can use to draw the back face
     const dummyCard = { rank: 'D', suit: 'D', placeholder: true }; 
     
-    // Clear hands (in case it runs after a game)
     dealerHand.innerHTML = '';
     playerHand.innerHTML = '';
     
@@ -368,13 +358,11 @@ function initializeTable() {
     renderCard(dummyCard, dealerHand, true, 200);
     renderCard(dummyCard, dealerHand, true, 300);
 
-    // Reset scores to 0
     dealerScoreEl.textContent = `Dealer: 0`;
     playerScoreEl.textContent = `Player: 0`;
-    dealBtn.disabled = true; // Wait for bet
+    dealBtn.disabled = true;
     hitBtn.disabled = true;
     standBtn.disabled = true;
 }
 
-// Run initialization when the script loads
 initializeTable();
