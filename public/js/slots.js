@@ -98,16 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const finalSymbols = data.finalSymbols;
 
       // High-Frequency Flicker Pool (The Illusion)
-      const highFrequencyFiles = [
-        '/images/ClassicSlot/cherry.png',
-        '/images/ClassicSlot/lemon.png',
-        '/images/ClassicSlot/orange.png',
-        '/images/ClassicSlot/watermelon.png'
+      const flickerPool = [
+        '/images/ClassicSlot/bar.png', 
+        '/images/ClassicSlot/diamond.png', 
+        '/images/ClassicSlot/jackpot.png',
+        '/images/ClassicSlot/red7.png',
       ];
-      // Weighted pool: 4 copies of common symbols + 1 copy of high value symbols
-      const flickerPool = [...highFrequencyFiles, ...highFrequencyFiles, ...highFrequencyFiles, ...highFrequencyFiles];
-      const highValueFiles = finalSymbols.flat().filter(s => s.multiplier >= 4).map(s => s.file);
-      highValueFiles.forEach(file => flickerPool.push(file));
+      finalSymbols.flat().forEach(s => {
+          if (s.multiplier > 1) flickerPool.push(s.file);
+      });
 
 
       reels.forEach((col, colIdx) => {
@@ -187,13 +186,13 @@ document.addEventListener('DOMContentLoaded', () => {
       line.forEach((rowIdx, colIdx) => {
         const colElement = reelCols[colIdx];
         const colRect = colElement.getBoundingClientRect();
-        
+
         // X coordinate: Column center, relative to container
         const x = (colRect.left - containerRect.left) + (colRect.width / 2);
-        
+
         // Y coordinate: Row center, adjusted for container/image start
         const y = (rowIdx * (imgHeight + gap)) + (imgHeight / 2) + gap / 2;
-        
+
         if (colIdx === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       });

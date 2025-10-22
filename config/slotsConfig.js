@@ -22,16 +22,16 @@ const slotsConfig = {
     // Chance configuration: Total weight is 143.
     // Cherry and Lemon now account for over 70% of the weights to force a win frequency near 35%.
     symbolChances: {
-      cherry: 50,       // Highest chance, very low payout
+      cherry: 1000,       // Highest chance, very low payout
       lemon: 30,        // High chance, break-even payout
-      orange: 17,
-      watermelon: 9,
-      grapes: 7,
-      star: 6,
-      red7: 4,
-      diamond: 4,
-      bar: 3,
-      jackpot: 2        // Lowest chance for max profit on the big prize
+      orange: 20,
+      watermelon: 10,
+      grapes: 9,
+      star: 8,
+      red7: 5,
+      diamond: 5,
+      bar: 4,
+      jackpot: 3        // Lowest chance for max profit on the big prize
     },
 
     // slotsConfig.js - Complete Legit Paylines Array

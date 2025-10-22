@@ -1,6 +1,5 @@
 // controllers/slotsController.js
 const slotsConfig = require('../config/slotsConfig.js');
-const GameHistory = require('../models/GameHistory');
 const User = require('../models/User');
 
 const slotType = 'ClassicSlot';
@@ -63,16 +62,6 @@ exports.spin = async (req, res) => {
     // Update user's chips (deduct bet then add winnings)
     user.chips = (user.chips - bet) + totalWin;
     await user.save();
-
-    // Save history
-    await GameHistory.create({
-      userId: user._id,
-      bet,
-      resultMatrix: finalSymbols.map(col => col.map(s => s.name)),
-      winningLines,
-      winnings: totalWin,
-      gameType: slotType
-    });
 
     // Response to client: finalSymbols (filenames), winnings, new balance, winningLines
     return res.json({

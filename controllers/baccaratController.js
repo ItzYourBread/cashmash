@@ -1,4 +1,5 @@
 // controllers/baccaratController.js
+const User = require('../models/User'); // 👈 ADDED: Import User model
 
 // Card and point logic
 const suits = ["hearts", "diamonds", "clubs", "spades"];
@@ -10,7 +11,7 @@ const cardValues = {
   "10": 0, "jack": 0, "queen": 0, "king": 0
 };
 
-// Helper: create unshuffled deck
+// Helper: create unshuffled deck (Remains the same)
 function generateDeck() {
   const deck = [];
   for (const suit of suits) {
@@ -18,16 +19,16 @@ function generateDeck() {
       deck.push({ rank, suit, file: `${rank}_of_${suit}.svg`, value: cardValues[rank] });
     }
   }
-  return deck; // No shuffle needed as we will manually select cards
+  return deck;
 }
 
-// Calculate total points (mod 10)
+// Calculate total points (mod 10) (Remains the same)
 function calculatePoints(hand) {
   const total = hand.reduce((sum, card) => sum + card.value, 0);
   return total % 10;
 }
 
-// Baccarat draw rule logic (kept for completeness, but largely bypassed by manipulation)
+// Baccarat draw rule logic (Remains the same)
 function drawThirdCardRule(playerPoints, bankerPoints, playerThirdCard) {
   let playerDraws = playerPoints <= 5;
 
@@ -46,9 +47,8 @@ function drawThirdCardRule(playerPoints, bankerPoints, playerThirdCard) {
   return { playerDraws, bankerDraws };
 }
 
-// Helper function to create a dummy card for manipulation
+// Helper function to create a dummy card for manipulation (Remains the same)
 function createDummyCard(pointValue) {
-    // Finds a card that matches the desired point value (e.g., 'ace' for 1, '10' for 0)
     const rank = Object.keys(cardValues).find(key => cardValues[key] === pointValue);
     const suit = suits[Math.floor(Math.random() * suits.length)];
     return { 
@@ -62,7 +62,25 @@ function createDummyCard(pointValue) {
 // Main game controller
 exports.playBaccarat = async (req, res) => {
   try {
+    const userId = req.user.id; // Get User ID from authentication middleware
     const { bet, choice } = req.body; // choice = "player" | "banker" | "tie"
+    
+    // --- 1. VALIDATION AND CHIP DEDUCTION ---
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    
+    const parsedBet = parseFloat(bet);
+    if (isNaN(parsedBet) || parsedBet <= 0) {
+        return res.status(400).json({ success: false, message: 'Invalid bet amount.' });
+    }
+    if (parsedBet > user.chips) {
+        return res.status(400).json({ success: false, message: 'Insufficient chips' });
+    }
+
+    // Deduct bet immediately (Lock the money)
+    user.chips -= parsedBet;
+    // NOTE: We delay user.save() until after the result is calculated.
+    // ----------------------------------------
 
     // --- 🚨 BIAS LOGIC MODIFIED: 20% WIN / 80% LOSS 🚨 ---
     const rng = Math.random();
@@ -74,40 +92,25 @@ exports.playBaccarat = async (req, res) => {
     } else {
         // 80% chance of the user losing (result does not match choice)
         const possibleLoserOutcomes = ["player", "banker", "tie"].filter(w => w !== choice);
-        
-        // Simple equal distribution among losing outcomes:
         const outcomeIndex = Math.floor(Math.random() * possibleLoserOutcomes.length);
         predeterminedWinner = possibleLoserOutcomes[outcomeIndex];
     }
     // ----------------------------------------------------
 
-    // Initialize hands (will be overwritten by manipulation)
+    // Initialize hands
     const playerHand = [];
     const bankerHand = [];
     let playerPoints = 0;
     let bankerPoints = 0;
     
     
-    // ✅ Step 1-4: MANIPULATE CARDS TO MATCH PREDETERMINED OUTCOME
-    
-    // Function to ensure points match the predetermined winner
+    // ✅ Step 1-4: MANIPULATE CARDS TO MATCH PREDETERMINED OUTCOME (Remains the same)
     const manipulateHands = (winner) => {
         let playerP, bankerP;
         
-        // Simple 2-card scenarios to force the result
-        if (winner === "player") {
-            // Player wins (e.g., P=7, B=6)
-            playerP = 7;
-            bankerP = 6;
-        } else if (winner === "banker") {
-            // Banker wins (e.g., P=6, B=7)
-            playerP = 6;
-            bankerP = 7;
-        } else {
-            // Tie (e.g., P=8, B=8)
-            playerP = 8;
-            bankerP = 8;
-        }
+        if (winner === "player") { playerP = 7; bankerP = 6; }
+        else if (winner === "banker") { playerP = 6; bankerP = 7; }
+        else { playerP = 8; bankerP = 8; }
 
         // Generate 2 cards for Player
         playerHand.push(createDummyCard(4));
@@ -123,23 +126,29 @@ exports.playBaccarat = async (req, res) => {
     manipulateHands(predeterminedWinner);
 
 
-    // ✅ Step 5: Determine result (now based on manipulated cards, which matches predeterminedWinner)
+    // ✅ Step 5: Determine result
     let winner = predeterminedWinner;
 
-    // ✅ Step 6: Calculate profit
-    let multiplier = 0;
-    if (winner === "player") multiplier = 2;
-    else if (winner === "banker") multiplier = 1.95; // banker tax
-    else if (winner === "tie") multiplier = 9; // Tie pays 8:1 (9x total return)
-
-    // Calculate Payout - Bet (Net Profit)
+    // ✅ Step 6: Calculate Payout and Final Profit
     let payout = 0;
     if (winner === choice) {
-        if (winner === "player") payout = bet * 2;
-        else if (winner === "banker") payout = bet * 1.95;
-        else if (winner === "tie") payout = bet * 9; 
+        if (winner === "player") payout = parsedBet * 2;
+        else if (winner === "banker") payout = parsedBet * 1.95;
+        else if (winner === "tie") payout = parsedBet * 9; 
+    } else if (winner !== choice && winner === "player" && choice === "banker") {
+        // Banker bet loses, but no refund
     }
-    const finalProfit = payout - bet;
+    // Note: No loss scenario needs specific payout logic since the bet was already deducted.
+
+    // Final Profit: This is the net change to the user's chip balance AFTER the bet deduction.
+    // If the user loses, payout is 0, profit is -bet.
+    // If the user wins, payout is 2*bet, profit is (2*bet) - bet = +bet.
+    const finalProfit = payout - parsedBet;
+
+    // --- 2. CHIP SETTLEMENT ---
+    user.chips += payout; // Add the total payout (original bet + winnings, or just original bet for push)
+    await user.save();     // Save the final chip balance
+    // --------------------------
 
 
     return res.json({
@@ -147,7 +156,8 @@ exports.playBaccarat = async (req, res) => {
       result: winner,
       player: { cards: playerHand, points: playerPoints },
       banker: { cards: bankerHand, points: bankerPoints },
-      profit: finalProfit
+      profit: finalProfit,
+      balance: user.chips // 👈 ADDED: Return new chip balance
     });
   } catch (err) {
     console.error("Baccarat error:", err);
