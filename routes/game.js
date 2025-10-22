@@ -6,42 +6,41 @@ const minesController = require('../controllers/minesController');
 const baccaratController = require("../controllers/baccaratController");
 const blackjackController = require('../controllers/blackjackController');
 
-
 // ensureAuth middleware (same as your earlier code)
 function ensureAuth(req, res, next) {
   if (req.isAuthenticated && req.isAuthenticated()) return next();
   res.status(401).json({ error: 'Unauthorized' });
 }
 
+// --- SLOTS ROUTES ---
 router.get('/slots', ensureAuth, (req, res) => {
   res.render('slots', { user: req.user });
 });
-
-// API endpoint used by client to request a spin
 router.post('/slots/spin', ensureAuth, spin);
 
+
+// --- MINES ROUTES ---
 router.get('/mines', ensureAuth, (req, res) => {
   res.render('mines', { user: req.user });
 });
-
-// Mines endpoints
 router.post('/mines/start', ensureAuth, minesController.start);
 router.post('/mines/reveal', ensureAuth, minesController.reveal);
 router.post('/mines/cashout', ensureAuth, minesController.cashout);
 
+
+// --- BACCARAT ROUTES ---
 router.get('/baccarat', ensureAuth, (req, res) => {
   res.render('baccarat', { user: req.user });
 });
+router.post("/baccarat/play", ensureAuth, baccaratController.playBaccarat);
 
-router.post("/baccarat/play", baccaratController.playBaccarat);
 
-
+// --- BLACKJACK ROUTES ---
 router.get('/blackjack', ensureAuth, (req, res) => {
   res.render('blackjack', { user: req.user });
 });
-
-router.get('/blackjack/start', blackjackController.startGame);
-router.post('/blackjack/hit', blackjackController.hit);
-router.post('/blackjack/stand', blackjackController.stand);
+router.post('/blackjack/start', ensureAuth, blackjackController.startGame);
+router.post('/blackjack/hit', ensureAuth, blackjackController.hit);
+router.post('/blackjack/stand', ensureAuth, blackjackController.stand);
 
 module.exports = router;

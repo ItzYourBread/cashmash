@@ -318,19 +318,6 @@ body {
 .hist-loss { background: #c62828; } /* Darker red */
 .hist-push { background: #fbc02d; } /* Darker yellow */
 
-/* Balance Animations (Already present, maintained) */
-#balance.profit {
-  color: #00ff91;
-  text-shadow: 0 0 10px #00ff91;
-  transition: all 0.3s ease;
-}
-
-#balance.loss {
-  color: #ff4d4d;
-  text-shadow: 0 0 10px #ff4d4d;
-  transition: all 0.3s ease;
-}
-
 /* Result Text Animation (Already present, maintained) */
 #resultText.show-result {
   animation: popResult 0.6s ease;
