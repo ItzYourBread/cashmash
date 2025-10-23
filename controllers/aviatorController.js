@@ -7,7 +7,6 @@ let roundState = {
   multiplier: 1,
   crashAt: 0,
   bets: {}, // { userId: { amount, cashedOut } }
-  history: [] // last 10 crash multipliers
 };
 
 let roundInterval = null;
@@ -28,7 +27,6 @@ function startNewRound(io) {
     round: roundState.round,
     state: "betting",
     multiplier: roundState.multiplier,
-    history: roundState.history,
     flightStartTime: !bettingPhase ? Date.now() - (roundState.multiplier - 1) * 2 : null
   });
 
@@ -95,9 +93,7 @@ async function endRound(io) {
 
   io.emit("roundCrashed", { crashAt: roundState.crashAt });
 
-  // Save to history
-  roundState.history.unshift(roundState.crashAt);
-  if (roundState.history.length > 10) roundState.history.pop();
+
 
   roundState.round++;
 
@@ -111,13 +107,13 @@ exports.getRoundStateSync = () => ({
   round: roundState.round,
   multiplier: roundState.multiplier,
   crashAt: roundState.crashAt,
-  history: roundState.history,
   state: bettingPhase ? "betting" : "flying",
 });
 
 // ----------------- PLACE BET -----------------
 exports.placeBet = async (req, res) => {
   try {
+  // (debug logs removed)
     if (!roundActive || !bettingPhase)
       return res.status(400).json({ ok: false, error: "Betting closed" });
 
@@ -125,6 +121,7 @@ exports.placeBet = async (req, res) => {
     const { amount } = req.body;
 
     const user = await User.findById(userId);
+  // user lookup
     if (!user) return res.status(404).json({ ok: false, error: "User not found" });
     if (amount > user.chips)
       return res.status(400).json({ ok: false, error: "Insufficient chips" });

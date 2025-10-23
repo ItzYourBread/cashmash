@@ -31,24 +31,23 @@
     <div class="aviator-table">
       <div class="table-top">
 
-        <!-- MULTIPLIER DISPLAY -->
-        <div class="multiplier-display">
-          <span id="multiplier">1.00x</span>
-        </div>
-
         <!-- FLIGHT AREA -->
         <div class="flight-area">
+          <div class="flight-info">
+            <div class="multiplier-display" id="multiplierDisplay">
+              <span id="multiplier">1.00x</span>
+            </div>
+            <div class="result small-result" id="resultText"></div>
+          </div>
           <div class="flight-path"></div>
           <svg id="graph-svg" class="graph-svg"></svg>
           <div class="plane" id="plane">✈️</div>
-          
         </div>
 
       </div>
 
       <!-- CONTROLS AREA -->
       <div class="controls">
-        
         <!-- BETTING CONTROLS -->
         <div class="bet-controls">
           <input id="betAmount" type="number" min="1" value="10" />
@@ -59,15 +58,11 @@
         <div class="action-buttons">
           <button id="cashOutBtn" class="btn gold big" disabled>Cash Out</button>
         </div>
-
-        <!-- RESULT DISPLAY -->
-        <div class="result" id="resultText"></div>
       </div>
 
-      <!-- GAME HISTORY -->
-      <div class="history" id="history">
-        <!-- History will be dynamically populated by JS -->
-      </div>
+  </section>
+
+  <!-- GAME HISTORY: Move outside aviator-table for global visibility -->
     </div>
   </section>
 
