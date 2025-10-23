@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Aviator | CashMash</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/aviator.css" />
+  <script>
+    // Make user available for JS
+    window.user = <%- JSON.stringify(user) %>;
+  </script>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <section class="aviator-section">
+    <div class="aviator-header">
+      <div class="neon-title">CashMash Aviator</div>
+    </div>
+
+    <!-- USER PANEL -->
+    <div class="user-panel">
+      <div class="user-info">
+        <span>👤 <strong><%= user.username %></strong></span>
+        <span>💰 Chips: <strong id="balance"><%= user.chips %></strong></span>
+      </div>
+    </div>
+
+    <!-- MAIN GAME AREA -->
+    <div class="aviator-table">
+      <div class="table-top">
+
+        <!-- MULTIPLIER DISPLAY -->
+        <div class="multiplier-display">
+          <span id="multiplier">1.00x</span>
+        </div>
+
+        <!-- FLIGHT AREA -->
+        <div class="flight-area">
+          <div class="flight-path"></div>
+          <svg id="graph-svg" class="graph-svg"></svg>
+          <div class="plane" id="plane">✈️</div>
+          
+        </div>
+
+      </div>
+
+      <!-- CONTROLS AREA -->
+      <div class="controls">
+        
+        <!-- BETTING CONTROLS -->
+        <div class="bet-controls">
+          <input id="betAmount" type="number" min="1" value="10" />
+          <button id="placeBetBtn" class="btn gold">Place Bet</button>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="action-buttons">
+          <button id="cashOutBtn" class="btn gold big" disabled>Cash Out</button>
+        </div>
+
+        <!-- RESULT DISPLAY -->
+        <div class="result" id="resultText"></div>
+      </div>
+
+      <!-- GAME HISTORY -->
+      <div class="history" id="history">
+        <!-- History will be dynamically populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+  <!-- Socket.IO -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/aviator.js"></script>
+</body>
+</html>
