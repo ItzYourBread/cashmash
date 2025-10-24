@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -8,68 +9,77 @@
   <link rel="stylesheet" href="/css/aviator.css" />
   <script>
     // Make user available for JS
-    window.user = <%- JSON.stringify(user) %>;
+    window.user = <% - JSON.stringify(user) %>;
   </script>
 </head>
+
 <body>
   <%- include('partials/header') %>
 
-  <section class="aviator-section">
-    <div class="aviator-header">
-      <div class="neon-title">CashMash Aviator</div>
-    </div>
-
-    <!-- USER PANEL -->
-    <div class="user-panel">
-      <div class="user-info">
-        <span>👤 <strong><%= user.username %></strong></span>
-        <span>💰 Chips: <strong id="balance"><%= user.chips %></strong></span>
+    <section class="aviator-section">
+      <div class="aviator-header">
+        <div class="neon-title">CashMash Aviator</div>
       </div>
-    </div>
 
-    <!-- MAIN GAME AREA -->
-    <div class="aviator-table">
-      <div class="table-top">
+      <!-- USER PANEL -->
+      <div class="user-panel">
+        <div class="user-info">
+          <span>👤 <strong>
+              <%= user.username %>
+            </strong></span>
+          <span>💰 Chips: <strong id="balance">
+              <%= user.chips %>
+            </strong></span>
+        </div>
+      </div>
 
-        <!-- FLIGHT AREA -->
-        <div class="flight-area">
-          <div class="flight-info">
-            <div class="multiplier-display" id="multiplierDisplay">
-              <span id="multiplier">1.00x</span>
+      <!-- MAIN GAME AREA -->
+      <div class="aviator-table">
+        <div class="table-top">
+
+          <!-- FLIGHT AREA -->
+          <div class="flight-area">
+            <div class="flight-info">
+              <div class="multiplier-display" id="multiplierDisplay">
+                <span id="multiplier">1.00x</span>
+              </div>
+              <div class="result small-result" id="resultText"></div>
             </div>
-            <div class="result small-result" id="resultText"></div>
+            <div class="sunburst-container">
+              <div class="sunburst"></div>
+            </div>
+            <div class="flight-path"></div>
+            <svg id="graph-svg" class="graph-svg"></svg>
+            <div class="plane" id="plane"></div>
           </div>
-          <div class="flight-path"></div>
-          <svg id="graph-svg" class="graph-svg"></svg>
-          <div class="plane" id="plane">✈️</div>
+
         </div>
 
-      </div>
+        <!-- CONTROLS AREA -->
+        <div class="controls">
+          <!-- BETTING CONTROLS -->
+          <div class="bet-controls">
+            <input id="betAmount" type="number" min="1" value="10" />
+            <button id="placeBetBtn" class="btn gold">Place Bet</button>
+          </div>
 
-      <!-- CONTROLS AREA -->
-      <div class="controls">
-        <!-- BETTING CONTROLS -->
-        <div class="bet-controls">
-          <input id="betAmount" type="number" min="1" value="10" />
-          <button id="placeBetBtn" class="btn gold">Place Bet</button>
+          <!-- ACTION BUTTONS -->
+          <div class="action-buttons">
+            <button id="cashOutBtn" class="btn gold big" disabled>Cash Out</button>
+          </div>
         </div>
 
-        <!-- ACTION BUTTONS -->
-        <div class="action-buttons">
-          <button id="cashOutBtn" class="btn gold big" disabled>Cash Out</button>
-        </div>
-      </div>
+    </section>
 
-  </section>
-
-  <!-- GAME HISTORY: Move outside aviator-table for global visibility -->
+    <!-- GAME HISTORY: Move outside aviator-table for global visibility -->
     </div>
-  </section>
+    </section>
 
-  <%- include('partials/footer') %>
+    <%- include('partials/footer') %>
 
-  <!-- Socket.IO -->
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/js/aviator.js"></script>
+      <!-- Socket.IO -->
+      <script src="/socket.io/socket.io.js"></script>
+      <script src="/js/aviator.js"></script>
 </body>
+
 </html>

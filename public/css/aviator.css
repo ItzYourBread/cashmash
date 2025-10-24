@@ -30,6 +30,7 @@
   min-height: 18px;
   text-shadow: 0 0 4px #000b38;
 }
+
 /* ---------- AVIATOR CONTAINER ---------- */
 .aviator-section {
   text-align: center;
@@ -51,54 +52,118 @@
 }
 
 @keyframes pulseGlow {
-  0%, 100% { opacity:1; text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966; }
-  50% { opacity:0.85; text-shadow: 0 0 6px #f5c542; }
+
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966;
+  }
+
+  50% {
+    opacity: 0.85;
+    text-shadow: 0 0 6px #f5c542;
+  }
 }
 
 .user-panel {
   margin-bottom: 14px;
 }
+
 .user-info {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
   padding: 8px 20px;
   border-radius: 30px;
   display: inline-flex;
   gap: 18px;
   align-items: center;
   color: #fff;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 /* ---------- GAME TABLE ---------- */
 .aviator-table {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 14px;
   max-width: 700px;
   width: 100%;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.45);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
   padding: 20px;
 }
-
-/* ---------- MULTIPLIER DISPLAY ---------- */
 
 /* ---------- FLIGHT AREA ---------- */
 .flight-area {
   position: relative;
   width: 100%;
   height: 400px;
-  background: rgba(255,255,255,0.05);
+  background-color: #111;
   border-radius: 12px;
   overflow: hidden;
   margin-bottom: 20px;
 }
 
+/* ---------- SUNBURST CONTAINER ---------- */
+.sunburst-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+  /* behind interactive elements */
+}
+
+/* ---------- SUNBURST EFFECT ---------- */
+.sunburst {
+  position: absolute;
+
+  /* Positioning top-left shifted */
+  top: -100%;
+  left: 0%;
+  transform: translateX(-50%) rotate(0deg);
+
+  width: 400%;
+  height: 400%;
+  border-radius: 50%;
+
+  background:
+    repeating-conic-gradient(from 0deg,
+      #000 0deg 2deg,
+      /* Black Ray */
+      transparent 2deg 6deg
+      /* Transparent Gap (shows the #222 background) */
+    );
+
+  /* Animation applied */
+  transform-origin: center center;
+  background-color: #0c0c0c;
+}
+
+/* ---------- ROTATION ANIMATION ---------- */
+@keyframes rotateSunburst {
+  from {
+    transform: translateX(-50%) rotate(0deg);
+  }
+
+  to {
+    /* Rotates the sunburst 360 degrees */
+    transform: translateX(-50%) rotate(360deg);
+  }
+}
+
+/* Only animate during flight */
+.flight-area.flight-active .sunburst {
+  animation: rotateSunburst 50s linear infinite;
+}
+
 .graph-svg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 10; /* Lower z-index so plane is above it */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 12;
+  /* Lower z-index so plane is above it */
 }
 
 .flight-path {
@@ -107,27 +172,36 @@
   left: 0;
   height: 100%;
   width: 100%;
-  background-color: #000b38;
+  background-color: #484848;
+  z-index: 1;
+  /* keep background beneath the sunburst overlay */
 }
 
 #flight-path {
-    fill: none;
-    stroke: #3c3c3c; /* The line color */
-    stroke-width: 4;
-    transition: stroke-dasharray 0.05s linear; /* For the animated "draw" effect */
+  fill: none;
+  stroke: #3c3c3c;
+  /* The line color */
+  stroke-width: 4;
+  transition: stroke-dasharray 0.05s linear;
+  /* For the animated "draw" effect */
 }
 
-/* ---------- PLANE ---------- */
+/* ---------- PLANE (IMAGE VERSION) ---------- */
 .plane {
   position: absolute;
   bottom: 0;
   left: 0;
-  font-size: 64px; /* Increased from 36px to 64px for bigger plane */
+  width: 80px; /* Adjust to your image size */
+  height: 80px;
+  background: url('../images/Aviator/plane.png') no-repeat center center;
+  background-size: contain; /* ensures image scales properly */
   transform-origin: center;
   transition: transform 0.1s linear;
-  z-index: 20; /* Higher z-index to fly above the line */
+  z-index: 20; /* stays above graph and rays */
   will-change: transform, left, bottom;
+  pointer-events: none;
 }
+
 
 /* ---------- TRAIL ---------- */
 .trail {
@@ -140,8 +214,14 @@
 }
 
 @keyframes fadeTrail {
-  from { opacity: 0.5; }
-  to { opacity: 0; transform: scale(0.5); }
+  from {
+    opacity: 0.5;
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.5);
+  }
 }
 
 /* ---------- CONTROLS ---------- */
@@ -153,7 +233,8 @@
   margin-bottom: 20px;
 }
 
-.bet-controls, .action-buttons {
+.bet-controls,
+.action-buttons {
   display: flex;
   gap: 12px;
   justify-content: center;
@@ -164,7 +245,7 @@
   border-radius: 16px;
   border: none;
   outline: none;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
   font-size: 1.1em;
   width: 100px;
@@ -174,41 +255,23 @@
 /* ---------- BUTTONS ---------- */
 .btn.gold {
   padding: 10px 20px;
-  background: linear-gradient(135deg,#f5c542,#dca000);
+  background: linear-gradient(135deg, #f5c542, #dca000);
   color: #000b38;
   border-radius: 30px;
   font-weight: 700;
   border: none;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(245,197,66,0.3);
+  box-shadow: 0 6px 18px rgba(245, 197, 66, 0.3);
   transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
 }
-.btn.gold:hover:not(:disabled) { 
-  transform: translateY(-2px); 
-  box-shadow: 0 8px 25px rgba(245,197,66,0.5); 
+
+.btn.gold:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(245, 197, 66, 0.5);
 }
+
 .btn.gold:disabled {
   filter: grayscale(0.7) brightness(0.6);
   cursor: not-allowed;
   box-shadow: none;
-}
-
-/* CSS for a persistent dot on the flight path */
-.graph-dot {
-    position: absolute;
-    width: 6px; /* Size of the dot */
-    height: 6px;
-    border-radius: 50%;
-    background-color: #00ff66; /* Bright color for the trail */
-    box-shadow: 0 0 5px #00ff66, 0 0 10px #00ff66; /* Glow effect */
-    /* Animation: Subtle pulsating effect */
-    animation: pulse 1s infinite alternate; 
-    /* Ensures smooth dot placement relative to flightArea */
-    transform: translate(-50%, -50%); 
-}
-
-/* Keyframes for the animation */
-@keyframes pulse {
-    from { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
-    to { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
 }

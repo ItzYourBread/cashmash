@@ -85,11 +85,13 @@ socket.on('roundState', ({ round, state, multiplier, history, flightOngoing }) =
     hasBet = false;
     hasCashedOut = false;
 
-    // Reset button text and enable for current round
-    placeBetBtn.textContent = 'Place Bet';
-    toggleButton(placeBetBtn, true); 
-    toggleButton(cashOutBtn, false);
-    betAmountInput.disabled = false;
+  // Reset button text and enable for current round
+  placeBetBtn.textContent = 'Place Bet';
+  toggleButton(placeBetBtn, true); 
+  toggleButton(cashOutBtn, false);
+  betAmountInput.disabled = false;
+  // ensure sunburst overlay is off when not flying
+  if (flightArea) flightArea.classList.remove('flight-active');
 
   } else if (state === 'flying') {
     // Flight started
@@ -100,16 +102,49 @@ socket.on('roundState', ({ round, state, multiplier, history, flightOngoing }) =
     toggleButton(placeBetBtn, false); 
     betAmountInput.disabled = false; 
 
-    if (flightOngoing && !hasBet) {
-      showOverlay = true;
-      planeEl.style.display = 'none';
-      resultText.textContent = '⏳ Flight in progress, wait for next round';
-      toggleButton(cashOutBtn, false);
+    if (flightOngoing) {
+      if (!hasBet) {
+        resultText.textContent = '⏳ Flight in progress, wait for next round';
+        toggleButton(cashOutBtn, false);
+      }
+      // Show the plane flying for everyone, even non-betters
+      showOverlay = false;
+      isFlying = true; // Mark as flying to prevent reset
+      planeEl.style.display = 'block';
+      
+      // Calculate current position based on multiplier
+      const progress = Math.min(currentMultiplier / 25, 1);
+      const x = Math.min(0.75 * progress, 0.75); // Keep within bounds
+      const y = Math.min(0.75 * progress, 0.75);
+      
+      // Immediately position plane without animation
+      const areaWidth = flightArea.offsetWidth;
+      const areaHeight = flightArea.offsetHeight;
+      const left = x * areaWidth;
+      const bottom = y * areaHeight;
+      const tilt = -15 + 25 * progress;
+      const scale = 1.4 + x * 0.8;
+      
+      // Force plane position
+      planeEl.style.transition = 'none';
+      planeEl.style.left = `${left}px`;
+      planeEl.style.bottom = `${bottom}px`;
+      planeEl.style.transform = `scale(${scale}) rotate(${tilt}deg)`;
+      
+      // Update path immediately
+      updateSVGPath(progress);
+      
+      // Enable betting for next round
+      placeBetBtn.textContent = 'Betting for Next Round...';
+      toggleButton(placeBetBtn, false);
+      toggleButton(cashOutBtn, hasBet && !hasCashedOut);
+      if (flightArea) flightArea.classList.add('flight-active');
     } else {
       showOverlay = false;
       planeEl.style.display = 'block';
       startFlightAnimation();
       toggleButton(cashOutBtn, hasBet && !hasCashedOut); 
+      if (flightArea) flightArea.classList.add('flight-active');
       resultText.textContent = `✈️ Flight started!`;
     }
   }
@@ -149,7 +184,7 @@ socket.on('roundCrashed', ({ crashAt }) => {
   planeEl.style.display = 'block';
   showOverlay = false;
 
-  resultText.textContent = `✈️ Flew away! (${crashAt.toFixed(2)}x)`;
+  resultText.textContent = `✈️ Flew away!`;
   placeBetBtn.textContent = 'Place Bet';
   toggleButton(placeBetBtn, true);
   toggleButton(cashOutBtn, false);
@@ -158,6 +193,8 @@ socket.on('roundCrashed', ({ crashAt }) => {
   flyAwayPlaneAnimation();
   // Final update to draw the line to the end point
   updateSVGPath(); 
+  // stop sunburst overlay when round ends
+  if (flightArea) flightArea.classList.remove('flight-active');
 });
 
 // Small client-side handlers for placing bets and cashing out
@@ -312,11 +349,11 @@ function startFlightAnimation() {
 
   let animStart = Date.now();
   let duration = 1400; // ms, total flight duration
-  // Start: (0,0), End: (0.95,0.95)
+  // Start: (0,0), End: (0.75,0.75) - reduced path but keeps curve shape
   const p0 = { x: 0, y: 0 };
-  const p1 = { x: 0.25, y: 0.05 };
-  const p2 = { x: 0.7, y: 0.15 };
-  const p3 = { x: 0.95, y: 0.95 };
+  const p1 = { x: 0.2, y: 0.05 };
+  const p2 = { x: 0.5, y: 0.15 };
+  const p3 = { x: 0.75, y: 0.75 };
   function cubicBezier(t, p0, p1, p2, p3) {
     const x = Math.pow(1-t,3)*p0.x + 3*Math.pow(1-t,2)*t*p1.x + 3*(1-t)*t*t*p2.x + t*t*t*p3.x;
     const y = Math.pow(1-t,3)*p0.y + 3*Math.pow(1-t,2)*t*p1.y + 3*(1-t)*t*t*p2.y + t*t*t*p3.y;
@@ -348,8 +385,8 @@ function updatePlanePositionCustom(nx, ny, t) {
   const left = nx * areaWidth;
   const bottom = ny * areaHeight;
   // Gentle tilt upward
-  let tilt = -10 + 20 * t;
-  const scale = 1.2 + nx * 0.7;
+  let tilt = -10 + 20 * t;  // original tilt range
+  const scale = 1.2 + nx * 0.7;  // restored original scaling
   planeEl.style.left = `${left}px`;
   planeEl.style.bottom = `${bottom}px`;
   planeEl.style.transform = `scale(${scale}) rotate(${tilt}deg)`;
@@ -402,14 +439,19 @@ function stopFlightAnimation() {
     flightAnimInterval = null;
   }
 
-  // clear any remaining trails after a short delay
-  setTimeout(() => {
-    trails.forEach(t => t.remove());
-    trails = [];
-  }, 1000);
+  // Don't clear trails if flight is ongoing (for refresh cases)
+  if (!isFlying) {
+    setTimeout(() => {
+      trails.forEach(t => t.remove());
+      trails = [];
+    }, 1000);
+  }
 }
 
 function resetPlane() {
+  // Don't reset if we're in an ongoing flight
+  if (isFlying) return;
+
   planeEl.style.display = 'block';
   planeEl.style.left = '0px';
   planeEl.style.bottom = '0px';
@@ -436,7 +478,7 @@ function flyAwayPlaneAnimation(immediate = false) {
   // If immediate, fly out instantly after reaching top-right
   planeEl.style.transition = 'transform 1s cubic-bezier(0.4,1,0.7,1), opacity 1s linear';
   // Move further up/right and fade out (negative Y for upward)
-  planeEl.style.transform += ' translate(180px, -180px) scale(1.15) rotate(35deg)';
+  planeEl.style.transform += ' translate(250px, -500px) scale(2.30) rotate(65deg)';
   planeEl.style.opacity = '0';
     planeEl.style.transition = '';
     planeEl.style.opacity = '1';
@@ -498,5 +540,3 @@ function toggleButton(btn, enable) {
   btn.disabled = !enable;
   btn.classList.toggle('disabled', !enable);
 }
-
-// ---------------- HISTORY ----------------
