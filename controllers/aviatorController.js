@@ -14,7 +14,7 @@ const User = require('../models/User');
 // ---------------- CONFIG ----------------
 const config = {
   bettingDurationMs: 5000,     // how long betting is allowed before flight (ms)
-  interRoundDelayMs: 4000,     // time between end-of-round and next round start (ms)
+  interRoundDelayMs: 5000,     // time between end-of-round and next round start (ms)
   tickIntervalMs: 150,         // how frequently multiplier updates are emitted (ms)
   maxMultiplier: 200,          // hard cap for multiplier (safety)
   minMultiplier: 1.0,          // min multiplier

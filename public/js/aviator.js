@@ -343,7 +343,7 @@ function startFlightAnimation() {
   points = [];
   planeEl.style.left = '0px';
   planeEl.style.bottom = '0px';
-  planeEl.style.transform = 'scale(1.2) rotate(0deg)';
+  planeEl.style.transform = 'scale(1.3) rotate(0deg)';
   lastPlanePos = { x: 0, y: 0 };
   updateSVGPath(0); // Initialize graph
 
@@ -385,7 +385,7 @@ function updatePlanePositionCustom(nx, ny, t) {
   const left = nx * areaWidth;
   const bottom = ny * areaHeight;
   // Gentle tilt upward
-  let tilt = -10 + 20 * t;  // original tilt range
+  let tilt = -15 + 25 * t;  // original tilt range
   const scale = 1.2 + nx * 0.7;  // restored original scaling
   planeEl.style.left = `${left}px`;
   planeEl.style.bottom = `${bottom}px`;
