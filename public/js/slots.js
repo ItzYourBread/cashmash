@@ -99,13 +99,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // High-Frequency Flicker Pool (The Illusion)
       const flickerPool = [
-        '/images/ClassicSlot/bar.png', 
-        '/images/ClassicSlot/diamond.png', 
+        '/images/ClassicSlot/bar.png',
+        '/images/ClassicSlot/diamond.png',
         '/images/ClassicSlot/jackpot.png',
         '/images/ClassicSlot/red7.png',
       ];
       finalSymbols.flat().forEach(s => {
-          if (s.multiplier > 1) flickerPool.push(s.file);
+        if (s.multiplier > 1) flickerPool.push(s.file);
       });
 
 

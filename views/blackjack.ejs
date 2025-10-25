@@ -1,77 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Blackjack | CashMash</title>
   <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/blackjack.css" />
 </head>
+
 <body>
   <%- include('partials/header') %>
 
-  <section class="blackjack-section">
-    <div class="blackjack-header">
-      <div class="neon-title">CashMash Blackjack</div>
-    </div>
-
-    <!-- USER PANEL -->
-    <div class="user-panel">
-      <div class="user-info">
-        <span>👤 <strong><%= user.username %></strong></span>
-        <span>💰 Chips: <strong id="balance"><%= user.chips %></strong></span>
-      </div>
-    </div>
-
-    <!-- MAIN BLACKJACK TABLE -->
-    <div class="blackjack-table">
-
-      <!-- TABLE AREA -->
-      <div class="table-top">
-
-        <!-- DEALER SECTION -->
-        <div class="seat dealer-seat">
-          <div class="label">DEALER</div>
-          <div class="hand dealer-hand" id="dealerHand"><!-- Cards added by JS --></div>
-          <div class="score" id="dealerScore">0</div>
-        </div>
-
-        <!-- PLAYER SECTION -->
-        <div class="seat player-seat">
-          <div class="label">PLAYER</div>
-          <div class="hand player-hand" id="playerHand"><!-- Cards added by JS --></div>
-          <div class="score" id="playerScore">0</div>
-        </div>
-
+    <section class="blackjack-section">
+      <div class="blackjack-header">
+        <div class="neon-title">CashMash Blackjack</div>
       </div>
 
-      <!-- CONTROLS AREA -->
-      <div class="controls">
-
-        <!-- BETTING CONTROLS -->
-        <div class="bet-controls">
-          <input id="betAmount" type="number" min="1" value="10" />
-          <button id="placeBetBtn" class="btn gold">Place Bet</button>
+      <!-- USER PANEL -->
+      <div class="user-panel">
+        <div class="user-info">
+          <span>👤 <strong>
+              <%= user.username %>
+            </strong></span>
+          <span>💰 Chips: <strong id="balance">
+              <%= user.chips %>
+            </strong></span>
         </div>
-
-        <!-- ACTION BUTTONS -->
-        <div class="action-buttons">
-          <button id="hitBtn" class="btn gold big" disabled>Hit</button>
-          <button id="standBtn" class="btn gold big" disabled>Stand</button>
-          <button id="dealBtn" class="btn gold big">Deal</button>
-        </div>
-
-        <!-- RESULT DISPLAY -->
-        <div class="result" id="resultText">Place your bet and deal.</div>
-
       </div>
 
-      <!-- GAME HISTORY -->
-      <div class="history" id="history"><!-- Results badges added by JS --></div>
-    </div>
-  </section>
+      <!-- MAIN BLACKJACK TABLE -->
+      <div class="blackjack-table">
 
-  <%- include('partials/footer') %>
-  <script src="/js/blackjack.js"></script>
+        <!-- TABLE AREA -->
+        <div class="table-top">
+
+          <!-- DEALER SECTION -->
+          <div class="seat dealer-seat">
+            <div class="label">DEALER</div>
+            <div class="hand dealer-hand" id="dealerHand"><!-- Cards added by JS --></div>
+            <div class="score" id="dealerScore">0</div>
+          </div>
+
+          <!-- PLAYER SECTION -->
+          <div class="seat player-seat">
+            <div class="label">PLAYER</div>
+            <div class="hand player-hand" id="playerHand"><!-- Cards added by JS --></div>
+            <div class="score" id="playerScore">0</div>
+          </div>
+
+        </div>
+
+        <!-- CONTROLS AREA -->
+        <div class="controls">
+
+          <!-- BETTING CONTROLS -->
+          <div class="bet-controls">
+            <input id="betAmount" type="number" min="1" value="10" />
+            <button id="placeBetBtn" class="btn gold">Place Bet</button>
+          </div>
+
+          <!-- ACTION BUTTONS -->
+          <div class="action-buttons">
+            <button id="hitBtn" class="btn gold big" disabled>Hit</button>
+            <button id="standBtn" class="btn gold big" disabled>Stand</button>
+            <button id="dealBtn" class="btn gold big">Deal</button>
+          </div>
+
+          <!-- RESULT DISPLAY -->
+          <div class="result" id="resultText">Place your bet and deal.</div>
+
+        </div>
+
+        <!-- GAME HISTORY -->
+        <div class="history" id="history"><!-- Results badges added by JS --></div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+      <script src="/js/blackjack.js"></script>
 </body>
+
 </html>

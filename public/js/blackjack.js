@@ -21,14 +21,14 @@ let dealerCards = [];
 let gameActive = false;
 let currentBet = 0;
 // Initial balance is read once, subsequent changes come from the backend response.
-let balance = parseFloat(balanceEl.textContent) || 0; 
+let balance = parseFloat(balanceEl.textContent) || 0;
 
 // --- UTILITY: Server Endpoint Configuration ---
 const API_URL = '/blackjack';
 const ENDPOINTS = {
-    start: `${API_URL}/start`,
-    hit: `${API_URL}/hit`,
-    stand: `${API_URL}/stand`
+  start: `${API_URL}/start`,
+  hit: `${API_URL}/hit`,
+  stand: `${API_URL}/stand`
 };
 // --------------------------------------------------
 
@@ -36,8 +36,8 @@ const ENDPOINTS = {
 // CARD / SCORE UTILS (Kept for local display purposes)
 // --------------------------------------------------
 function cardValue(card) {
-  const val = card.rank || card.val; 
-  if (['J','Q','K'].includes(val)) return 10;
+  const val = card.rank || card.val;
+  if (['J', 'Q', 'K'].includes(val)) return 10;
   if (val === 'A') return 11;
   return parseInt(val);
 }
@@ -64,8 +64,8 @@ function getCardFilename(card) {
 function renderCard(card, container, hidden = false, delay = 0) {
   const div = document.createElement('div');
   div.classList.add('card');
-  
-  if (card.placeholder) div.classList.add('placeholder-card'); 
+
+  if (card.placeholder) div.classList.add('placeholder-card');
 
   const inner = document.createElement('div');
   inner.classList.add('card-inner');
@@ -97,7 +97,7 @@ function renderCard(card, container, hidden = false, delay = 0) {
     // 🚨 FIX: Flip the card only if it's NOT supposed to be hidden
     if (!card.hidden && !hidden) div.classList.add('flipped');
   }, delay);
-  
+
   return div; // Return the card element for later use (like flipping hidden card)
 }
 
@@ -107,7 +107,7 @@ function renderCard(card, container, hidden = false, delay = 0) {
 // --------------------------------------------------
 function updateScores(hideDealer = true) {
   playerScoreEl.textContent = `Player: ${calcScore(playerCards)}`;
-  
+
   if (hideDealer) {
     const visibleCard = dealerCards.find(c => !c.hidden);
     const visibleScore = visibleCard ? cardValue(visibleCard) : '?';
@@ -146,7 +146,7 @@ dealBtn.onclick = async () => {
   dealerHand.innerHTML = '';
   playerHand.innerHTML = '';
   resultText.textContent = 'Contacting server...';
-  
+
   hitBtn.disabled = true;
   standBtn.disabled = true;
   dealBtn.disabled = true;
@@ -181,14 +181,14 @@ dealBtn.onclick = async () => {
     renderCard(dealerCards[1], dealerHand, true, 1100); // Pass true to use local 'hidden-dealer-card' class
 
     setTimeout(() => {
-        updateScores(true);
-        if (data.result) {
-            endGame(data.result, data.result.includes('win') ? 'win' : 'loss', data.balance);
-        } else {
-            resultText.textContent = 'Hit or Stand?';
-            hitBtn.disabled = false;
-            standBtn.disabled = false;
-        }
+      updateScores(true);
+      if (data.result) {
+        endGame(data.result, data.result.includes('win') ? 'win' : 'loss', data.balance);
+      } else {
+        resultText.textContent = 'Hit or Stand?';
+        hitBtn.disabled = false;
+        standBtn.disabled = false;
+      }
     }, 1300);
 
   } catch (error) {
@@ -255,21 +255,21 @@ standBtn.onclick = async () => {
     // Flip the hidden dealer card
     const hiddenCardEl = dealerHand.querySelector('.hidden-dealer-card');
     if (hiddenCardEl) {
-        // Find the index of the hidden card (should be the second card)
-        const hiddenCardIndex = dealerCards.findIndex(c => c.hidden);
-        
-        // Update local dealerCards state *before* flipping
-        // The server response `data.dealerHand` contains the now-revealed card.
-        dealerCards = data.dealerHand;
-        
-        // Remove the hidden class and add the flipped class
-        hiddenCardEl.classList.remove('hidden-dealer-card');
-        setTimeout(() => hiddenCardEl.classList.add('flipped'), 10);
-        
-        // Update score now that the first two cards are visible
-        updateScores(false); 
+      // Find the index of the hidden card (should be the second card)
+      const hiddenCardIndex = dealerCards.findIndex(c => c.hidden);
+
+      // Update local dealerCards state *before* flipping
+      // The server response `data.dealerHand` contains the now-revealed card.
+      dealerCards = data.dealerHand;
+
+      // Remove the hidden class and add the flipped class
+      hiddenCardEl.classList.remove('hidden-dealer-card');
+      setTimeout(() => hiddenCardEl.classList.add('flipped'), 10);
+
+      // Update score now that the first two cards are visible
+      updateScores(false);
     }
-    
+
     // Animate the dealer's play and then end the game
     await playDealerSequence(data);
 
@@ -284,38 +284,38 @@ standBtn.onclick = async () => {
 // DEALER LOGIC (FIXED)
 // --------------------------------------------------
 async function playDealerSequence(data) {
-    // We already rendered the first two cards. Start rendering from the third card (index 2).
-    const startRenderIndex = 2; 
+  // We already rendered the first two cards. Start rendering from the third card (index 2).
+  const startRenderIndex = 2;
 
-    // data.dealerHand is the FINAL array of dealer cards from the server
-    const newCards = data.dealerHand.slice(startRenderIndex);
-    
-    // Update local state (already done in standBtn.onclick, but safe to re-assign)
-    dealerCards = data.dealerHand; 
+  // data.dealerHand is the FINAL array of dealer cards from the server
+  const newCards = data.dealerHand.slice(startRenderIndex);
 
-    const loop = (i) => new Promise(resolve => {
-        if (i >= newCards.length) {
-            resolve(); // All new cards rendered
-            return;
-        }
+  // Update local state (already done in standBtn.onclick, but safe to re-assign)
+  dealerCards = data.dealerHand;
 
-        const cardToRender = newCards[i];
-        
-        // 🚨 FIX: Render the card. It will automatically flip due to renderCard fix.
-        renderCard(cardToRender, dealerHand, false, 200); 
-        
-        // Update score for each hit
-        dealerScoreEl.textContent = `Dealer: ${calcScore(dealerCards.slice(0, startRenderIndex + i + 1))}`;
+  const loop = (i) => new Promise(resolve => {
+    if (i >= newCards.length) {
+      resolve(); // All new cards rendered
+      return;
+    }
 
-        setTimeout(() => {
-            loop(i + 1).then(resolve);
-        }, 800); // Wait for card flip animation
-    });
+    const cardToRender = newCards[i];
 
-    await loop(0); // Start the loop for the new cards
-    
-    // Once the dealer's turn is complete, finalize the round
-    endGame(data.result, data.result.includes('win') ? 'win' : data.result.includes('loss') ? 'loss' : 'push', data.balance);
+    // 🚨 FIX: Render the card. It will automatically flip due to renderCard fix.
+    renderCard(cardToRender, dealerHand, false, 200);
+
+    // Update score for each hit
+    dealerScoreEl.textContent = `Dealer: ${calcScore(dealerCards.slice(0, startRenderIndex + i + 1))}`;
+
+    setTimeout(() => {
+      loop(i + 1).then(resolve);
+    }, 800); // Wait for card flip animation
+  });
+
+  await loop(0); // Start the loop for the new cards
+
+  // Once the dealer's turn is complete, finalize the round
+  endGame(data.result, data.result.includes('win') ? 'win' : data.result.includes('loss') ? 'loss' : 'push', data.balance);
 }
 
 // --------------------------------------------------
@@ -326,15 +326,15 @@ function endGame(message, resultType, newBalance) {
   hitBtn.disabled = true;
   standBtn.disabled = true;
   dealBtn.disabled = false;
-  
-  updateScores(false); 
+
+  updateScores(false);
 
   if (newBalance !== undefined) {
     updateBalanceDisplay(newBalance);
   }
 
-  currentBet = 0; 
-  
+  currentBet = 0;
+
   resultText.classList.remove('show-result');
   void resultText.offsetWidth;
   resultText.textContent = message;
@@ -345,24 +345,24 @@ function endGame(message, resultType, newBalance) {
 // INITIALIZATION (Remains the same)
 // --------------------------------------------------
 function initializeTable() {
-    const dummyCard = { rank: 'D', suit: 'D', placeholder: true }; 
-    
-    dealerHand.innerHTML = '';
-    playerHand.innerHTML = '';
-    
-    // Draw 2 card backs for the player
-    renderCard(dummyCard, playerHand, true, 0); 
-    renderCard(dummyCard, playerHand, true, 100); 
-    
-    // Draw 2 card backs for the dealer
-    renderCard(dummyCard, dealerHand, true, 200);
-    renderCard(dummyCard, dealerHand, true, 300);
+  const dummyCard = { rank: 'D', suit: 'D', placeholder: true };
 
-    dealerScoreEl.textContent = `Dealer: 0`;
-    playerScoreEl.textContent = `Player: 0`;
-    dealBtn.disabled = true;
-    hitBtn.disabled = true;
-    standBtn.disabled = true;
+  dealerHand.innerHTML = '';
+  playerHand.innerHTML = '';
+
+  // Draw 2 card backs for the player
+  renderCard(dummyCard, playerHand, true, 0);
+  renderCard(dummyCard, playerHand, true, 100);
+
+  // Draw 2 card backs for the dealer
+  renderCard(dummyCard, dealerHand, true, 200);
+  renderCard(dummyCard, dealerHand, true, 300);
+
+  dealerScoreEl.textContent = `Dealer: 0`;
+  playerScoreEl.textContent = `Player: 0`;
+  dealBtn.disabled = true;
+  hitBtn.disabled = true;
+  standBtn.disabled = true;
 }
 
 initializeTable();

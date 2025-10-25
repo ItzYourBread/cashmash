@@ -1,64 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | CashMash</title>
-  <link rel="stylesheet" href="/css/style.css"/>
-  <link rel="stylesheet" href="/css/dashboard.css"/>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
 </head>
+
 <body>
   <%- include('partials/header') %>
 
-  <section class="dashboard">
-    <div class="dashboard-header">
-      <h1>Welcome, <%= user.username %> 👋</h1>
-      <p>Balance: <strong><%= user.chips %> Chips</strong></p>
-    </div>
+    <section class="dashboard">
+      <div class="dashboard-header">
+        <h1>Welcome, <%= user.username %> 👋</h1>
+        <p>Balance: <strong>
+            <%= user.chips %> Chips
+          </strong></p>
+      </div>
 
-    <!-- 🎰 SLOTS CATEGORY -->
-    <div class="category">
-      <h2>Slot Machines & Spins</h2>
-      <div class="game-grid">
-        <div class="game-card" onclick="window.location.href='/slots'">
-          <img src="/images/classic-slot-cover.jpg" alt="Classic Slot"/>
-          <div class="overlay">Classic</div>
+      <!-- 🎰 SLOTS CATEGORY -->
+      <div class="category">
+        <h2>Slot Machines & Spins</h2>
+        <div class="game-grid">
+          <div class="game-card" onclick="window.location.href='/slots'">
+            <img src="/images/classic-slot-cover.jpg" alt="Classic Slot" />
+            <div class="overlay">Classic</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- 🎡 ROULETTE CATEGORY -->
-    <div class="category">
-      <h2>Cards & Casino</h2>
-      <div class="game-grid">
-        <div class="game-card" onclick="window.location.href='/blackjack'">
-          <img src="/images/blackjack-cover.jpg" alt="BlackJack"/>
-          <div class="overlay">Blackjack</div>
-        </div>
-        <div class="game-card" onclick="window.location.href='/baccarat'">
-          <img src="/images/baccarat-cover.jpg" alt="Bacccarat"/>
-          <div class="overlay">Bacccarat</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 🃏 BLACKJACK CATEGORY -->
-    <div class="category">
-      <h2>Other</h2>
-      <div class="game-grid">
-        <div class="game-card" onclick="window.location.href='/mines'">
-          <img src="/images/mines-cover.jpg" alt="Mine"/>
-          <div class="overlay">Mines</div>
-        </div>
-        <div class="game-card" onclick="window.location.href='/aviator'">
-          <img src="/images/aviator-cover.jpg" alt="Aviator"/>
-          <div class="overlay">Aviator</div>
+      <!-- 🎡 ROULETTE CATEGORY -->
+      <div class="category">
+        <h2>Cards & Casino</h2>
+        <div class="game-grid">
+          <div class="game-card" onclick="window.location.href='/blackjack'">
+            <img src="/images/blackjack-cover.jpg" alt="BlackJack" />
+            <div class="overlay">Blackjack</div>
+          </div>
+          <div class="game-card" onclick="window.location.href='/baccarat'">
+            <img src="/images/baccarat-cover.jpg" alt="Bacccarat" />
+            <div class="overlay">Bacccarat</div>
+          </div>
         </div>
       </div>
-    </div>
 
-  </section>
+      <!-- 🃏 BLACKJACK CATEGORY -->
+      <div class="category">
+        <h2>Other</h2>
+        <div class="game-grid">
+          <div class="game-card" onclick="window.location.href='/mines'">
+            <img src="/images/mines-cover.jpg" alt="Mine" />
+            <div class="overlay">Mines</div>
+          </div>
+          <div class="game-card" onclick="window.location.href='/aviator'">
+            <img src="/images/aviator-cover.jpg" alt="Aviator" />
+            <div class="overlay">Aviator</div>
+          </div>
+        </div>
+      </div>
 
-  <%- include('partials/footer') %>
+    </section>
+
+    <%- include('partials/footer') %>
 </body>
+
 </html>

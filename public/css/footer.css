@@ -1,0 +1,16 @@
+/* ==========================================
+   CASHMASH FOOTER STYLE
+   Author: Arif Satify
+   ========================================== */
+
+/* ==========================================
+   FOOTER
+   ========================================== */
+footer {
+  text-align: center;
+  padding: 25px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.9em;
+  opacity: 0.75;
+  background: rgba(0, 0, 0, 0.3);
+}

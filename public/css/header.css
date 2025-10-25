@@ -1,0 +1,89 @@
+/* ==========================================
+   CASHMASH HEADER STYLE
+   Author: Arif Satify
+   ========================================== */
+
+/* ==========================================
+   NAVBAR
+   ========================================== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 50px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #f5c542;
+  letter-spacing: 1px;
+  animation: shimmer 3s infinite;
+}
+
+.nav-buttons a {
+  margin-left: 15px;
+  text-decoration: none;
+}
+
+.btn {
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.btn.gold {
+  background: #f5c542;
+  color: #000b38;
+  border: none;
+}
+
+.btn.outline {
+  border: 2px solid #f5c542;
+  color: #f5c542;
+  background: transparent;
+}
+
+.btn.gold:hover {
+  background: #fff;
+  color: #000b38;
+  box-shadow: 0 0 12px rgba(245, 197, 66, 0.5);
+}
+
+.btn.outline:hover {
+  background: #f5c542;
+  color: #000b38;
+}
+
+/* ===== User Panel - Related to Header/User State ===== */
+.user-panel { margin-bottom: 20px; display: flex; justify-content: center; }
+
+.user-info {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 30px;
+  border-radius: 30px;
+  display: flex;
+  gap: 40px;
+  font-size: 1.1em;
+  font-weight: 500;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(245,197,66,0.15);
+}
+
+/* RESPONSIVE for Navbar */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px 20px;
+  }
+}

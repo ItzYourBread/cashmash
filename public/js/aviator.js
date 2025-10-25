@@ -16,7 +16,7 @@ const balanceEl = document.getElementById('balance');
 const trailContainer = document.createElement('div');
 
 // Assume 'window.user' exists and has a unique ID
-const userId = window.user?._id; 
+const userId = window.user?._id;
 
 let hasBet = false;
 let hasCashedOut = false;
@@ -33,28 +33,28 @@ let pathClearedAfterFlyAway = false;
 
 // Setup the SVG path element
 if (graphSvgEl) {
-    graphPathEl.setAttribute('id', 'flight-path');
-    graphPathEl.setAttribute('fill', 'none');
-    graphPathEl.setAttribute('stroke', '#00ff66');
-    graphPathEl.setAttribute('stroke-width', '3');
-    graphPathEl.setAttribute('stroke-linecap', 'round');
-    graphPathEl.setAttribute('stroke-linejoin', 'round');
-    graphSvgEl.appendChild(graphPathEl);
+  graphPathEl.setAttribute('id', 'flight-path');
+  graphPathEl.setAttribute('fill', 'none');
+  graphPathEl.setAttribute('stroke', '#00ff66');
+  graphPathEl.setAttribute('stroke-width', '3');
+  graphPathEl.setAttribute('stroke-linecap', 'round');
+  graphPathEl.setAttribute('stroke-linejoin', 'round');
+  graphSvgEl.appendChild(graphPathEl);
 
-    // Place a trail container inside flightArea to hold fading dots
-    trailContainer.className = 'trail-container';
-    trailContainer.style.position = 'absolute';
-    trailContainer.style.top = 0;
-    trailContainer.style.left = 0;
-    trailContainer.style.width = '100%';
-    trailContainer.style.height = '100%';
-    trailContainer.style.pointerEvents = 'none';
-    trailContainer.style.overflow = 'hidden';
-    if (flightArea) flightArea.appendChild(trailContainer);
+  // Place a trail container inside flightArea to hold fading dots
+  trailContainer.className = 'trail-container';
+  trailContainer.style.position = 'absolute';
+  trailContainer.style.top = 0;
+  trailContainer.style.left = 0;
+  trailContainer.style.width = '100%';
+  trailContainer.style.height = '100%';
+  trailContainer.style.pointerEvents = 'none';
+  trailContainer.style.overflow = 'hidden';
+  if (flightArea) flightArea.appendChild(trailContainer);
 }
 
 // ---------------- SOCKET EVENTS ----------------
-socket.on('connect', () => {});
+socket.on('connect', () => { });
 
 // Betting countdown
 socket.on('betTimer', ({ timeLeft }) => {
@@ -85,13 +85,13 @@ socket.on('roundState', ({ round, state, multiplier, history, flightOngoing }) =
     hasBet = false;
     hasCashedOut = false;
 
-  // Reset button text and enable for current round
-  placeBetBtn.textContent = 'Place Bet';
-  toggleButton(placeBetBtn, true); 
-  toggleButton(cashOutBtn, false);
-  betAmountInput.disabled = false;
-  // ensure sunburst overlay is off when not flying
-  if (flightArea) flightArea.classList.remove('flight-active');
+    // Reset button text and enable for current round
+    placeBetBtn.textContent = 'Place Bet';
+    toggleButton(placeBetBtn, true);
+    toggleButton(cashOutBtn, false);
+    betAmountInput.disabled = false;
+    // ensure sunburst overlay is off when not flying
+    if (flightArea) flightArea.classList.remove('flight-active');
 
   } else if (state === 'flying') {
     // Flight started
@@ -99,8 +99,8 @@ socket.on('roundState', ({ round, state, multiplier, history, flightOngoing }) =
 
     // Preparation for next-round bet during flight
     placeBetBtn.textContent = 'Betting for Next Round...';
-    toggleButton(placeBetBtn, false); 
-    betAmountInput.disabled = false; 
+    toggleButton(placeBetBtn, false);
+    betAmountInput.disabled = false;
 
     if (flightOngoing) {
       if (!hasBet) {
@@ -111,12 +111,12 @@ socket.on('roundState', ({ round, state, multiplier, history, flightOngoing }) =
       showOverlay = false;
       isFlying = true; // Mark as flying to prevent reset
       planeEl.style.display = 'block';
-      
+
       // Calculate current position based on multiplier
       const progress = Math.min(currentMultiplier / 25, 1);
       const x = Math.min(0.75 * progress, 0.75); // Keep within bounds
       const y = Math.min(0.75 * progress, 0.75);
-      
+
       // Immediately position plane without animation
       const areaWidth = flightArea.offsetWidth;
       const areaHeight = flightArea.offsetHeight;
@@ -124,16 +124,16 @@ socket.on('roundState', ({ round, state, multiplier, history, flightOngoing }) =
       const bottom = y * areaHeight;
       const tilt = -15 + 25 * progress;
       const scale = 1.4 + x * 0.8;
-      
+
       // Force plane position
       planeEl.style.transition = 'none';
       planeEl.style.left = `${left}px`;
       planeEl.style.bottom = `${bottom}px`;
       planeEl.style.transform = `scale(${scale}) rotate(${tilt}deg)`;
-      
+
       // Update path immediately
       updateSVGPath(progress);
-      
+
       // Enable betting for next round
       placeBetBtn.textContent = 'Betting for Next Round...';
       toggleButton(placeBetBtn, false);
@@ -143,7 +143,7 @@ socket.on('roundState', ({ round, state, multiplier, history, flightOngoing }) =
       showOverlay = false;
       planeEl.style.display = 'block';
       startFlightAnimation();
-      toggleButton(cashOutBtn, hasBet && !hasCashedOut); 
+      toggleButton(cashOutBtn, hasBet && !hasCashedOut);
       if (flightArea) flightArea.classList.add('flight-active');
       resultText.textContent = `✈️ Flight started!`;
     }
@@ -171,7 +171,7 @@ socket.on('multiplierUpdate', ({ multiplier }) => {
     }
   }
   if (!showOverlay) {
-    const progress = Math.min(currentMultiplier / 25, 1); 
+    const progress = Math.min(currentMultiplier / 25, 1);
     updatePlanePosition(progress);
   }
 });
@@ -192,7 +192,7 @@ socket.on('roundCrashed', ({ crashAt }) => {
 
   flyAwayPlaneAnimation();
   // Final update to draw the line to the end point
-  updateSVGPath(); 
+  updateSVGPath();
   // stop sunburst overlay when round ends
   if (flightArea) flightArea.classList.remove('flight-active');
 });
@@ -248,8 +248,8 @@ placeBetBtn.addEventListener('click', async () => {
       body: JSON.stringify({ amount })
     });
 
-  let data;
-  try { data = await res.json(); } catch (e) { data = null; }
+    let data;
+    try { data = await res.json(); } catch (e) { data = null; }
 
     if (!res.ok) {
       // show server-provided message when possible
@@ -293,8 +293,8 @@ cashOutBtn.addEventListener('click', async () => {
       headers: { 'Content-Type': 'application/json' }
     });
 
-  let data;
-  try { data = await res.json(); } catch (e) { data = null; }
+    let data;
+    try { data = await res.json(); } catch (e) { data = null; }
 
     if (!res.ok) {
       const errMsg = data && (data.error || data.message) ? (data.error || data.message) : `HTTP ${res.status}`;
@@ -355,8 +355,8 @@ function startFlightAnimation() {
   const p2 = { x: 0.5, y: 0.15 };
   const p3 = { x: 0.75, y: 0.75 };
   function cubicBezier(t, p0, p1, p2, p3) {
-    const x = Math.pow(1-t,3)*p0.x + 3*Math.pow(1-t,2)*t*p1.x + 3*(1-t)*t*t*p2.x + t*t*t*p3.x;
-    const y = Math.pow(1-t,3)*p0.y + 3*Math.pow(1-t,2)*t*p1.y + 3*(1-t)*t*t*p2.y + t*t*t*p3.y;
+    const x = Math.pow(1 - t, 3) * p0.x + 3 * Math.pow(1 - t, 2) * t * p1.x + 3 * (1 - t) * t * t * p2.x + t * t * t * p3.x;
+    const y = Math.pow(1 - t, 3) * p0.y + 3 * Math.pow(1 - t, 2) * t * p1.y + 3 * (1 - t) * t * t * p2.y + t * t * t * p3.y;
     return { x, y };
   }
   function animate() {
@@ -408,8 +408,8 @@ function updateSVGPath(t = 1, p0, p1, p2, p3) {
   p3 = p3 || { x: 0.95, y: 0.95 };
   // For partial path, interpolate up to t
   function bezier(tt, p0, p1, p2, p3) {
-    const x = Math.pow(1-tt,3)*p0.x + 3*Math.pow(1-tt,2)*tt*p1.x + 3*(1-tt)*tt*tt*p2.x + tt*tt*tt*p3.x;
-    const y = Math.pow(1-tt,3)*p0.y + 3*Math.pow(1-tt,2)*tt*p1.y + 3*(1-tt)*tt*tt*p2.y + tt*tt*tt*p3.y;
+    const x = Math.pow(1 - tt, 3) * p0.x + 3 * Math.pow(1 - tt, 2) * tt * p1.x + 3 * (1 - tt) * tt * tt * p2.x + tt * tt * tt * p3.x;
+    const y = Math.pow(1 - tt, 3) * p0.y + 3 * Math.pow(1 - tt, 2) * tt * p1.y + 3 * (1 - tt) * tt * tt * p2.y + tt * tt * tt * p3.y;
     return { x, y };
   }
   let samples = Math.max(8, Math.floor(40 * t));
@@ -430,7 +430,7 @@ function updateSVGPath(t = 1, p0, p1, p2, p3) {
     graphPathEl.style.transition = 'stroke-dashoffset 0.15s linear';
     graphPathEl.style.strokeDasharray = pathLength + ' ' + pathLength;
     graphPathEl.style.strokeDashoffset = Math.max(0, pathLength - pathLength * t);
-  } catch (e) {}
+  } catch (e) { }
 }
 
 function stopFlightAnimation() {
@@ -480,15 +480,15 @@ function flyAwayPlaneAnimation(immediate = false) {
   // Move further up/right and fade out (negative Y for upward)
   planeEl.style.transform += ' translate(250px, -500px) scale(2.30) rotate(65deg)';
   planeEl.style.opacity = '0';
-    planeEl.style.transition = '';
-    planeEl.style.opacity = '1';
-    // Clear the SVG flight path after flying away
-    if (graphPathEl) {
-      graphPathEl.setAttribute('d', '');
-      graphPathEl.style.strokeDasharray = '';
-      graphPathEl.style.strokeDashoffset = '';
-    }
-    pathClearedAfterFlyAway = true;
+  planeEl.style.transition = '';
+  planeEl.style.opacity = '1';
+  // Clear the SVG flight path after flying away
+  if (graphPathEl) {
+    graphPathEl.setAttribute('d', '');
+    graphPathEl.style.strokeDasharray = '';
+    graphPathEl.style.strokeDashoffset = '';
+  }
+  pathClearedAfterFlyAway = true;
 }
 
 /**
