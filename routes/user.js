@@ -7,7 +7,7 @@ function ensureAuth(req, res, next) {
 }
 
 router.get('/dashboard', ensureAuth, (req, res) => {
-  res.render('dashboard', { user: req.user });
+  res.render('dashboard', { user: req.user, currentPage: 'dashboard' });
 });
 
 module.exports = router;

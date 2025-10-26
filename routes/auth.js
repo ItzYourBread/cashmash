@@ -4,7 +4,7 @@ const User = require('../models/User');
 const router = express.Router();
 
 // Register
-router.get('/register', (req, res) => res.render('register'));
+router.get('/register', (req, res) => res.render('register', { currentPage: 'register' }));
 router.post('/register', async (req, res) => {
   const { username, email, phone, password } = req.body;
 
@@ -28,7 +28,7 @@ router.post('/register', async (req, res) => {
 });
 
 // Login
-router.get('/login', (req, res) => res.render('login'));
+router.get('/login', (req, res) => res.render('login', { currentPage: 'login' }));
 router.post('/login', passport.authenticate('local', {
   successRedirect: '/dashboard',
   failureRedirect: '/login'

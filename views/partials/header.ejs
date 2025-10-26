@@ -1,12 +1,78 @@
 <header class="navbar">
-  <div class="logo">💰 CashMash</div>
-  <div class="nav-buttons">
-    <% if(user){ %>
-      <a href="/dashboard" class="btn gold">Dashboard</a>
-      <a href="/logout" class="btn outline">Logout</a>
-    <% } else { %>
-      <a href="/login" class="btn gold">Login</a>
-      <a href="/register" class="btn outline">Sign Up</a>
-    <% } %>
+  <div class="navbar-left">
+    <a href="/" class="logo">
+      <img src="/images/CashMash.png" alt="CashMash Logo" class="logo-img" />
+    </a>
+  </div>
+
+  <div class="navbar-right">
+    <!-- Language Selector (PC) -->
+    <div class="language-selector desktop-lang">
+      <span class="lang-current" id="langCurrent">
+        English <i class="arrow-down"></i>
+      </span>
+      <div class="lang-dropdown" id="langDropdown">
+        <a href="#" data-lang="en">English</a>
+        <a href="#" data-lang="bn">বাংলা</a>
+        <a href="#" data-lang="hi">हिन्दी</a>
+      </div>
+    </div>
+
+    <nav class="nav-links">
+      <a href="/" class="nav-item <%= currentPage === '' ? 'active-link' : '' %>">Home</a>
+      <a href="/games" class="nav-item <%= currentPage === 'games' ? 'active-link' : '' %>">Games</a>
+      <a href="/leaderboard" class="nav-item <%= currentPage === 'leaderboard' ? 'active-link' : '' %>">Leaderboard</a>
+      <a href="/promotions" class="nav-item <%= currentPage === 'promotions' ? 'active-link' : '' %>">Promotions</a>
+    </nav>
+
+    <% if (user) { %>
+      <div class="nav-buttons">
+        <a href="/dashboard" class="btn btn-gold">Dashboard</a>
+        <a href="/logout" class="btn btn-outline">Logout</a>
+      </div>
+      <% } else { %>
+        <div class="nav-buttons">
+          <a href="/login" class="btn btn-gold">Login</a>
+          <a href="/register" class="btn btn-outline">Sign
+            Up</a>
+        </div>
+        <% } %>
+
+
+          <!-- Language Selector (Mobile) -->
+          <div class="language-selector mobile-lang">
+            <span class="lang-current" id="langCurrentMobile">
+              English <i class="arrow-down"></i>
+            </span>
+            <div class="lang-dropdown" id="langDropdownMobile">
+              <a href="#" data-lang="en">English</a>
+              <a href="#" data-lang="bn">বাংলা</a>
+              <a href="#" data-lang="hi">हिन्दी</a>
+            </div>
+          </div>
+
+          <div class="menu-toggle" id="menuToggle">
+            <span></span><span></span><span></span>
+          </div>
   </div>
 </header>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <nav>
+    <a href="/" class="nav-item <%= currentPage === '' ? 'active-link' : '' %>">Home</a>
+    <a href="/games" class="nav-item <%= currentPage === 'games' ? 'active-link' : '' %>">Games</a>
+    <a href="/leaderboard" class="nav-item <%= currentPage === 'leaderboard' ? 'active-link' : '' %>">Leaderboard</a>
+
+    <% if (user) { %>
+      <a href="/dashboard" class="nav-item <%= currentPage === 'dashboard' ? 'active-link' : '' %>">Dashboard</a>
+      <a href="/logout" class="nav-item">Logout</a>
+      <% } else { %>
+        <a href="/login" class="nav-item <%= currentPage === 'login' ? 'active-link' : '' %>">Login</a>
+        <a href="/register" class="nav-item <%= currentPage === 'register' ? 'active-link' : '' %>">Sign Up</a>
+        <% } %>
+  </nav>
+</div>
+
+<!-- JS -->
+<script src="/js/header.js"></script>
