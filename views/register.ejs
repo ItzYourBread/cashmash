@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= currentLang %>">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Register | CashMash</title>
+  <title><%= __('Register Title') %> | CashMash</title>
   <link rel="stylesheet" href="/css/style.css"/>
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
@@ -13,21 +13,82 @@
   <%- include('partials/header') %>
 
   <section class="auth-section">
-    <form action="/register" method="POST" class="auth-form">
-      <h2>Create Your Account</h2>
+    <form id="registerForm" class="auth-form" novalidate>
+      <h2><%= __('Create Your Account') %></h2>
       
-      <input type="text" name="username" placeholder="Username" required/>
-      <input type="email" name="email" placeholder="Email" required/>
-      <input type="tel" name="phone" placeholder="Phone Number (BD)" required
-             pattern="^(?:\+8801|01)[3-9][0-9]{8}$"
-             title="Enter a valid Bangladeshi phone number, e.g., 01XXXXXXXXX or +8801XXXXXXXXX"/>
-      <input type="password" name="password" placeholder="Password" required/>
+      <input type="text" name="username" id="username" placeholder="<%= __('Username') %>" required />
+      <input type="email" name="email" id="email" placeholder="<%= __('Email') %>" required />
+      <input
+        type="tel"
+        name="phone"
+        id="phone"
+        placeholder="<%= __('Phone Number (optional)') %>"
+      />
+      <input type="password" name="password" id="password" placeholder="<%= __('Password') %>" required />
+
+      <button type="submit" class="btn gold big"><%= __('Register') %></button>
       
-      <button type="submit" class="btn gold big">Register</button>
-      <p>Already have an account? <a href="/login">Login</a></p>
+      <p>
+        <%= __('Already have an account?') %> 
+        <a href="/login"><%= __('Login') %></a>
+      </p>
+      <p id="responseMsg"></p>
     </form>
   </section>
 
   <%- include('partials/footer') %>
+
+  <script>
+    const registerForm = document.getElementById('registerForm');
+    const responseMsg = document.getElementById('responseMsg');
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      responseMsg.textContent = '';
+
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      // Get language-specific error messages from the backend or define them here
+      // For simplicity, we are hardcoding the errors here and assuming the backend will provide the correct language response.
+
+      // Optional phone validation: only check if filled
+      if (phone && !/^\+?[0-9]{6,15}$/.test(phone)) {
+        // NOTE: For full localization, this message should also come from the server 
+        // using an API endpoint to fetch the string based on req.session.lang.
+        // For now, we will use a basic English message.
+        responseMsg.textContent = '<%= __('Phone validation error') %>'; 
+        responseMsg.style.color = 'red';
+        return;
+      }
+
+      try {
+        const res = await fetch('/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, phone, password })
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok) {
+          // Assume 'data.message' is returned in the correct language by the server
+          responseMsg.textContent = data.message || '<%= __('Registration successful!') %>';
+          responseMsg.style.color = '#f5c542';
+          setTimeout(() => { window.location.href = '/login'; }, 1200);
+        } else {
+          // Assume 'data.message' is returned in the correct language by the server
+          responseMsg.textContent = data.message || '<%= __('Registration failed.') %>';
+          responseMsg.style.color = 'red';
+        }
+      } catch (err) {
+        console.error(err);
+        responseMsg.textContent = '<%= __('Something went wrong.') %>';
+        responseMsg.style.color = 'red';
+      }
+    });
+  </script>
 </body>
 </html>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= currentLang %>">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login | CashMash</title>
+  <title><%= __('Login Title') %> | CashMash</title>
   <link rel="stylesheet" href="/css/style.css"/>
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
@@ -17,35 +17,36 @@
 
   <section class="auth-section">
     <form id="loginForm" class="auth-form" novalidate>
-      <h2>Login to CashMash</h2>
+      <h2><%= __('Login to CashMash') %></h2>
 
-      <!-- STEP 1: LOGIN -->
       <div id="step-login">
-        <input type="email" name="email" id="email" placeholder="Email" required />
-        <input type="password" name="password" id="password" placeholder="Password" required />
-        <button type="submit">Login</button>
+        <input type="email" name="email" id="email" placeholder="<%= __('Email') %>" required />
+        <input type="password" name="password" id="password" placeholder="<%= __('Password') %>" required />
+        <button type="submit"><%= __('Login') %></button>
       </div>
 
-      <!-- STEP 2: OTP VERIFICATION -->
       <div id="step-otp" class="hidden">
         <p class="auth-message">
-          We detected a new device or location.<br/>
-          Please verify using the OTP sent to your email.
+          <%= __('OTP new device warning line 1') %><br/>
+          <%= __('OTP new device warning line 2') %>
         </p>
         <input
           type="text"
           id="otp"
           name="otp"
-          placeholder="Enter 6-digit OTP"
+          placeholder="<%= __('Enter 6-digit OTP') %>"
           maxlength="6"
           pattern="[0-9]{6}"
           inputmode="numeric"
         />
-        <button type="button" id="verifyOtpBtn">Verify OTP</button>
+        <button type="button" id="verifyOtpBtn"><%= __('Verify OTP') %></button>
       </div>
 
       <p id="responseMsg"></p>
-      <p>Don't have an account? <a href="/register">Sign Up</a></p>
+      <p>
+        <%= __('Don\'t have an account?') %> 
+        <a href="/register"><%= __('Sign Up') %></a>
+      </p>
     </form>
   </section>
 
@@ -59,6 +60,15 @@
     const responseMsg = document.getElementById('responseMsg');
     const verifyOtpBtn = document.getElementById('verifyOtpBtn');
 
+    // Retrieve localized messages from EJS context
+    const MSGS = {
+        otpSent: '<%= __('OTP sent to your email.') %>',
+        loginFailed: '<%= __('Login failed.') %>',
+        otpRequired: '<%= __('Please enter the OTP.') %>',
+        loginSuccessful: '<%= __('Login successful!') %>',
+        invalidOtp: '<%= __('Invalid OTP.') %>'
+    };
+
     // Handle login step
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -67,7 +77,6 @@
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
 
-      // Disable OTP required when hidden
       otpInput.removeAttribute('required');
 
       const res = await fetch('/login', {
@@ -81,13 +90,14 @@
       if (res.ok && data.otpRequired) {
         stepLogin.classList.add('hidden');
         stepOtp.classList.remove('hidden');
-        otpInput.setAttribute('required', 'true'); // only required when visible
-        responseMsg.textContent = 'OTP sent to your email.';
+        otpInput.setAttribute('required', 'true');
+        responseMsg.textContent = MSGS.otpSent;
         responseMsg.style.color = '#f5c542';
       } else if (res.ok && data.otpRequired === false) {
         window.location.href = '/dashboard';
       } else {
-        responseMsg.textContent = data.message || 'Login failed.';
+        // Assume data.message, if present, is in the correct language from the server
+        responseMsg.textContent = data.message || MSGS.loginFailed;
         responseMsg.style.color = 'red';
       }
     });
@@ -100,7 +110,7 @@
       const otp = otpInput.value.trim();
 
       if (!otp) {
-        responseMsg.textContent = 'Please enter the OTP.';
+        responseMsg.textContent = MSGS.otpRequired;
         responseMsg.style.color = 'red';
         return;
       }
@@ -111,14 +121,17 @@
         body: JSON.stringify({ email, otp })
       });
 
+      // The server may return plain text for errors
       const data = await res.text();
 
       if (res.ok) {
-        responseMsg.textContent = 'Login successful!';
+        responseMsg.textContent = MSGS.loginSuccessful;
         responseMsg.style.color = '#f5c542';
         setTimeout(() => (window.location.href = '/dashboard'), 800);
       } else {
-        responseMsg.textContent = data || 'Invalid OTP.';
+        // Here, we trust the server response for the error message, 
+        // but fall back to a localized default if the response is empty.
+        responseMsg.textContent = data || MSGS.invalidOtp; 
         responseMsg.style.color = 'red';
       }
     });
