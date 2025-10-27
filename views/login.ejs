@@ -8,18 +8,120 @@
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/auth.css" />
+  <style>
+    .hidden { display: none; }
+  </style>
 </head>
 <body>
   <%- include('partials/header') %>
+
   <section class="auth-section">
-    <form action="/login" method="POST" class="auth-form">
+    <form id="loginForm" class="auth-form" novalidate>
       <h2>Login to CashMash</h2>
-      <input type="email" name="email" placeholder="Email" required/>
-      <input type="password" name="password" placeholder="Password" required/>
-      <button type="submit" class="btn gold big">Login</button>
+
+      <!-- STEP 1: LOGIN -->
+      <div id="step-login">
+        <input type="email" name="email" id="email" placeholder="Email" required />
+        <input type="password" name="password" id="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+      </div>
+
+      <!-- STEP 2: OTP VERIFICATION -->
+      <div id="step-otp" class="hidden">
+        <p class="auth-message">
+          We detected a new device or location.<br/>
+          Please verify using the OTP sent to your email.
+        </p>
+        <input
+          type="text"
+          id="otp"
+          name="otp"
+          placeholder="Enter 6-digit OTP"
+          maxlength="6"
+          pattern="[0-9]{6}"
+          inputmode="numeric"
+        />
+        <button type="button" id="verifyOtpBtn">Verify OTP</button>
+      </div>
+
+      <p id="responseMsg"></p>
       <p>Don't have an account? <a href="/register">Sign Up</a></p>
     </form>
   </section>
+
   <%- include('partials/footer') %>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const stepLogin = document.getElementById('step-login');
+    const stepOtp = document.getElementById('step-otp');
+    const otpInput = document.getElementById('otp');
+    const responseMsg = document.getElementById('responseMsg');
+    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+
+    // Handle login step
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      responseMsg.textContent = '';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      // Disable OTP required when hidden
+      otpInput.removeAttribute('required');
+
+      const res = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.otpRequired) {
+        stepLogin.classList.add('hidden');
+        stepOtp.classList.remove('hidden');
+        otpInput.setAttribute('required', 'true'); // only required when visible
+        responseMsg.textContent = 'OTP sent to your email.';
+        responseMsg.style.color = '#f5c542';
+      } else if (res.ok && data.otpRequired === false) {
+        window.location.href = '/dashboard';
+      } else {
+        responseMsg.textContent = data.message || 'Login failed.';
+        responseMsg.style.color = 'red';
+      }
+    });
+
+    // Handle OTP verification
+    verifyOtpBtn.addEventListener('click', async () => {
+      responseMsg.textContent = '';
+
+      const email = document.getElementById('email').value.trim();
+      const otp = otpInput.value.trim();
+
+      if (!otp) {
+        responseMsg.textContent = 'Please enter the OTP.';
+        responseMsg.style.color = 'red';
+        return;
+      }
+
+      const res = await fetch('/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp })
+      });
+
+      const data = await res.text();
+
+      if (res.ok) {
+        responseMsg.textContent = 'Login successful!';
+        responseMsg.style.color = '#f5c542';
+        setTimeout(() => (window.location.href = '/dashboard'), 800);
+      } else {
+        responseMsg.textContent = data || 'Invalid OTP.';
+        responseMsg.style.color = 'red';
+      }
+    });
+  </script>
 </body>
 </html>

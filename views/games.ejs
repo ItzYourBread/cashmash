@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Games | CashMash</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
+    <link rel="stylesheet" href="/css/games.css" />
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <section class="games">
+            <div class="games-header">
+                <h1>🎮 Explore Games</h1>
+                <p>Play and experience the thrill — anytime, anywhere.</p>
+            </div>
+
+            <!-- 🎰 SLOTS CATEGORY -->
+            <div class="category">
+                <h2>Slot Machines & Spins</h2>
+                <div class="game-grid">
+                    <div class="game-card" data-game="Classic Slot">
+                        <img src="/images/classic-slot-cover.jpg" alt="Classic Slot" />
+                        <div class="overlay">Classic</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🎡 CARDS CATEGORY -->
+            <div class="category">
+                <h2>Cards & Casino</h2>
+                <div class="game-grid">
+                    <div class="game-card" data-game="Blackjack">
+                        <img src="/images/blackjack-cover.jpg" alt="Blackjack" />
+                        <div class="overlay">Blackjack</div>
+                    </div>
+                    <div class="game-card" data-game="Baccarat">
+                        <img src="/images/baccarat-cover.jpg" alt="Baccarat" />
+                        <div class="overlay">Baccarat</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🧨 OTHER CATEGORY -->
+            <div class="category">
+                <h2>Other</h2>
+                <div class="game-grid">
+                    <div class="game-card" data-game="Mines">
+                        <img src="/images/mines-cover.jpg" alt="Mines" />
+                        <div class="overlay">Mines</div>
+                    </div>
+                    <div class="game-card" data-game="Aviator">
+                        <img src="/images/aviator-cover.jpg" alt="Aviator" />
+                        <div class="overlay">Aviator</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🔐 LOGIN MODAL -->
+        <div class="login-modal" id="loginModal">
+            <div class="modal-content">
+                <h2>Login Required</h2>
+                <p>You need to be logged in to play <span id="selectedGame"></span>.</p>
+                <div class="modal-actions">
+                    <a href="/login" class="btn gold">Login</a>
+                    <button class="btn outline" id="closeModal">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>
+
+            <script>
+                const modal = document.getElementById('loginModal');
+                const closeBtn = document.getElementById('closeModal');
+                const gameCards = document.querySelectorAll('.game-card');
+                const selectedGame = document.getElementById('selectedGame');
+
+                // Check if logged in (server-side injection)
+                const isLoggedIn = <%= user ? 'true' : 'false' %>;
+
+                // Map each game name to its route
+                const gameRoutes = {
+                    "Classic Slot": "/slots",
+                    "Blackjack": "/blackjack",
+                    "Baccarat": "/baccarat",
+                    "Mines": "/mines",
+                    "Aviator": "/aviator"
+                };
+
+                gameCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        const gameName = card.dataset.game;
+                        if (isLoggedIn) {
+                            // Redirect to game page
+                            window.location.href = gameRoutes[gameName] || '/';
+                        } else {
+                            // Show login modal
+                            selectedGame.textContent = gameName;
+                            modal.classList.add('show');
+                        }
+                    });
+                });
+
+                // Modal close logic
+                closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+                window.addEventListener('click', e => {
+                    if (e.target === modal) modal.classList.remove('show');
+                });
+            </script>
+
+</body>
+
+</html>

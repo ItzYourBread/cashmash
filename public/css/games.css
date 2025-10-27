@@ -1,0 +1,277 @@
+/* ==========================================
+   CASHMASH GAMES PAGE STYLE
+   Author: Arif Satify
+   ========================================== */
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* THEME COLORS */
+:root {
+  --gold: #f5c542;
+  --gold-light: #ffdb6e;
+  --bg-black: #000;
+  --bg-soft: #0a0a0a;
+  --text-light: #fff;
+  --text-dim: #bbb;
+}
+
+/* BODY */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top center, #000 10%, #0a0a0a 100%);
+  color: var(--text-light);
+  overflow-x: hidden;
+}
+
+/* ==========================================
+   GAMES SECTION
+   ========================================== */
+.games {
+  padding: 100px 6% 120px;
+  text-align: center;
+}
+
+.games-header {
+  max-width: 800px;
+  margin: 0 auto 70px;
+}
+
+.games-header h1 {
+  font-size: 3em;
+  color: var(--gold);
+  text-shadow: 0 0 25px rgba(245, 197, 66, 0.4);
+  animation: goldPulse 3s infinite ease-in-out;
+}
+
+.games-header p {
+  color: var(--text-dim);
+  font-size: 1.1em;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+/* CATEGORY */
+.category {
+  margin-bottom: 80px;
+}
+
+.category h2 {
+  color: var(--gold);
+  text-transform: uppercase;
+  font-size: 1.4em;
+  letter-spacing: 1px;
+  margin-bottom: 25px;
+  text-shadow: 0 0 15px rgba(245, 197, 66, 0.25);
+}
+
+.category h2::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: var(--gold);
+  margin: 10px auto 0;
+  border-radius: 2px;
+}
+
+/* GAME GRID */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 per row */
+  grid-template-rows: repeat(4, auto);   /* 4 rows */
+  gap: 18px;
+  justify-items: center;
+  align-items: start;
+}
+
+
+/* GAME CARD */
+.game-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* square */
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* overlay stays at bottom */
+  box-shadow: 0 0 15px rgba(245,197,66,0.05);
+} 
+
+.game-card img {
+  width: 100%;
+  height: auto; /* keep original ratio */
+  flex-grow: 1; /* image fills remaining space */
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.game-card .overlay {
+  position: relative;
+  background: rgba(0,0,0,0.65);
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 1.1em;
+  letter-spacing: 0.5px;
+  padding: 10px 0;
+  transition: background 0.3s ease;
+  z-index: 2;
+  width: 100%;
+  text-align: center;
+}
+
+/* HOVER EFFECTS */
+.game-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold);
+  box-shadow: 0 0 25px rgba(245, 197, 66, 0.35);
+}
+
+.game-card:hover img {
+  transform: scale(1.05);
+  filter: brightness(1);
+}
+
+.game-card:hover .overlay {
+  background: linear-gradient(to right, rgba(245,197,66,0.3), rgba(245,197,66,0.6));
+  color: #fff;
+}
+
+/* ==========================================
+   MODAL
+   ========================================== */
+.login-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(6px);
+}
+
+.login-modal.show {
+  display: flex;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.modal-content {
+  background: var(--bg-soft);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 40px 30px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 0 40px rgba(245, 197, 66, 0.25);
+  animation: slideUp 0.4s ease;
+}
+
+.modal-content h2 {
+  color: var(--gold);
+  margin-bottom: 12px;
+  font-size: 1.5em;
+}
+
+.modal-content p {
+  color: var(--text-dim);
+  font-size: 1em;
+  margin-bottom: 25px;
+}
+
+/* MODAL BUTTONS */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn {
+  border: none;
+  padding: 12px 30px;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95em;
+}
+
+.btn.gold {
+  background: linear-gradient(145deg, var(--gold-light), var(--gold));
+  color: #000;
+  box-shadow: 0 0 20px rgba(245,197,66,0.3);
+}
+
+.btn.gold:hover {
+  box-shadow: 0 0 35px rgba(245,197,66,0.7);
+  transform: scale(1.05);
+}
+
+.btn.outline {
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+}
+
+.btn.outline:hover {
+  background: rgba(245,197,66,0.1);
+}
+
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes goldPulse {
+  0%, 100% { text-shadow: 0 0 10px rgba(245,197,66,0.3); }
+  50% { text-shadow: 0 0 25px rgba(245,197,66,0.7); }
+}
+
+/* ==========================================
+   RESPONSIVE GRID
+   ========================================== */
+@media (max-width: 992px) {
+  .game-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .game-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .games-header h1 {
+    font-size: 2.2em;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .game-card {
+    aspect-ratio: 1 / 1;
+  }
+}

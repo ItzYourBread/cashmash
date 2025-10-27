@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= currentLang %>">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CashMash | Virtual Casino</title>
+  <title>CashMash | <%= __('Online Betting & Casino') %></title>
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
@@ -16,24 +16,29 @@
     <section class="hero">
       <div class="hero-overlay"></div>
       <div class="hero-content">
-        <h1>Welcome to <span class="cash">Cash</span><span class="mash">Mash</span></h1>
-        <p>The most thrilling virtual casino experience. <br> Play. Win. Dominate.</p>
-        <a href="/login" class="btn-gold big">Start Playing</a>
+        <h1><%= __('Welcome to') %> <span class="cash">Cash</span><span class="mash">Mash</span></h1>
+        
+        <p>
+          <%= __('THE GAME IS LIVE. FEAR IS A LUXURY. BET BOLDLY.') %> <br> 
+          <%= __('The adrenaline rush that pays your bills. Maximum payout. Minimum regret.') %>
+        </p>
+
+        <a href="/login" class="btn-gold big"><%= __('Play Now') %></a>
       </div>
     </section>
 
     <section class="features">
       <div class="feature">
-        <h2>🎰 Virtual Chips</h2>
-        <p>Play risk-free using fun virtual chips and experience real casino vibes — no real money involved.</p>
+        <h2>💰 <%= __('Real Cash Winnings') %></h2>
+        <p><%= __('Feature Real Cash Info') %></p> 
       </div>
       <div class="feature">
-        <h2>🏆 Leaderboards</h2>
-        <p>Prove your skills and climb to the top — only the luckiest and sharpest survive!</p>
+        <h2>🏆 <%= __('Global Leaderboards') %></h2>
+        <p><%= __('Feature Leaderboard Info') %></p>
       </div>
       <div class="feature">
-        <h2>🎮 Exclusive Games</h2>
-        <p>Experience fast-paced rounds, live multipliers, and dazzling rewards — all in one place.</p>
+        <h2>🕹️ <%= __('Instant Payout Games') %></h2>
+        <p><%= __('Feature Exclusive Games Info') %></p>
       </div>
     </section>
 
