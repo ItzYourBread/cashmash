@@ -1,3 +1,34 @@
-<footer>
-  <p>© 2025 CashMash • All rights reserved</p>
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-logo">
+      <a href="/">
+        <img src="/images/CashMash.png" alt="CashMash Logo" class="logo-img" />
+      </a>
+    </div>
+
+    <div class="footer-info">
+      <p><%= __('Footer Age Warning') %></p>
+      <p><%= __('Footer Legal Warning') %></p>
+      <p><%= __('Footer Terms Policy') %></p>
+      <p>
+        <%= __('Footer Contact Info') %>: 
+        <a href="mailto:support@cashmash.com" class="footer-link">support@cashmash.com</a>
+      </p>
+    </div>
+
+    <div class="footer-social">
+      <a href="https://t.me/YourTelegramLink" target="_blank" class="social-icon">
+        <img src="/images/icons/telegram.svg" alt="Telegram" class="social-img" style="width: 30px; height: 30px;" />
+      </a>
+
+      <a href="https://instagram.com/YourInstagram" target="_blank" class="social-icon">
+        <img src="/images/icons/instagram.svg" alt="Instagram" class="social-img" />
+      </a>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2025 CashMash • <%= __('All rights reserved') %></p>
+  </div>
 </footer>

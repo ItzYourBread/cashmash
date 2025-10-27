@@ -12,11 +12,13 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "connect-mongo": "^5.1.0",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "http": "^0.0.1-security",
+    "i18n": "^0.15.2",
     "mongoose": "^8.19.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",

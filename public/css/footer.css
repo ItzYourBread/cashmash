@@ -1,16 +1,121 @@
-/* ==========================================
-   CASHMASH FOOTER STYLE
-   Author: Arif Satify
-   ========================================== */
+:root {
+  --gold: #f5c542;
+  --gold-light: #ffdb6e;
+  --text-light: #fff;
+  --text-dim: #ccc;
+  --bg-dark: #000;
+  --transition: 0.3s ease;
+}
 
-/* ==========================================
-   FOOTER
-   ========================================== */
-footer {
-  text-align: center;
-  padding: 25px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+/* =======================
+   FOOTER BASE
+======================= */
+.footer {
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(10px);
+  color: var(--text-light);
+  font-family: 'Poppins', sans-serif;
+  padding: 40px 50px 20px 50px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Top Section */
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-bottom: 25px;
+}
+
+/* Logo */
+.footer-logo .logo-img {
+  height: 50px;
+}
+
+
+/* Footer Info Text */
+.footer-info {
+  max-width: 600px;
+  color: var(--text-dim);
   font-size: 0.9em;
-  opacity: 0.75;
-  background: rgba(0, 0, 0, 0.3);
+  line-height: 1.6em;
+  text-align: left;
+}
+
+.footer-info p {
+  margin: 6px 0;
+  transition: var(--transition);
+}
+
+.footer-info p:hover {
+  color: var(--gold);
+  text-shadow: 0 0 6px rgba(245,197,66,0.6);
+}
+
+.footer-info a.footer-link {
+  color: var(--gold);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.footer-info a.footer-link:hover {
+  text-shadow: 0 0 8px rgba(245,197,66,0.7);
+}
+
+/* Social Icons */
+.footer-social {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.footer-social .social-img {
+    width: 28px;
+    height: 28px;
+}
+
+/* Bottom Section */
+.footer-bottom {
+  text-align: center;
+  font-size: 0.9em;
+  color: var(--text-dim);
+  opacity: 0.8;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 15px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .footer-top {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-info {
+    text-align: center;
+    margin: 15px 0;
+  }
+
+  .footer-social {
+    gap: 12px;
+  }
+}
+
+/* Optional: subtle fade-in animation for all footer items */
+.footer-top > * {
+  opacity: 0;
+  transform: translateY(15px);
+  animation: fadeInUp 0.5s forwards;
+}
+
+.footer-top > *:nth-child(1) { animation-delay: 0.1s; }
+.footer-top > *:nth-child(2) { animation-delay: 0.2s; }
+.footer-top > *:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
