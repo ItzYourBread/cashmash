@@ -6,10 +6,13 @@
     "Dashboard": "Dashboard",
     "Login": "Login",
     "Logout": "Logout",
-    "Sign Up": "Sign Up",    
-    "Footer Age Warning": "CashMash is a gaming platform intended for users 18 years or older. Please play responsibly.",
-    "Footer Legal Warning": "All games are for entertainment purposes only. Gambling may be addictive; seek help if needed.",
-    "Footer Terms Policy": "Terms & Conditions and Privacy Policy apply.",
-    "Footer Contact Info": "For support or inquiries, contact",
+    "Sign Up": "Sign Up",
+    "Deposit": "Deposit",
+    "Withdraw": "Withdraw",
+    
+    "Footer Age Warning": "CashMash is a licensed and regulated online gaming platform. Participation is strictly restricted to users aged 18 or over.",
+    "Footer Legal Warning": "WARNING: Gambling is highly addictive. Play responsibly and only bet what you can afford to lose. For help, visit our Responsible Gaming page.",
+    "Footer Terms Policy": "By using this site, you agree to our full Terms & Conditions, Privacy Policy, and Responsible Gaming policy.",
+    "Footer Contact Info": "For customer support, regulatory inquiries, or responsible gaming assistance, contact",
     "All rights reserved": "All rights reserved"
 }
