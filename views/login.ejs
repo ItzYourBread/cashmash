@@ -1,140 +1,177 @@
 <!DOCTYPE html>
 <html lang="<%= currentLang %>">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title><%= __('Login Title') %> | CashMash</title>
-  <link rel="stylesheet" href="/css/style.css"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= __('Login Title') %> | CashMash
+  </title>
+  <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/auth.css" />
   <style>
-    .hidden { display: none; }
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
+
 <body>
   <%- include('partials/header') %>
 
-  <section class="auth-section">
-    <form id="loginForm" class="auth-form" novalidate>
-      <h2><%= __('Login to CashMash') %></h2>
+    <section class="auth-section">
+      <form id="loginForm" class="auth-form" novalidate>
+        <h2>
+          <%= __('Login to CashMash') %>
+        </h2>
 
-      <div id="step-login">
-        <input type="email" name="email" id="email" placeholder="<%= __('Email') %>" required />
-        <input type="password" name="password" id="password" placeholder="<%= __('Password') %>" required />
-        <button type="submit"><%= __('Login') %></button>
-      </div>
+        <div id="step-login">
+          <input type="email" name="email" id="email" placeholder="<%= __('Email') %>" required />
+          <input type="password" name="password" id="password" placeholder="<%= __('Password') %>" required />
+          <button type="submit">
+            <%= __('Login') %>
+          </button>
+        </div>
 
-      <div id="step-otp" class="hidden">
-        <p class="auth-message">
-          <%= __('OTP new device warning line 1') %><br/>
-          <%= __('OTP new device warning line 2') %>
+        <div id="step-otp" class="hidden">
+          <p class="auth-message">
+            <%= __('OTP new device warning line 1') %><br />
+              <%= __('OTP new device warning line 2') %>
+          </p>
+          <input type="text" id="otp" name="otp" placeholder="<%= __('Enter 6-digit OTP') %>" maxlength="6"
+            pattern="[0-9]{6}" inputmode="numeric" />
+          <button type="button" id="verifyOtpBtn">
+            <%= __('Verify OTP') %>
+          </button>
+        </div>
+
+        <p id="responseMsg"></p>
+        <p>
+          <%= __('Don\'t have an account?') %>
+            <a href="/register">
+              <%= __('Sign Up') %>
+            </a>
         </p>
-        <input
-          type="text"
-          id="otp"
-          name="otp"
-          placeholder="<%= __('Enter 6-digit OTP') %>"
-          maxlength="6"
-          pattern="[0-9]{6}"
-          inputmode="numeric"
-        />
-        <button type="button" id="verifyOtpBtn"><%= __('Verify OTP') %></button>
-      </div>
+      </form>
+    </section>
 
-      <p id="responseMsg"></p>
-      <p>
-        <%= __('Don\'t have an account?') %> 
-        <a href="/register"><%= __('Sign Up') %></a>
-      </p>
-    </form>
-  </section>
+    <%- include('partials/footer') %>
 
-  <%- include('partials/footer') %>
+      <script>
+        const loginForm = document.getElementById('loginForm');
+        const stepLogin = document.getElementById('step-login');
+        const stepOtp = document.getElementById('step-otp');
+        const otpInput = document.getElementById('otp');
+        const responseMsg = document.getElementById('responseMsg');
+        const verifyOtpBtn = document.getElementById('verifyOtpBtn');
 
-  <script>
-    const loginForm = document.getElementById('loginForm');
-    const stepLogin = document.getElementById('step-login');
-    const stepOtp = document.getElementById('step-otp');
-    const otpInput = document.getElementById('otp');
-    const responseMsg = document.getElementById('responseMsg');
-    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+        const loginBtn = stepLogin.querySelector('button[type="submit"]');
 
-    // Retrieve localized messages from EJS context
-    const MSGS = {
-        otpSent: '<%= __('OTP sent to your email.') %>',
-        loginFailed: '<%= __('Login failed.') %>',
-        otpRequired: '<%= __('Please enter the OTP.') %>',
-        loginSuccessful: '<%= __('Login successful!') %>',
-        invalidOtp: '<%= __('Invalid OTP.') %>'
-    };
+        // Retrieve localized messages
+        const MSGS = {
+          otpSent: '<%= __("OTP sent to your email.") %>',
+          loginFailed: '<%= __("Login failed.") %>',
+          otpRequired: '<%= __("Please enter the OTP.") %>',
+          loginSuccessful: '<%= __("Login successful!") %>',
+          invalidOtp: '<%= __("Invalid OTP.") %>'
+        };
 
-    // Handle login step
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      responseMsg.textContent = '';
+        // Handle login step
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          responseMsg.textContent = '';
+          loginBtn.disabled = true;
+          loginBtn.textContent = 'Checking...';
+          loginBtn.style.opacity = '0.6';
 
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value.trim();
 
-      otpInput.removeAttribute('required');
+          otpInput.removeAttribute('required');
 
-      const res = await fetch('/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+          try {
+            const res = await fetch('/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, password })
+            });
 
-      const data = await res.json().catch(() => ({}));
+            const data = await res.json().catch(() => ({}));
 
-      if (res.ok && data.otpRequired) {
-        stepLogin.classList.add('hidden');
-        stepOtp.classList.remove('hidden');
-        otpInput.setAttribute('required', 'true');
-        responseMsg.textContent = MSGS.otpSent;
-        responseMsg.style.color = '#f5c542';
-      } else if (res.ok && data.otpRequired === false) {
-        window.location.href = '/dashboard';
-      } else {
-        // Assume data.message, if present, is in the correct language from the server
-        responseMsg.textContent = data.message || MSGS.loginFailed;
-        responseMsg.style.color = 'red';
-      }
-    });
+            if (res.ok && data.otpRequired) {
+              stepLogin.classList.add('hidden');
+              stepOtp.classList.remove('hidden');
+              otpInput.setAttribute('required', 'true');
+              responseMsg.textContent = MSGS.otpSent;
+              responseMsg.style.color = '#f5c542';
+            } else if (res.ok && data.otpRequired === false) {
+              window.location.href = '/dashboard';
+            } else {
+              responseMsg.textContent = data.message || MSGS.loginFailed;
+              responseMsg.style.color = 'red';
+            }
+          } catch (err) {
+            responseMsg.textContent = 'Network issue, please try again.';
+            responseMsg.style.color = 'red';
+          }
 
-    // Handle OTP verification
-    verifyOtpBtn.addEventListener('click', async () => {
-      responseMsg.textContent = '';
+          // Re-enable button after delay (to prevent spam click)
+          setTimeout(() => {
+            loginBtn.disabled = false;
+            loginBtn.textContent = '<%= __("Login") %>';
+            loginBtn.style.opacity = '1';
+          }, 1500);
+        });
 
-      const email = document.getElementById('email').value.trim();
-      const otp = otpInput.value.trim();
+        // Handle OTP verification
+        verifyOtpBtn.addEventListener('click', async () => {
+          responseMsg.textContent = '';
 
-      if (!otp) {
-        responseMsg.textContent = MSGS.otpRequired;
-        responseMsg.style.color = 'red';
-        return;
-      }
+          const email = document.getElementById('email').value.trim();
+          const otp = otpInput.value.trim();
 
-      const res = await fetch('/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp })
-      });
+          if (!otp) {
+            responseMsg.textContent = MSGS.otpRequired;
+            responseMsg.style.color = 'red';
+            return;
+          }
 
-      // The server may return plain text for errors
-      const data = await res.text();
+          verifyOtpBtn.disabled = true;
+          verifyOtpBtn.textContent = 'Verifying...';
+          verifyOtpBtn.style.opacity = '0.6';
 
-      if (res.ok) {
-        responseMsg.textContent = MSGS.loginSuccessful;
-        responseMsg.style.color = '#f5c542';
-        setTimeout(() => (window.location.href = '/dashboard'), 800);
-      } else {
-        // Here, we trust the server response for the error message, 
-        // but fall back to a localized default if the response is empty.
-        responseMsg.textContent = data || MSGS.invalidOtp; 
-        responseMsg.style.color = 'red';
-      }
-    });
-  </script>
+          try {
+            const res = await fetch('/verify-otp', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, otp })
+            });
+
+            const data = await res.text();
+
+            if (res.ok) {
+              responseMsg.textContent = MSGS.loginSuccessful;
+              responseMsg.style.color = '#f5c542';
+              setTimeout(() => (window.location.href = '/dashboard'), 800);
+            } else {
+              responseMsg.textContent = data || MSGS.invalidOtp;
+              responseMsg.style.color = 'red';
+            }
+          } catch (err) {
+            responseMsg.textContent = 'Connection error, try again.';
+            responseMsg.style.color = 'red';
+          }
+
+          // Re-enable button after delay
+          setTimeout(() => {
+            verifyOtpBtn.disabled = false;
+            verifyOtpBtn.textContent = '<%= __("Verify OTP") %>';
+            verifyOtpBtn.style.opacity = '1';
+          }, 1500);
+        });
+      </script>
 </body>
+
 </html>
