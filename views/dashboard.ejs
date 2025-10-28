@@ -5,7 +5,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | CashMash</title>
-  <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/dashboard.css" />
@@ -14,34 +13,214 @@
 <body>
   <%- include('partials/header') %>
 
-  <section class="dashboard">
-    <div class="dashboard-header">
-      <h1>Welcome, <%= user.username %> 👋</h1>
-      <p>Balance: <strong><%= user.chips %> Chips</strong></p>
-    </div>
+    <section class="dashboard">
+      <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <div class="balance-box">
+            <h3>Balance</h3>
+            <p>
+              <%= user.chips.toLocaleString() %> Chips
+            </p>
+          </div>
 
-    <div class="dashboard-actions">
-      <a href="/deposit" class="btn gold">💰 Deposit</a>
-      <a href="/withdraw" class="btn outline">💸 Withdraw</a>
-      <a href="/history" class="btn gray">📜 History</a>
-    </div>
+          <ul class="sidebar-menu">
+            <li class="active" data-section="statistics">Statistics</li>
+            <li data-section="deposit">Deposits</li>
+            <li data-section="withdraw">Withdrawals</li>
+            <li data-section="history">Game History</li>
+            <li data-section="account">Account Management</li>
+          </ul>
+        </aside>
 
-    <div class="account-summary">
-      <div class="summary-card">
-        <h3>Total Bets</h3>
-        <p>1,245</p>
-      </div>
-      <div class="summary-card">
-        <h3>Total Wins</h3>
-        <p>745</p>
-      </div>
-      <div class="summary-card">
-        <h3>Win Rate</h3>
-        <p>59.8%</p>
-      </div>
-    </div>
-  </section>
+        <!-- Content -->
+        <div class="content-area">
 
-  <%- include('partials/footer') %>
+          <!-- Statistics -->
+          <div id="statistics" class="content-section active">
+            <h2>Welcome, <%= user.username %> 👋</h2>
+            <p>Joined: <%= new Date(user.joinedAt).toLocaleDateString() %>
+            </p>
+            <p>Email: <%= user.email || 'N/A' %>
+            </p>
+            <p>Phone: <%= user.phone || 'N/A' %>
+            </p>
+          </div>
+
+          <!-- Deposits -->
+          <div id="deposit" class="content-section">
+            <h2>Your Deposits</h2>
+            <% if (user.deposits.length) { %>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% user.deposits.forEach(dep=> { %>
+                    <tr>
+                      <td>
+                        <%= new Date(dep.createdAt).toLocaleDateString() %>
+                      </td>
+                      <td>
+                        <%= dep.amount %>
+                      </td>
+                      <td>
+                        <%= dep.method %>
+                      </td>
+                      <td>
+                        <%= dep.status %>
+                      </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+              </table>
+              <% } else { %>
+                <p>No deposits yet.</p>
+                <% } %>
+          </div>
+
+          <!-- Withdrawals -->
+          <div id="withdraw" class="content-section">
+            <h2>Your Withdrawals</h2>
+            <% if (user.withdrawals.length) { %>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% user.withdrawals.forEach(w=> { %>
+                    <tr>
+                      <td>
+                        <%= new Date(w.createdAt).toLocaleDateString() %>
+                      </td>
+                      <td>
+                        <%= w.amount %>
+                      </td>
+                      <td>
+                        <%= w.method %>
+                      </td>
+                      <td>
+                        <%= w.status %>
+                      </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+              </table>
+              <% } else { %>
+                <p>No withdrawals yet.</p>
+                <% } %>
+          </div>
+
+          <!-- Game History -->
+          <div id="history" class="content-section">
+            <h2>Game History</h2>
+            <% if (user.gameHistory.length) { %>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Game</th>
+                    <th>Bet</th>
+                    <th>Multiplier</th>
+                    <th>Win</th>
+                    <th>Result</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% user.gameHistory.forEach(g=> { %>
+                    <tr>
+                      <td>
+                        <%= new Date(g.playedAt).toLocaleDateString() %>
+                      </td>
+                      <td>
+                        <%= g.gameType %>
+                      </td>
+                      <td>
+                        <%= g.betAmount %>
+                      </td>
+                      <td>
+                        <%= g.multiplier %>x
+                      </td>
+                      <td>
+                        <%= g.winAmount %>
+                      </td>
+                      <td>
+                        <%= g.result %>
+                      </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+              </table>
+              <% } else { %>
+                <p>No game history yet.</p>
+                <% } %>
+          </div>
+
+          <!-- Account Management -->
+          <div id="account" class="content-section">
+            <h2>Manage Account</h2>
+            <form method="POST" action="/account/update" class="account-form">
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" value="<%= user.phone || '' %>">
+              </div>
+
+              <div class="form-buttons">
+                <button type="submit" class="btn gold">Save Changes</button>
+              </div>
+            </form>
+
+            <form action="/change-password" method="POST" class="password-form">
+              <h3>Change Password</h3>
+
+              <label for="currentPassword">Current Password</label>
+              <input type="password" name="currentPassword" required />
+
+              <label for="newPassword">New Password</label>
+              <input type="password" name="newPassword" required minlength="6" />
+
+              <label for="confirmPassword">Confirm New Password</label>
+              <input type="password" name="confirmPassword" required minlength="6" />
+
+              <button type="submit">Update Password</button>
+            </form>
+
+            <form method="POST" action="/account/delete"
+              onsubmit="return confirm('Are you sure? This will permanently delete your account.')">
+              <button type="submit" class="btn danger">Delete Account</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+
+      <script>
+        const menuItems = document.querySelectorAll('.sidebar-menu li');
+        const sections = document.querySelectorAll('.content-section');
+        menuItems.forEach(item => {
+          item.addEventListener('click', () => {
+            menuItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            const target = item.dataset.section;
+            sections.forEach(sec => {
+              sec.classList.remove('active');
+              if (sec.id === target) sec.classList.add('active');
+            });
+          });
+        });
+      </script>
 </body>
+
 </html>
