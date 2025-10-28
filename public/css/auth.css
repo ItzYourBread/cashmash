@@ -27,9 +27,9 @@ body {
 .auth-section {
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 90vh;
-    padding: 40px 20px;
+    align-items: center; /* <-- don't vertically center on small screens */
+    padding: 60px 20px;
+    overflow-y: auto;        /* allow scroll if OTP step taller */
 }
 
 /* FORM CONTAINER */
