@@ -5,6 +5,8 @@ const { generateOTP, otpExpired } = require('../utils/otp');
 const nodemailer = require('nodemailer');
 const router = express.Router();
 
+const otpEnable = false; // ⬅️ change to false to disable OTP system
+
 /* =====================================
    🔹 EMAIL TRANSPORTER (Nodemailer)
    ===================================== */
@@ -75,19 +77,26 @@ router.post('/login', async (req, res) => {
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid password.' });
 
-    // Check if known device
+    // ✅ Skip OTP if disabled
+    if (!otpEnable) {
+      req.login(user, (err) => {
+        if (err) return res.status(500).json({ message: 'Login error.' });
+        return res.status(200).json({ message: 'Login successful.', otpRequired: false });
+      });
+      return;
+    }
+
+    // ✅ If OTP is enabled → check if known device
     const knownDevice = user.knownDevices.find(
       (d) => d.ip === ip && d.userAgent === userAgent
     );
 
     if (!knownDevice) {
-      // Generate OTP for unrecognized device
       const otp = generateOTP();
       user.otp = otp;
-      user.otpExpiresAt = Date.now() + 5 * 60 * 1000; // 5 min
+      user.otpExpiresAt = Date.now() + 5 * 60 * 1000;
       await user.save();
 
-      // Send OTP via email
       try {
         await transporter.sendMail({
           from: `"CashMash Security" <${process.env.SMTP_EMAIL}>`,
@@ -116,7 +125,7 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Known device → log in instantly
+    // ✅ Known device → login directly
     req.login(user, (err) => {
       if (err) return res.status(500).json({ message: 'Login error.' });
       res.status(200).json({ message: 'Login successful.', otpRequired: false });
