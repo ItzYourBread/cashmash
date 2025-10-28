@@ -48,5 +48,6 @@
 	"Login failed.": "Login failed.",
 	"Please enter the OTP.": "Please enter the OTP.",
 	"Login successful!": "Login successful!",
-	"Invalid OTP.": "Invalid OTP."
+	"Invalid OTP.": "Invalid OTP.",
+	"Email or Username": "Email or Username"
 }

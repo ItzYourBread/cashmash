@@ -66,18 +66,26 @@ router.post('/register', async (req, res) => {
    🔹 LOGIN (Step 1)
    ===================================== */
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { identifier, password } = req.body; // identifier = email OR username
   const userAgent = req.headers['user-agent'];
   const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
   try {
-    const user = await User.findOne({ email });
+    // Determine whether identifier is email or username
+    let user;
+    if (identifier.includes('@')) {
+      user = await User.findOne({ email: identifier });
+    } else {
+      user = await User.findOne({ username: identifier });
+    }
+
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
+    // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid password.' });
 
-    // ✅ Skip OTP if disabled
+    // If OTP is disabled globally → login directly
     if (!otpEnable) {
       req.login(user, (err) => {
         if (err) return res.status(500).json({ message: 'Login error.' });
@@ -86,17 +94,19 @@ router.post('/login', async (req, res) => {
       return;
     }
 
-    // ✅ If OTP is enabled → check if known device
+    // If OTP is enabled → check known device
     const knownDevice = user.knownDevices.find(
       (d) => d.ip === ip && d.userAgent === userAgent
     );
 
     if (!knownDevice) {
+      // Generate OTP
       const otp = generateOTP();
       user.otp = otp;
-      user.otpExpiresAt = Date.now() + 5 * 60 * 1000;
+      user.otpExpiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
       await user.save();
 
+      // Send OTP email
       try {
         await transporter.sendMail({
           from: `"CashMash Security" <${process.env.SMTP_EMAIL}>`,
@@ -125,11 +135,12 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // ✅ Known device → login directly
+    // Known device → login directly
     req.login(user, (err) => {
       if (err) return res.status(500).json({ message: 'Login error.' });
       res.status(200).json({ message: 'Login successful.', otpRequired: false });
     });
+
   } catch (err) {
     console.error('Login Error:', err);
     res.status(500).json({ message: 'Something went wrong during login.' });
