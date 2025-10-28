@@ -39,6 +39,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// --- CORS for Render ---
+const cors = require('cors');
+
+app.use(cors({
+  origin: [
+    'https://cashmash.onrender.com',   // your hosted frontend (change this if different)
+    'https://www.cashmash.onrender.com',
+    'http://localhost:3000'
+  ],
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
+
+
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET || 'cashmashsecret',
   resave: false,
