@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/css/header.css" />
     <link rel="stylesheet" href="/css/footer.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
-    <link rel="stylesheet" href="/css/deposit.css" />
+    <link rel="stylesheet" href="/css/payment.css" />
 </head>
 
 <body>
@@ -98,45 +98,75 @@
             </div>
         </section>
 
+        <!-- Bkash Modal -->
         <div id="modal-bkash" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
                 <h3>Bkash Deposit</h3>
-                <form method="POST" action="/deposit/bkash">
-                    <label>Amount</label>
-                    <input type="number" name="amount" required min="10">
-                    <label>Transaction ID</label>
-                    <input type="text" name="transactionId" required>
-                    <button type="submit">Confirm</button>
-                </form>
+                <% const bkashAgents=agentPayments['bkash']; const randomBkashAgent=bkashAgents[Math.floor(Math.random()
+                    * bkashAgents.length)]; %>
+                    <h4>Send money to:</h4>
+                    <p><strong>
+                            <%= randomBkashAgent.full_name %>
+                        </strong>: <%= randomBkashAgent.contact %>
+                    </p>
+                    <form method="POST" action="/deposit/bkash">
+                        <label>Amount</label>
+                        <input type="number" name="amount" required min="10">
+                        <label>Transaction ID</label>
+                        <input type="text" name="transactionId" required>
+                        <p>After sending money, please enter the Transaction ID above to confirm your deposit. Deposits
+                            may take up to 5 minutes to reflect.</p>
+                        <button type="submit">Confirm</button>
+                    </form>
             </div>
         </div>
 
+        <!-- Nagad Modal -->
         <div id="modal-nagad" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
                 <h3>Nagad Deposit</h3>
-                <form method="POST" action="/deposit/nagad">
-                    <label>Amount</label>
-                    <input type="number" name="amount" required min="10">
-                    <label>Transaction ID</label>
-                    <input type="text" name="transactionId" required>
-                    <button type="submit">Confirm</button>
-                </form>
+                <% const nagadAgents=agentPayments['Nagad']; const randomNagadAgent=nagadAgents[Math.floor(Math.random()
+                    * nagadAgents.length)]; %>
+                    <h4>Send money to:</h4>
+                    <p><strong>
+                            <%= randomNagadAgent.full_name %>
+                        </strong>: <%= randomNagadAgent.contact %>
+                    </p>
+                    <form method="POST" action="/deposit/nagad">
+                        <label>Amount</label>
+                        <input type="number" name="amount" required min="10">
+                        <label>Transaction ID</label>
+                        <input type="text" name="transactionId" required>
+                        <p>After sending money, please enter the Transaction ID above to confirm your deposit. Deposits
+                            may take up to 5 minutes to reflect.</p>
+                        <button type="submit">Confirm</button>
+                    </form>
             </div>
         </div>
 
+        <!-- Upay Modal -->
         <div id="modal-upay" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
                 <h3>Upay Deposit</h3>
-                <form method="POST" action="/deposit/upay">
-                    <label>Amount</label>
-                    <input type="number" name="amount" required min="10">
-                    <label>Transaction ID</label>
-                    <input type="text" name="transactionId" required>
-                    <button type="submit">Confirm</button>
-                </form>
+                <% const upayAgents=agentPayments['Upay']; const randomUpayAgent=upayAgents[Math.floor(Math.random() *
+                    upayAgents.length)]; %>
+                    <h4>Send money to:</h4>
+                    <p><strong>
+                            <%= randomUpayAgent.full_name %>
+                        </strong>: <%= randomUpayAgent.contact %>
+                    </p>
+                    <form method="POST" action="/deposit/upay">
+                        <label>Amount</label>
+                        <input type="number" name="amount" required min="10">
+                        <label>Transaction ID</label>
+                        <input type="text" name="transactionId" required>
+                        <p>After sending money, please enter the Transaction ID above to confirm your deposit. Deposits
+                            may take up to 5 minutes to reflect.</p>
+                        <button type="submit">Confirm</button>
+                    </form>
             </div>
         </div>
 

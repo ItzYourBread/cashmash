@@ -5,13 +5,13 @@ const bcrypt = require('bcrypt');
 // ----------------- SUBSCHEMAS -----------------
 const depositSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
+  method: { type: String, enum: ['Bkash', 'Nagad', 'Upay', 'BinancePay'], required: true },
+  txnId: { type: String },
   status: { 
     type: String, 
     enum: ['Pending', 'Completed', 'Failed', 'Cancelled'], 
     default: 'Pending' 
   },
-  method: { type: String, default: 'Binance Pay' },
-  txnId: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 
