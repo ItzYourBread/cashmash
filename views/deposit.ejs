@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deposit | CashMash</title>
+
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/deposit.css" />
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <section class="dashboard">
+            <div class="dashboard-container">
+
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <div class="balance-box">
+                        <h3>Balance</h3>
+                        <% if (user) { %>
+                            <p>
+                                <%= user.chips.toLocaleString() %> Chips
+                            </p>
+                            <% } else { %>
+                                <p>Login to see balance</p>
+                                <% } %>
+                    </div>
+
+                    <ul class="sidebar-menu">
+                        <li class="active" data-tab="ewallets">E-Wallets</li>
+                        <li data-tab="crypto">Crypto</li>
+                        <li data-tab="bank">Bank</li>
+                    </ul>
+                </aside>
+
+                <!-- Main Content -->
+                <div class="content-area">
+
+                    <!-- E-Wallets -->
+                    <div id="ewallets" class="content-section active">
+                        <h2>E-Wallets</h2>
+                        <div class="payment-cards">
+                            <div class="payment-card" data-modal="modal-bkash">
+                                <img src="/images/payments/bkash.jpg" alt="Bkash">
+                                <h4>Bkash</h4>
+                            </div>
+                            <div class="payment-card" data-modal="modal-nagad">
+                                <img src="/images/payments/nagad.jpg" alt="Nagad">
+                                <h4>Nagad</h4>
+                            </div>
+                            <div class="payment-card" data-modal="modal-upay">
+                                <img src="/images/payments/upay.jpg" alt="Upay">
+                                <h4>Upay</h4>
+                            </div>
+                            <div class="payment-card" data-modal="modal-binance">
+                                <img src="/images/payments/binance.jpg" alt="Binance">
+                                <h4>BinancePay</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Crypto -->
+                    <div id="crypto" class="content-section">
+                        <h2>Crypto</h2>
+                        <div class="payment-cards">
+                            <!-- <div class="payment-card" data-modal="modal-bitcoin">
+                                <img src="/images/bitcoin.png" alt="Bitcoin">
+                                <h4>Bitcoin</h4>
+                            </div>
+
+                            <div class="payment-card" data-modal="modal-ethereum">
+                                <img src="/images/ethereum.png" alt="Ethereum">
+                                <h4>Ethereum</h4>
+                            </div> -->
+                        </div>
+                        <h2 style="margin-top: 20px;">Coming Soon...</h2>
+
+                    </div>
+
+                    <!-- Bank -->
+                    <div id="bank" class="content-section">
+                        <h2>Bank</h2>
+                        <div class="payment-cards">
+                            <!-- <div class="payment-card" data-modal="modal-bank">
+                                <img src="/images/bank.png" alt="Bank">
+                                <h4>Bank Transfer</h4>
+                            </div> -->
+                        </div>
+                        <h2 style="margin-top: 20px;">Coming Soon...</h2>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <div id="modal-bkash" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Bkash Deposit</h3>
+                <form method="POST" action="/deposit/bkash">
+                    <label>Amount</label>
+                    <input type="number" name="amount" required min="10">
+                    <label>Transaction ID</label>
+                    <input type="text" name="transactionId" required>
+                    <button type="submit">Confirm</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="modal-nagad" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Nagad Deposit</h3>
+                <form method="POST" action="/deposit/nagad">
+                    <label>Amount</label>
+                    <input type="number" name="amount" required min="10">
+                    <label>Transaction ID</label>
+                    <input type="text" name="transactionId" required>
+                    <button type="submit">Confirm</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="modal-upay" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Upay Deposit</h3>
+                <form method="POST" action="/deposit/upay">
+                    <label>Amount</label>
+                    <input type="number" name="amount" required min="10">
+                    <label>Transaction ID</label>
+                    <input type="text" name="transactionId" required>
+                    <button type="submit">Confirm</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="modal-binance" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>BinancePay Deposit</h3>
+                <form method="POST" action="/deposit/binance">
+                    <label>Amount</label>
+                    <input type="number" name="amount" required min="10">
+                    <button type="submit">Confirm</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="login-modal" id="loginModal">
+            <div class="login-modal-content">
+                <h2>Login Required</h2>
+                <p>You need to be logged in to deposit chips.</p>
+                <div class="login-modal-actions">
+                    <a href="/login" class="login-btn gold">Login</a>
+                    <button class="login-btn outline" id="closeLoginModal">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+
+        <%- include('partials/footer') %>
+
+            <script>
+                // Server-injected login status
+                const isLoggedIn = <%= user ? 'true' : 'false' %>;
+
+                // Tabs
+                const tabs = document.querySelectorAll('.sidebar-menu li');
+                const sections = document.querySelectorAll('.content-section');
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        tabs.forEach(t => t.classList.remove('active'));
+                        sections.forEach(s => s.classList.remove('active'));
+                        tab.classList.add('active');
+                        document.getElementById(tab.dataset.tab).classList.add('active');
+                    });
+                });
+
+                // Modals
+                const cards = document.querySelectorAll('.payment-card');
+                const modals = document.querySelectorAll('.modal');
+                const closes = document.querySelectorAll('.close');
+
+                // Login modal elements
+                const loginModal = document.getElementById('loginModal');
+                const closeLoginModal = document.getElementById('closeLoginModal');
+
+                cards.forEach(card => {
+                    const modal = document.getElementById(card.dataset.modal);
+                    card.addEventListener('click', () => {
+                        if (!isLoggedIn) {
+                            loginModal.classList.add('show');
+                        } else {
+                            modal.style.display = 'flex';
+                        }
+                    });
+                });
+
+                closes.forEach(c => {
+                    c.addEventListener('click', () => c.closest('.modal').style.display = 'none');
+                });
+
+                window.addEventListener('click', e => {
+                    if (e.target.classList.contains('modal')) e.target.style.display = 'none';
+                    if (e.target === loginModal) loginModal.classList.remove('show');
+                });
+
+                closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
+            </script>
+
+</body>
+
+</html>

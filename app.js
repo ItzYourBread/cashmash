@@ -113,6 +113,7 @@ app.use('/', require('./routes/index'));
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/user'));
 app.use('/', require('./routes/game'));
+app.use('/', require('./routes/payment'));
 
 // HTTP + Socket.IO
 const server = http.createServer(app);
