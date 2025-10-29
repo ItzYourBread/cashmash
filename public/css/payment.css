@@ -258,3 +258,17 @@
   from { transform: translateY(40px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+.amount-feedback {
+    margin-top: 5px;
+    font-weight: bold;
+    font-size: 0.95em;
+}
+
+.amount-valid {
+    color: var(--gold); /* Matches your gold highlights */
+}
+
+.amount-invalid {
+    color: var(--text-dim); /* Matches your dim text for warnings */
+}

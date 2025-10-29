@@ -57,6 +57,46 @@ router.get('/deposit', (req, res) => {
   });
 });
 
+// Handle BinancePay deposit
+router.post('/deposit/binance', ensureAuth, async (req, res) => {
+  try {
+    const { amount, txnId } = req.body; // txnId comes from front-end as "Order ID"
+
+    if (!amount || Number(amount) < 10 || !txnId) {
+      throw new Error('Invalid deposit details');
+    }
+
+    // Pick a random agent from agentPayments JSON or default fallback
+    const agents = agentPayments['binance'] || [{ full_name: 'MD Arif', contact: '01341803889' }];
+    const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+
+    const depositData = {
+      amount,
+      method: 'BinancePay',
+      txnId,
+      status: 'Pending',
+      agentName: "MD Arif",
+      agentContact: "01341803889"
+    };
+
+    // Save in user's deposits array
+    req.user.deposits.push(depositData);
+    await req.user.save();
+
+    // Save in Deposit model
+    await Deposit.create({
+      user: req.user._id,
+      ...depositData
+    });
+
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error('BinancePay deposit failed:', err);
+    res.status(500).send('Deposit failed');
+  }
+});
+
+
 // ----------------- WITHDRAW ROUTES -----------------
 router.get('/withdraw', (req, res) => {
   res.render('withdraw', { user: req.user, currentPage: 'withdraw', agentPayments });

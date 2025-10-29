@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard | CashMash</title>
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/leaderboard.css">
+</head>
+<body>
+
+  <%- include('partials/header') %>
+
+  <section class="leaderboard-section">
+    <div class="leaderboard-header">
+      <h1>Cash<span class="mash">Mash</span> Leaderboard</h1>
+      <p>Top Players Dominating the Charts</p>
+    </div>
+
+    <% if (user) { %>
+      <div class="user-rank">
+        <h3>Your Ranking</h3>
+        <p>
+          Position: <span><%= userRank ? userRank : 'Unranked' %></span><br>
+          Balance: <span>৳<%= user.chips ? user.chips.toLocaleString() : 0 %></span>
+        </p>
+      </div>
+    <% } %>
+
+    <div class="leaderboard-grid">
+      <% if (topUsers && topUsers.length > 0) { %>
+        <% topUsers.forEach((u, index) => { %>
+          <div class="leaderboard-card <%= user && user._id.toString() === u._id.toString() ? 'current-user' : '' %>">
+            <div class="rank">#<%= index + 1 %></div>
+            <div class="info">
+              <h3><%= u.username || (u.email ? u.email.split('@')[0] : 'Unknown') %></h3>
+              <p>ID: <%= u._id.toString().slice(-5) %></p>
+              <p class="balance">৳<%= u.chips ? u.chips.toLocaleString() : 0 %></p>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p style="color: var(--text-dim); margin-top: 40px;">No leaderboard data yet.</p>
+      <% } %>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+</body>
+</html>

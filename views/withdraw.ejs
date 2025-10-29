@@ -1,49 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="<%= currentLang %>">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Withdraw | CashMash</title>
-
+    <title><%= __('Withdraw Title') %> | CashMash</title>
     <link rel="stylesheet" href="/css/header.css" />
     <link rel="stylesheet" href="/css/footer.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
     <link rel="stylesheet" href="/css/payment.css" />
 </head>
-
 <body>
     <%- include('partials/header') %>
-
         <section class="dashboard">
             <div class="dashboard-container">
-
-                <!-- Sidebar -->
                 <aside class="sidebar">
                     <div class="balance-box">
-                        <h3>Balance</h3>
+                        <h3><%= __('Balance') %></h3>
                         <% if (user) { %>
                             <p>
                                 ৳<%= user.chips.toLocaleString() %>
                             </p>
                             <% } else { %>
-                                <p>Login to see balance</p>
+                                <p><%= __('Login to see balance') %></p>
                                 <% } %>
                     </div>
-
                     <ul class="sidebar-menu">
-                        <li class="active" data-tab="ewallets">E-Wallets</li>
-                        <li data-tab="crypto">Crypto</li>
-                        <li data-tab="bank">Bank</li>
+                        <li class="active" data-tab="ewallets"><%= __('E-Wallets') %></li>
+                        <li data-tab="crypto"><%= __('Crypto') %></li>
+                        <li data-tab="bank"><%= __('Bank') %></li>
                     </ul>
                 </aside>
-
-                <!-- Main Content -->
                 <div class="content-area">
-
-                    <!-- E-Wallets -->
                     <div id="ewallets" class="content-section active">
-                        <h2>E-Wallets</h2>
+                        <h2><%= __('E-Wallets') %></h2>
                         <div class="payment-cards">
                             <div class="payment-card" data-modal="modal-bkash">
                                 <img src="/images/payments/bkash.jpg" alt="Bkash">
@@ -63,84 +52,69 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Crypto -->
                     <div id="crypto" class="content-section">
-                        <h2>Crypto</h2>
-                        <h2 style="margin-top: 20px;">Coming Soon...</h2>
+                        <h2><%= __('Crypto') %></h2>
+                        <h2 style="margin-top: 20px;"><%= __('Coming Soon...') %></h2>
                     </div>
-
-                    <!-- Bank -->
                     <div id="bank" class="content-section">
-                        <h2>Bank</h2>
-                        <h2 style="margin-top: 20px;">Coming Soon...</h2>
+                        <h2><%= __('Bank') %></h2>
+                        <h2 style="margin-top: 20px;"><%= __('Coming Soon...') %></h2>
                     </div>
-
                 </div>
             </div>
         </section>
-
-        <!-- Withdraw Modals -->
         <% ['bkash', 'nagad' , 'upay' ].forEach(method=> { %>
             <div id="modal-<%= method %>" class="modal">
                 <div class="modal-content">
                     <span class="close">&times;</span>
                     <h3>
-                        <%= method.charAt(0).toUpperCase() + method.slice(1) %> Withdraw
+                        <%= method.charAt(0).toUpperCase() + method.slice(1) %> <%= __('Withdraw') %>
                     </h3>
                     <form method="POST" action="/withdraw/<%= method %>">
-                        <label>Full Name</label>
+                        <label><%= __('Full Name') %></label>
                         <input type="text" name="fullName" required>
                         <label>
-                            <%= method.charAt(0).toUpperCase() + method.slice(1) %> Number
+                            <%= method.charAt(0).toUpperCase() + method.slice(1) %> <%= __('Number') %>
                         </label>
                         <input type="text" name="contact" required>
-                        <label>Amount</label>
+                        <label><%= __('Amount') %> (<%= __('BDT') %>)</label>
                         <input type="number" name="amount" required min="10">
-                        <p>After submitting, your withdrawal request will be processed within 24 hours.</p>
-                        <button type="submit">Confirm</button>
+                        <p><%= __('Withdrawal processing time') %></p>
+                        <button type="submit"><%= __('Confirm') %></button>
                     </form>
                 </div>
             </div>
             <% }) %>
-
-                <!-- BinancePay Modal -->
                 <div id="modal-binance" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h3>BinancePay Withdraw</h3>
+                        <h3>BinancePay <%= __('Withdraw') %></h3>
                         <form method="POST" action="/withdraw/binance">
-                            <label>Email or User ID</label>
+                            <label><%= __('Email or User ID') %></label>
                             <input type="text" name="userIdOrEmail" required>
-                            <label>Amount</label>
+                            <label><%= __('Amount') %> (<%= __('BDT') %>)</label>
                             <input type="number" name="amount" required min="10">
-                            <p>After submitting, your withdrawal request will be processed within 24 hours.</p>
-                            <button type="submit">Confirm</button>
+                            <p><%= __('Withdrawal processing time') %></p>
+                            <button type="submit"><%= __('Confirm') %></button>
                         </form>
                     </div>
                 </div>
-
-
                 <div class="login-modal" id="loginModal">
                     <div class="login-modal-content">
-                        <h2>Login Required</h2>
-                        <p>You need to be logged in to withdraw chips.</p>
+                        <h2><%= __('Login Required') %></h2>
+                        <p><%= __('You need to be logged in to withdraw BDT.') %></p>
                         <div class="login-modal-actions">
-                            <a href="/login" class="login-btn gold">Login</a>
-                            <button class="login-btn outline" id="closeLoginModal">Cancel</button>
+                            <a href="/login" class="login-btn gold"><%= __('Login') %></a>
+                            <button class="login-btn outline" id="closeLoginModal"><%= __('Cancel') %></button>
                         </div>
                     </div>
                 </div>
-
                 <%- include('partials/footer') %>
-
                     <script>
                         const isLoggedIn = <%= user ? 'true' : 'false' %>;
-
                         // Tabs
                         const tabs = document.querySelectorAll('.sidebar-menu li');
                         const sections = document.querySelectorAll('.content-section');
-
                         tabs.forEach(tab => {
                             tab.addEventListener('click', () => {
                                 tabs.forEach(t => t.classList.remove('active'));
@@ -149,14 +123,12 @@
                                 document.getElementById(tab.dataset.tab).classList.add('active');
                             });
                         });
-
                         // Modals
                         const cards = document.querySelectorAll('.payment-card');
                         const modals = document.querySelectorAll('.modal');
                         const closes = document.querySelectorAll('.close');
                         const loginModal = document.getElementById('loginModal');
                         const closeLoginModal = document.getElementById('closeLoginModal');
-
                         cards.forEach(card => {
                             const modal = document.getElementById(card.dataset.modal);
                             card.addEventListener('click', () => {
@@ -167,18 +139,14 @@
                                 }
                             });
                         });
-
                         closes.forEach(c => {
                             c.addEventListener('click', () => c.closest('.modal').style.display = 'none');
                         });
-
                         window.addEventListener('click', e => {
                             if (e.target.classList.contains('modal')) e.target.style.display = 'none';
                             if (e.target === loginModal) loginModal.classList.remove('show');
                         });
-
                         closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
                     </script>
 </body>
-
 </html>

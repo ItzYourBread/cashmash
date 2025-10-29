@@ -1,0 +1,158 @@
+/* ==========================================
+   LEADERBOARD STYLES
+   Author: Arif Satify
+   ========================================== */
+
+:root {
+  --gold: #f5c542;
+  --gold-light: #ffdb6e;
+  --text-light: #fff;
+  --text-dim: #bbb;
+}
+
+.leaderboard-section {
+  padding: 100px 20px;
+  text-align: center;
+  position: relative;
+  background: radial-gradient(circle at center, #020617 20%, #000 100%);
+  min-height: 100vh;
+}
+
+/* -------- HEADER -------- */
+.leaderboard-header h1 {
+  font-size: 2.8em;
+  font-weight: 700;
+  text-shadow: 0 0 25px rgba(245,197,66,0.3);
+  color: var(--text-light);
+}
+
+.leaderboard-header .mash {
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(245,197,66,0.8);
+  animation: glowPulse 3s infinite ease-in-out;
+}
+
+@keyframes glowPulse {
+  0%, 100% { text-shadow: 0 0 15px rgba(245,197,66,0.4); }
+  50% { text-shadow: 0 0 30px rgba(245,197,66,0.9); }
+}
+
+.leaderboard-header p {
+  color: var(--text-dim);
+  margin-top: 10px;
+  font-size: 1.1em;
+  letter-spacing: 0.5px;
+}
+
+/* -------- GRID -------- */
+.leaderboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+  margin-top: 60px;
+  justify-items: center;
+}
+
+.leaderboard-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 30px 20px;
+  width: 100%;
+  max-width: 260px;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.leaderboard-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--gold);
+  box-shadow: 0 0 25px rgba(245,197,66,0.3);
+}
+
+/* -------- RANK BADGE -------- */
+.rank {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  font-weight: 700;
+  font-size: 1.2em;
+  color: var(--gold);
+}
+
+/* -------- INFO -------- */
+.info h3 {
+  color: var(--text-light);
+  font-size: 1.2em;
+  margin-bottom: 6px;
+}
+
+.info p {
+  color: var(--text-dim);
+  font-size: 1em;
+  margin-bottom: 4px;
+}
+
+/* -------- BALANCE -------- */
+.balance {
+  color: var(--gold-light);
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+/* -------- CURRENT USER -------- */
+.current-user {
+  background: linear-gradient(145deg, rgba(245,197,66,0.15), rgba(255,255,255,0.05));
+  border-color: var(--gold);
+  box-shadow: 0 0 25px rgba(245,197,66,0.25);
+  transform: scale(1.03);
+}
+
+/* -------- USER RANK BOX -------- */
+.user-rank {
+  margin-top: 80px;
+  background: rgba(255,255,255,0.05);
+  display: inline-block;
+  padding: 20px 40px;
+  border-radius: 20px;
+  border: 1px solid rgba(245,197,66,0.3);
+  box-shadow: 0 0 20px rgba(245,197,66,0.15);
+}
+
+.user-rank h3 {
+  color: var(--gold);
+  font-size: 1.4em;
+  margin-bottom: 8px;
+}
+
+.user-rank span {
+  color: var(--gold-light);
+}
+
+/* -------- RESPONSIVE -------- */
+@media (max-width: 992px) {
+  .leaderboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .leaderboard-header h1 {
+    font-size: 2em;
+  }
+
+  .leaderboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  .leaderboard-card {
+    max-width: 180px;
+    padding: 20px 10px;
+  }
+
+  .user-rank {
+    padding: 15px 25px;
+  }
+}
