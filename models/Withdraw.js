@@ -9,7 +9,7 @@ const withdrawSchema = new mongoose.Schema({
   contact: { type: String, required: true },
   status: { 
     type: String, 
-    enum: ['Pending', 'Completed', 'Failed', 'Cancelled'], 
+    enum: ['Pending', 'Processing', 'Completed', 'Failed', 'Cancelled'], 
     default: 'Pending' 
   },
   createdAt: { type: Date, default: Date.now }

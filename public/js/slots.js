@@ -1,237 +1,369 @@
-// public/js/slots.js (Client-Side Final)
-
-// NOTE: Ensure your server environment uses 'module.exports' for slotsConfig.js
-// and that this client file is loaded with type="module" if using ES modules.
-
 document.addEventListener('DOMContentLoaded', () => {
-  const REEL_STOP_DURATION = 1000;
-  const INTERVAL_TIME = 50;
-  const BASE_SPIN_COUNT = 30;
-  const SPIN_COUNT_STAGGER = 8;
-  const REELS = 5;
-  const ROWS = 4;
+    const canvas = document.getElementById('slotCanvas');
+    const ctx = canvas.getContext('2d');
 
-  const reelsContainer = document.getElementById('reels');
-  const spinBtn = document.getElementById('spinBtn');
-  const balanceDisplay = document.getElementById('balance');
-  const betInput = document.getElementById('betAmount');
-  const resultDisplay = document.getElementById('result');
+    const spinBtn = document.getElementById('spinBtn');
+    const balanceDisplay = document.getElementById('balance');
+    const betInput = document.getElementById('betAmount');
+    const resultDisplay = document.getElementById('result');
 
-  // Win message element
-  const winMessageEl = document.createElement('div');
-  winMessageEl.id = 'winMessage';
-  winMessageEl.classList.add('win-message');
-  reelsContainer.appendChild(winMessageEl);
+    // ====================== CONFIG (Incorporating your patterns) ======================
+    const REELS = 5;
+    const ROWS = 4;
+    const SYMBOL_SIZE = 100;
+    const GAP = 8;
+    const CANVAS_WIDTH = REELS * (SYMBOL_SIZE + GAP);
+    const CANVAS_HEIGHT = ROWS * (SYMBOL_SIZE + GAP);
 
-  let currentBalance = parseInt(balanceDisplay.textContent, 10) || 0;
-  balanceDisplay.textContent = currentBalance;
+    canvas.width = CANVAS_WIDTH;
+    canvas.height = CANVAS_HEIGHT;
 
-  const reels = [];
-  const reelImgs = [];
-
-  // Canvas Overlay Setup
-  const winCanvas = document.createElement('canvas');
-  winCanvas.classList.add('win-lines');
-  reelsContainer.insertBefore(winCanvas, reelsContainer.firstChild);
-  const ctx = winCanvas.getContext('2d');
-
-  const resizeCanvas = () => {
-    winCanvas.width = reelsContainer.offsetWidth;
-    winCanvas.height = reelsContainer.offsetHeight;
-    winCanvas.style.position = 'absolute';
-    winCanvas.style.top = '0';
-    winCanvas.style.left = '0';
-    winCanvas.style.pointerEvents = 'none';
-  };
-  window.addEventListener('resize', resizeCanvas);
-  window.addEventListener('load', resizeCanvas); // Ensure sizing on load
-
-  // Initialize visible slots
-  for (let r = 0; r < REELS; r++) {
-    const col = document.createElement('div');
-    col.classList.add('reel-col');
-    const imgs = [];
-    for (let row = 0; row < ROWS; row++) {
-      const img = document.createElement('img');
-      img.src = '/images/ClassicSlot/cherry.png'; // initial placeholder
-      img.classList.add('reel-img');
-      col.appendChild(img);
-      imgs.push(img);
-    }
-    reelsContainer.appendChild(col);
-    reels.push(col);
-    reelImgs.push(imgs);
-  }
-
-  // --- Core Server Communication ---
-  const serverSpin = async (bet) => {
-    const res = await fetch('/slots/spin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bet })
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: 'Unknown' }));
-      throw new Error(err.error || 'Spin failed');
-    }
-    return res.json();
-  };
-
-  // --- Core Spin Function ---
-  const spinReels = async () => {
-    const bet = parseInt(betInput.value, 10);
-    if (!bet || bet < 1) return alert('Enter valid bet!');
-    if (bet > currentBalance) return alert('Not enough chips!');
-
-    spinBtn.disabled = true;
-    resultDisplay.textContent = '';
-    ctx.clearRect(0, 0, winCanvas.width, winCanvas.height);
-    reels.forEach(col => col.classList.remove('win'));
-    winMessageEl.style.animation = 'none';
-
-    // Deduct locally
-    currentBalance -= bet;
+    let currentBalance = parseInt(balanceDisplay.textContent, 10) || 1000;
     balanceDisplay.textContent = currentBalance;
 
-    try {
-      const data = await serverSpin(bet);
-      const finalSymbols = data.finalSymbols;
+    const symbols = [
+        { name: 'cherry', file: '/images/ClassicSlot/cherry.png', multiplier: 1 },
+        { name: 'lemon', file: '/images/ClassicSlot/lemon.png', multiplier: 1 },
+        { name: 'orange', file: '/images/ClassicSlot/orange.png', multiplier: 1.5 },
+        { name: 'watermelon', file: '/images/ClassicSlot/watermelon.png', multiplier: 2 },
+        { name: 'grapes', file: '/images/ClassicSlot/grapes.png', multiplier: 4 },
+        { name: 'star', file: '/images/ClassicSlot/star.png', multiplier: 5 },
+        { name: 'red7', file: '/images/ClassicSlot/red7.png', multiplier: 12 },
+        { name: 'diamond', file: '/images/ClassicSlot/diamond.png', multiplier: 8 },
+        { name: 'bar', file: '/images/ClassicSlot/bar.png', multiplier: 20 },
+        { name: 'jackpot', file: '/images/ClassicSlot/jackpot.png', multiplier: 100 },
+    ];
+    
+    const SYMBOL_MULTIPLIERS = symbols.reduce((map, sym) => {
+        map[sym.name] = sym.multiplier;
+        return map;
+    }, {});
+    
+    // Weighted chances for random symbol selection (Total weight is 4594)
+    const SYMBOL_CHANCES = {
+        cherry: 45, lemon: 30, orange: 20, watermelon: 10, grapes: 9, 
+        star: 8, red7: 5, diamond: 5, bar: 4, jackpot: 3
+    };
+    
+    const PAYLINES = [
+        [0, 0, 0, 0, 0], [1, 1, 1, 1, 1], [2, 2, 2, 2, 2], [3, 3, 3, 3, 3],
+        [0, 1, 2, 3, 3], [3, 2, 1, 0, 0], [0, 1, 2, 1, 0], [3, 2, 1, 2, 3],
+        [1, 2, 3, 2, 1], [2, 1, 0, 1, 2], [0, 1, 0, 1, 0], [3, 2, 3, 2, 3],
+        [0, 0, 1, 1, 2], [3, 3, 2, 2, 1]
+    ];
+    
+    // Preload images
+    const loadedSymbols = [];
+    let loadedCount = 0;
+    symbols.forEach(s => {
+        const img = new Image();
+        img.src = s.file;
+        img.onload = () => {
+            loadedCount++;
+            if (loadedCount === symbols.length) init();
+        };
+        loadedSymbols.push(img);
+    });
 
-      // High-Frequency Flicker Pool (The Illusion)
-      const flickerPool = [
-        '/images/ClassicSlot/bar.png',
-        '/images/ClassicSlot/diamond.png',
-        '/images/ClassicSlot/jackpot.png',
-        '/images/ClassicSlot/red7.png',
-      ];
-      finalSymbols.flat().forEach(s => {
-        if (s.multiplier > 1) flickerPool.push(s.file);
-      });
+    // --- UTILITY FUNCTIONS FOR SERVER MOCK ---
 
+    function getRandomWeightedSymbol() {
+        const totalWeight = Object.values(SYMBOL_CHANCES).reduce((a, b) => a + b, 0);
+        let random = Math.random() * totalWeight;
 
-      reels.forEach((col, colIdx) => {
-        const imgs = reelImgs[colIdx];
-        let spinCount = 0;
-        const maxSpin = BASE_SPIN_COUNT + colIdx * SPIN_COUNT_STAGGER;
+        for (const name in SYMBOL_CHANCES) {
+            random -= SYMBOL_CHANCES[name];
+            if (random <= 0) {
+                return symbols.find(s => s.name === name);
+            }
+        }
+        // Fallback (shouldn't happen)
+        return symbols[0]; 
+    }
 
-        imgs.forEach(img => (img.style.transition = 'none'));
+    /**
+     * Checks the paylines against the resulting symbols grid and marks winning symbols.
+     */
+    function checkPaylines(symbolGrid) {
+        let totalWinnings = 0;
+        const reels = symbolGrid.length;
+        
+        // Use a mutable copy of the grid where symbols can be marked with `win: true`
+        const winningSymbols = symbolGrid.map(reel => reel.map(symbol => ({...symbol, win: false})));
 
-        const spinInterval = setInterval(() => {
-          // Flicker effect using the weighted pool
-          imgs.forEach(img => {
-            img.src = flickerPool[Math.floor(Math.random() * flickerPool.length)];
-          });
+        for (const payline of PAYLINES) {
+            let winLength = 0;
+            let currentSymbolName = null;
 
-          spinCount++;
+            // Check the payline from left to right (Reel 0 to Reel 4)
+            for (let r = 0; r < reels; r++) {
+                const row = payline[r];
+                const symbol = winningSymbols[r][row]; 
+                const symbolName = symbol.name;
 
-          if (spinCount >= maxSpin) {
-            clearInterval(spinInterval);
-            // Set final images from server result (The TRUE result)
-            imgs.forEach((img, rowIdx) => {
-              const serverSym = finalSymbols[colIdx][rowIdx];
-              // Optional: Add a transition back if you want a subtle landing effect
-              img.style.transition = 'transform 400ms cubic-bezier(.25,.1,.25,1)';
-              img.src = serverSym.file;
-            });
-          }
-        }, INTERVAL_TIME);
-      });
+                if (r === 0) {
+                    // Start of the line
+                    currentSymbolName = symbolName;
+                    winLength = 1;
+                } else if (symbolName === currentSymbolName) {
+                    // Match the symbol on the previous reel
+                    winLength++;
+                } else {
+                    // Break the matching sequence
+                    break;
+                }
+            }
 
-      // --- Post-Spin Resolution ---
-      const maxSpinTime = (BASE_SPIN_COUNT + (REELS - 1) * SPIN_COUNT_STAGGER) * INTERVAL_TIME;
-      const finalDelay = maxSpinTime + REEL_STOP_DURATION;
+            // --- Payout Calculation (Win requires 3 or more symbols) ---
 
-      setTimeout(() => {
-        currentBalance = data.balance;
-        balanceDisplay.textContent = currentBalance;
+            if (winLength >= 3) {
+                // Get the multiplier for the winning symbol type
+                const multiplier = SYMBOL_MULTIPLIERS[currentSymbolName];
+                
+                // Example Payout Logic (can be adjusted):
+                let payoutFactor = 0;
+                if (winLength === 3) payoutFactor = 1.0;
+                else if (winLength === 4) payoutFactor = 3.0;
+                else if (winLength === 5) payoutFactor = 5.0;
 
-        if (data.winnings > 0) {
-          resultDisplay.textContent = `🎉 You won ${data.winnings} Chips!`;
-          drawWinningLines(data.winningLines);
-          const winType = getWinType(data.winnings, bet);
-          showWinMessage(winType);
-        } else {
-          resultDisplay.textContent = '😢 Loss';
+                // For simplicity, we assume the bet is the line bet
+                const linePayout = multiplier * payoutFactor;
+                totalWinnings += linePayout;
+
+                // Mark the winning symbols with win: true
+                for (let r = 0; r < winLength; r++) {
+                    const row = payline[r];
+                    // IMPORTANT: Ensure the symbol object has the `win: true` property set
+                    winningSymbols[r][row].win = true; 
+                }
+            }
         }
 
-        spinBtn.disabled = false;
-      }, finalDelay + 50);
-
-    } catch (err) {
-      console.error(err);
-      currentBalance = parseInt(balanceDisplay.textContent, 10) + bet;
-      balanceDisplay.textContent = currentBalance;
-      alert(err.message || 'Spin error');
-      spinBtn.disabled = false;
+        return { winnings: totalWinnings, finalSymbols: winningSymbols };
     }
-  };
 
-  // --- Drawing and FX Helpers ---
-  const drawWinningLines = (winningLines) => {
-    resizeCanvas();
-    ctx.clearRect(0, 0, winCanvas.width, winCanvas.height);
-    const reelCols = document.querySelectorAll('.reel-col');
-    if (!reelCols.length) return;
-    const imgHeight = reelCols[0].querySelector('.reel-img').offsetHeight;
-    const gap = parseInt(getComputedStyle(reelCols[0]).gap, 10) || 8;
-    const containerRect = reelsContainer.getBoundingClientRect();
+    /**
+     * Mocks the server-side spin, generates results, and checks for wins.
+     */
+    const mockServerSpin = (bet) => {
+        return new Promise(resolve => {
+            // 1. Generate the 5x4 result grid
+            const resultGrid = [];
+            for (let r = 0; r < REELS; r++) {
+                const reelSymbols = [];
+                for (let i = 0; i < ROWS; i++) {
+                    // We generate more than 4 symbols per reel to ensure smooth stopping animation
+                    // (The first 4 are the visible result, the rest are just padding)
+                    reelSymbols.push(getRandomWeightedSymbol());
+                }
+                // Add padding symbols for smooth stop
+                for (let i = 0; i < 4; i++) { 
+                    reelSymbols.push(getRandomWeightedSymbol());
+                }
+                resultGrid.push(reelSymbols);
+            }
 
-    ctx.lineWidth = 4;
-    ctx.shadowBlur = 8;
-    ctx.shadowColor = '#FFD700';
-    ctx.strokeStyle = '#FFD700';
+            // 2. Check Paylines and calculate winnings
+            const { winnings, finalSymbols } = checkPaylines(resultGrid.map(reel => reel.slice(0, ROWS))); // Pass only the visible 4 rows for check
+            
+            // Re-integrate the marked symbols into the full result grid for the client animation
+            for (let r = 0; r < REELS; r++) {
+                for (let i = 0; i < ROWS; i++) {
+                    resultGrid[r][i] = finalSymbols[r][i];
+                }
+            }
 
-    winningLines.forEach(line => {
-      ctx.beginPath();
-      line.forEach((rowIdx, colIdx) => {
-        const colElement = reelCols[colIdx];
-        const colRect = colElement.getBoundingClientRect();
+            // 3. Resolve the server response
+            resolve({
+                finalSymbols: resultGrid, // Full grid with win: true flags
+                winnings: winnings * bet, // Scale winnings by the original bet
+                balance: currentBalance + (winnings * bet)
+            });
+        });
+    };
 
-        // X coordinate: Column center, relative to container
-        const x = (colRect.left - containerRect.left) + (colRect.width / 2);
+    // ====================== REEL CLASS (Refined draw method) ======================
+    class Reel {
+        constructor(x, index) {
+            this.x = x;
+            this.index = index;
+            this.position = 0;
+            this.speed = 0;
+            this.target = null;
+            this.stopping = false;
+            this.settled = false;
+            this.blur = 0;
+            this.glowIndices = [];
+        }
 
-        // Y coordinate: Row center, adjusted for container/image start
-        const y = (rowIdx * (imgHeight + gap)) + (imgHeight / 2) + gap / 2;
+        start() {
+            this.speed = 40 + Math.random() * 20;
+            this.stopping = false;
+            this.settled = false;
+            this.blur = 0;
+            this.glowIndices = [];
+        }
 
-        if (colIdx === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-      ctx.stroke();
-    });
-  };
+        stop(finalSymbols) {
+            this.target = finalSymbols;
+            this.stopping = true;
+        }
 
-  const getWinType = (winnings, bet) => {
-    if (winnings >= bet * 100) return 'JACKPOT!';
-    if (winnings >= bet * 50) return 'MEGA WIN';
-    if (winnings >= bet * 20) return 'EPIC WIN';
-    if (winnings >= bet * 5) return 'SUPER WIN';
-    if (winnings > 0) return 'WIN';
-    return '';
-  };
+        update() {
+            if (!spinning) return;
 
-  const showWinMessage = (text) => {
-    winMessageEl.textContent = text;
-    winMessageEl.style.animation = 'winFadeIn 0.8s forwards';
-    createConfetti(25);
+            this.position += this.speed;
 
-    setTimeout(() => {
-      winMessageEl.style.animation = 'winFadeOut 1s forwards';
-    }, 3000);
-  };
+            if (this.position >= SYMBOL_SIZE + GAP) {
+                this.position -= SYMBOL_SIZE + GAP;
+            }
 
-  const createConfetti = (count = 12) => {
-    for (let i = 0; i < count; i++) {
-      const confetti = document.createElement('div');
-      confetti.classList.add('confetti');
-      const rect = reelsContainer.getBoundingClientRect();
-      const x = Math.random() * rect.width;
-      confetti.style.left = `${x}px`;
-      confetti.style.top = `${Math.random() * 20}px`;
-      confetti.style.background = `hsl(${Math.random() * 50 + 45}, 100%, 50%)`;
-      reelsContainer.appendChild(confetti);
-      confetti.addEventListener('animationend', () => confetti.remove());
+            if (this.stopping && !this.settled) {
+                this.speed *= 0.95;
+                if (this.speed < 1) {
+                    this.speed = 0;
+                    this.settled = true;
+                    this.position = 0;
+                }
+            }
+
+            this.blur = Math.min(this.speed / 10, 3);
+        }
+
+        draw() {
+            const yOffset = -this.position;
+
+            for (let i = 0; i < ROWS + 2; i++) {
+                let img;
+                let isWinningSymbol = false;
+                
+                if (this.settled && this.target) {
+                    const idx = i % this.target.length;
+                    // Find the symbol object from the target array
+                    const symbolData = this.target[idx];
+                    
+                    // Find the preloaded image based on the symbol's file path
+                    const match = loadedSymbols.find(s => s.src.includes(symbolData.file.split('/').pop()));
+                    img = match || loadedSymbols[0];
+
+                    // Check if the symbol object has the `win: true` flag set
+                    if (symbolData.win) { 
+                        isWinningSymbol = true;
+                    }
+
+                } else {
+                    img = loadedSymbols[Math.floor(Math.random() * loadedSymbols.length)];
+                }
+
+                const y = yOffset + i * (SYMBOL_SIZE + GAP);
+
+                // --- DRAWING LOGIC (Applied to each symbol) ---
+                ctx.save(); 
+
+                if (isWinningSymbol && glowing) { // Only glow if it's a winning symbol AND the global `glowing` state is true
+                    // Apply GLOW settings (shadow)
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = 'gold'; 
+                    // No motion blur filter when glowing
+                } else {
+                    // Apply MOTION BLUR settings (filter) or 'none' if settled/lost
+                    ctx.filter = this.blur > 0 ? `blur(${this.blur}px) brightness(${1 + this.blur * 0.05})` : 'none';
+                }
+                
+                // Draw the image
+                ctx.drawImage(img, this.x, y, SYMBOL_SIZE, SYMBOL_SIZE);
+                
+                // Restore context to remove shadow/filter for the next symbol
+                ctx.restore(); 
+            }
+        }
     }
-  };
 
-  spinBtn.addEventListener('click', spinReels);
+    // ====================== SETUP & MAIN SPIN ======================
+    const reels = [];
+    let spinning = false;
+    let glowing = false; // State to keep animation loop running for glow
+
+    const init = () => {
+        for (let i = 0; i < REELS; i++) {
+            reels.push(new Reel(i * (SYMBOL_SIZE + GAP), i));
+        }
+        draw();
+    };
+
+    const draw = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        reels.forEach(r => {
+            r.update();
+            r.draw();
+        });
+        // Loop continues if spinning OR glowing
+        if (spinning || glowing) requestAnimationFrame(draw); 
+    };
+
+    const startSpin = async () => {
+        if (spinning || glowing) return; 
+        const bet = parseInt(betInput.value, 10) || 1;
+        if (bet <= 0) return alert('Enter a valid bet!');
+        if (bet > currentBalance) return alert('Not enough chips!');
+
+        resultDisplay.textContent = '';
+        spinBtn.disabled = true;
+
+        currentBalance -= bet;
+        balanceDisplay.textContent = currentBalance;
+
+        try {
+            // Call the mock server function
+            const data = await mockServerSpin(bet);
+            const finalSymbols = data.finalSymbols; 
+            
+            spinning = true;
+            reels.forEach(r => r.start());
+            draw();
+
+            // Stop reels with staggered delay
+            reels.forEach((r, i) => setTimeout(() => r.stop(finalSymbols[i]), i * 800 + 1000));
+
+            // After all reels settled
+            const stopTime = 1000 + REELS * 800 + 2000;
+            setTimeout(() => {
+                spinning = false;
+                currentBalance = data.balance;
+                balanceDisplay.textContent = currentBalance;
+
+                if (data.winnings > 0) {
+                    resultDisplay.textContent = `🎉 You won ${data.winnings.toFixed(2)} chips!`;
+                    
+                    // START GLOW ANIMATION
+                    glowing = true; 
+                    draw(); // Force redraw to start glow
+
+                    const GLOW_DURATION = 3000; // 3 seconds for the glow
+
+                    setTimeout(() => {
+                        // End glow effect
+                        glowing = false; // Stops the draw loop
+                        spinBtn.disabled = false; 
+                    }, GLOW_DURATION);
+
+                    return; 
+                } 
+                
+                // No win - loss condition
+                resultDisplay.textContent = '😢 No win this time!';
+                spinBtn.disabled = false;
+
+            }, stopTime);
+
+        } catch (err) {
+            console.error(err);
+            alert(err.message || 'Spin error');
+            currentBalance += bet;
+            balanceDisplay.textContent = currentBalance;
+            spinBtn.disabled = false;
+        }
+    };
+
+    spinBtn.addEventListener('click', startSpin);
 });

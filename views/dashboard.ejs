@@ -67,7 +67,7 @@
                         <%= new Date(dep.createdAt).toLocaleDateString() %>
                       </td>
                       <td>
-                        <%= dep.amount %>
+                        ৳<%= dep.amount %>
                       </td>
                       <td>
                         <%= dep.method %>
@@ -85,6 +85,7 @@
           </div>
 
           <!-- Withdrawals -->
+          <!-- Withdrawals -->
           <div id="withdraw" class="content-section">
             <h2>Your Withdrawals</h2>
             <% if (user.withdrawals.length) { %>
@@ -95,6 +96,7 @@
                     <th>Amount</th>
                     <th>Method</th>
                     <th>Status</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -104,13 +106,23 @@
                         <%= new Date(w.createdAt).toLocaleDateString() %>
                       </td>
                       <td>
-                        <%= w.amount %>
+                        ৳<%= w.amount %>
                       </td>
                       <td>
                         <%= w.method %>
                       </td>
                       <td>
                         <%= w.status %>
+                      </td>
+                      <td>
+                        <% if (w.status==='Pending' ) { %>
+                          <form action="/withdraw/cancel/<%= w._id %>" method="POST"
+                            onsubmit="return confirm('Cancel this withdrawal?')">
+                            <button type="submit" class="btn cancel">Cancel</button>
+                          </form>
+                          <% } else { %>
+                            <span class="text-dim">—</span>
+                            <% } %>
                       </td>
                     </tr>
                     <% }) %>

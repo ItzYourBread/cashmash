@@ -1,145 +1,244 @@
-/* slots.css - FINAL (Centering, Visuals, and Mobile Optimization) */
+/* =======================================================
+   CASHMASH SLOTS - CANVAS VERSION (by Arif Satify Films)
+   ======================================================= */
 
-/* ==========================================
-   CASHMASH SLOTS - CLASSIC BASE (Desktop/Base)
-   ========================================== */
-
+/* ===================== BASE ===================== */
 html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #000b38 40%, #000218 100%);
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  overflow-x: hidden;
 }
 
+/* ===================== MAIN SECTION ===================== */
 .slots-section {
-  text-align: center;
-  padding: 40px 10px;
-  position: relative;
-  
-  /* PERFECT CENTERING */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 40px 10px;
+  position: relative;
 }
 
-/* ===== Animated Header ===== */
-.slot-header { margin-bottom: 25px; }
+/* ===================== HEADER ===================== */
+.slot-header {
+  margin-bottom: 25px;
+}
 
 .neon-title {
   font-size: 3em;
   font-weight: 700;
   color: #f5c542;
   text-shadow: 0 0 10px #f5c542, 0 0 20px #f5c542, 0 0 30px #f5c542, 0 0 40px #ffd966;
-  animation: pulseGlow 3s infinite;
+  animation: pulseGlow 3s infinite alternate;
 }
 
 @keyframes pulseGlow {
-  0%, 100% { opacity: 1; text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966; }
-  50% { opacity: 0.8; text-shadow: 0 0 5px #f5c542, 0 0 10px #fff; }
+  0%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966;
+  }
+  50% {
+    opacity: 0.8;
+    text-shadow: 0 0 5px #f5c542, 0 0 10px #fff;
+  }
 }
 
-/* ===== Slot Machine Casing ===== */
+/* ===================== SLOT MACHINE CASING ===================== */
 .slot-machine {
   background: rgba(255, 255, 255, 0.05);
-  padding: 20px; /* Base padding */
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 25px 20px;
+  border-radius: 20px;
+  max-width: 850px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 35px;
+  gap: 30px;
   box-shadow: 0 0 45px rgba(0, 0, 0, 0.25);
+  position: relative;
+  border: 1px solid rgba(245, 197, 66, 0.2);
 }
 
-/* ==========================================
-   REELS & ANIMATION (Desktop)
-   ========================================== */
-
-.reels {
+/* ===================== CANVAS AREA ===================== */
+.slot-canvas-wrapper {
   position: relative;
+  display: inline-block;
+  border-radius: 12px;
+}
+
+#slotCanvas {
+  display: block;
+  background: linear-gradient(180deg, #000b38 0%, #000 100%);
+  border: 4px solid #f5c542;
+  border-radius: 12px;
+  box-shadow: inset 0 0 20px rgba(245,197,66,0.5), 0 0 40px rgba(245,197,66,0.3);
+  image-rendering: crisp-edges;
+}
+
+/* ===================== WIN GLOW ===================== */
+.win-glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 12px;
+  box-shadow: 0 0 25px #FFD700, 0 0 45px #fff, 0 0 65px #FFD700;
+  animation: glowPulse 1.2s infinite alternate;
+}
+
+@keyframes glowPulse {
+  0% { transform: scale(1); box-shadow: 0 0 15px #FFD700, 0 0 30px #fff; }
+  50% { transform: scale(1.05); box-shadow: 0 0 25px #FFD700, 0 0 50px #fff; }
+  100% { transform: scale(1); box-shadow: 0 0 15px #FFD700, 0 0 30px #fff; }
+}
+
+/* ===================== WIN MESSAGE ===================== */
+.win-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3em;
+  font-weight: 900;
+  color: #FFD700;
+  text-shadow: 0 0 10px #fff, 0 0 20px #FFD700, 0 0 30px #FFD700;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 20;
+}
+
+@keyframes winFadeIn {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes winFadeOut {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
+}
+
+/* ===================== CONTROLS ===================== */
+.controls {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  max-width: 650px; 
-  width: 100%;
-  margin: 0 auto;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
-.reel-col {
+.bet-section {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow: hidden;
-  
-  /* Fixed Dimensions (Base Size) */
-  width: 114px; 
-  height: 472px; 
-  flex-shrink: 0; 
-  flex-grow: 0;
-  
-  /* Visuals */
-  border: 4px solid #f5c542; 
-  border-radius: 12px;
-  background: #000b38; 
-  box-shadow: inset 0 0 15px rgba(245, 197, 66, 0.5), 0 4px 6px rgba(0, 0, 0, 0.5);
-  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+  gap: 10px;
+  align-items: center;
 }
-
-.reel-col.spinning { transition: none; }
-.reel-col.win { border-color: #fff; }
-
-.reel-img {
-  width: 110px; /* Base Image Size */
-  height: 110px;
-  border-radius: 8px;
-  flex-shrink: 0; 
-  
-  /* Image Polish */
-  border: 1px solid #fff; 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); 
-}
-
-/* ==========================================
-   CONTROLS & RESULTS (Desktop)
-   ========================================== */
-.controls {
-  display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;
-}
-
-.bet-section { display: flex; gap: 10px; align-items: center; }
 
 #betAmount {
-  padding: 14px 20px; font-size: 1.1em; border-radius: 30px; border: none; outline: none; width: 130px;
-  text-align: center; background: rgba(255, 255, 255, 0.1); color: #fff;
+  padding: 14px 20px;
+  font-size: 1.1em;
+  border-radius: 30px;
+  border: none;
+  outline: none;
+  width: 130px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+#betAmount:focus {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 8px rgba(245, 197, 66, 0.4);
 }
 
 #spinBtn {
-  padding: 15px 50px; font-size: 1.2em; border-radius: 35px; border: none;
-  background: #f5c542; color: #000b38; font-weight: bold; transition: 0.3s; cursor: pointer;
+  padding: 15px 50px;
+  font-size: 1.2em;
+  border-radius: 35px;
+  border: none;
+  background: #f5c542;
+  color: #000b38;
+  font-weight: bold;
+  transition: 0.3s;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(245,197,66,0.3);
 }
 
-#spinBtn:hover { background: #fff; box-shadow: 0 0 20px rgba(245,197,66,0.5); }
-
-.info-icon {
-  width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  background: rgba(245, 197, 66, 0.8); color: #000b38; font-weight: bold; cursor: pointer;
-  box-shadow: 0 0 10px rgba(245,197,66,0.5); transition: 0.3s;
+#spinBtn:hover {
+  background: #fff;
+  box-shadow: 0 0 20px rgba(245,197,66,0.6);
 }
 
-.info-icon:hover { transform: scale(1.1); background: #fff; }
+#spinBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(245,197,66,0.5);
+  box-shadow: none;
+}
 
 #result {
-  font-size: 1.4em; color: #f5c542; min-height: 32px; font-weight: 600;
+  font-size: 1.4em;
+  color: #f5c542;
+  min-height: 32px;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(245,197,66,0.4);
 }
 
-/* ==========================================
-   MODAL (Desktop)
-   ========================================== */
-/* ===============================
-   CASHMASH Modal (Improved)
-   =============================== */
+/* ===================== BALANCE DISPLAY ===================== */
+.balance-container {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 25px;
+  border-radius: 30px;
+  font-size: 1.2em;
+  color: #f5c542;
+  font-weight: 600;
+  box-shadow: inset 0 0 10px rgba(245,197,66,0.3);
+}
 
+/* ===================== LOADING OVERLAY ===================== */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  z-index: 10;
+  color: #f5c542;
+  font-size: 1.5em;
+  font-weight: 600;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ===================== CONFETTI ===================== */
+.confetti {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: confettiDrop 1.2s forwards;
+  z-index: 998;
+}
+
+@keyframes confettiDrop {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(350px) rotate(720deg); opacity: 0; }
+}
+
+/* ===================== MODAL ===================== */
 .modal {
   display: none;
   position: fixed;
@@ -147,7 +246,7 @@ html, body {
   inset: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 5, 30, 0.85); /* darker navy glass */
+  background: rgba(0, 5, 30, 0.85);
   backdrop-filter: blur(5px);
   justify-content: center;
   align-items: center;
@@ -158,13 +257,8 @@ html, body {
   display: flex;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
-}
-
 .modal-content {
-  background: rgba(5, 10, 40, 0.95); /* deeper blue base */
+  background: rgba(5, 10, 40, 0.95);
   border: 2px solid rgba(245, 197, 66, 0.4);
   border-radius: 20px;
   padding: 40px 45px;
@@ -230,7 +324,6 @@ html, body {
   font-size: 1.2em;
 }
 
-/* Mini slot symbol inside modal */
 .mini-symbol {
   width: 25px;
   height: 25px;
@@ -238,98 +331,34 @@ html, body {
   margin-right: 8px;
 }
 
-/* Win message centered on reels */
-.win-message {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 3em;
-  font-weight: 800;
-  color: #FFD700;
-  text-shadow: 0 0 10px #fff, 0 0 20px #FFD700, 0 0 30px #FFD700;
-  pointer-events: none;
-  opacity: 0;
-  z-index: 999;
-}
-
-/* Fade in/out animations */
-@keyframes winFadeIn {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-}
-
-@keyframes winFadeOut {
-  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
-}
-
-/* Confetti for win */
-.confetti {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  animation: confettiDrop 1.2s forwards;
-  z-index: 998;
-}
-
-@keyframes confettiDrop {
-  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(250px) rotate(720deg); opacity: 0; }
-}
-
-
-/* ==========================================
-   MOBILE OPTIMIZATION (< 600px)
-   ========================================== */
-
+/* ===================== MOBILE RESPONSIVE ===================== */
 @media (max-width: 600px) {
-  
-  /* Global/Containers */
-  .slots-section { padding: 20px 5px; }
-  
-  .neon-title { font-size: 2em; }
-
-  .user-info { 
-    gap: 20px; 
-    font-size: 1em;
-    padding: 10px 20px;
+  .slots-section {
+    padding: 20px 5px;
   }
-  
+
+  .neon-title {
+    font-size: 2em;
+  }
+
   .slot-machine {
-    padding: 20px 15px; /* Reduce casing size */
+    padding: 15px;
     gap: 20px;
   }
 
-  /* Reels (The most important part to shrink) */
-  .reels {
-    max-width: 380px; /* Constrain container for smaller reels */
-    gap: 2px; /* Reduce gap between reels */
+  #slotCanvas {
+    width: 100% !important;
+    max-width: 360px;
+    border-width: 2px;
   }
 
-  /* New Reel/Image Dimensions for Mobile (e.g., 60px size) */
-  .reel-img {
-    width: 60px;
-    height: 60px;
-  }
-  
-  /* Reel Column Adjustment */
-  .reel-col {
-    width: 64px; /* 60px image + 4px border */
-    height: 260px; /* 4 rows * 60px + 3 gaps * 5px + 4px border = 240 + 15 + 4 = 259. Use 260px */
-    gap: 5px; /* Use the smaller gap */
-    border-width: 2px; /* Thinner border */
-  }
-
-  /* Controls */
   .controls {
-    flex-direction: column; /* Stack controls vertically */
-    gap: 15px;
+    flex-direction: column;
+    gap: 12px;
   }
 
   .bet-section {
-    width: 100%; /* Make bet section take full width of container */
+    width: 100%;
     justify-content: space-between;
   }
 
@@ -343,18 +372,16 @@ html, body {
     padding: 10px 30px;
     font-size: 1em;
   }
-  
-  .info-icon {
-    width: 30px;
-    height: 30px;
-    font-size: 0.9em;
-  }
-  
+
   #result {
     font-size: 1.1em;
   }
-  
-  /* Modal adjustment for smaller screens */
+
+  .balance-container {
+    font-size: 1em;
+    padding: 8px 18px;
+  }
+
   .modal-content {
     width: 90%;
     padding: 20px;

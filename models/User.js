@@ -40,7 +40,7 @@ const gameHistorySchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, trim: true },
   email: { type: String, unique: true, sparse: true },
-  phone: { type: String, unique: true, sparse: true },
+  phone: { type: String, unique: true, sparse: true, default: null },
   password: { type: String, required: true },
 
   chips: { type: Number, default: 0 },

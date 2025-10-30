@@ -7,31 +7,58 @@
 
 .payment-card {
   background: rgba(20, 20, 20, 0.85);
-  padding: 20px 15px;
-  border-radius: 10px;
+  border-radius: 12px;
   text-align: center;
   cursor: pointer;
+  overflow: hidden;
+  position: relative;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Hover effect */
 .payment-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0 15px rgba(245, 197, 66, 0.3);
+  box-shadow: 0 0 20px rgba(245, 197, 66, 0.35);
 }
 
+/* Inner container for logo */
 .payment-card img {
-  width: 60px;
-  margin-bottom: 10px;
+  width: 100px;
+  height: auto;
+  margin: 18px auto 18px;
+  display: block;
+  transition: transform 0.3s ease;
 }
 
+.payment-card:hover img {
+  transform: scale(1.2);
+}
+
+/* Bottom bar for name */
 .payment-card h4 {
+  background: rgba(245, 197, 66, 0.12);
+  border-top: 1px solid rgba(245, 197, 66, 0.25);
   color: var(--gold);
-  margin-bottom: 5px;
+  font-size: 1.1em;
+  font-weight: 600;
+  margin: 0;
+  padding: 12px 0;
+  letter-spacing: 0.5px;
+  transition: background 0.3s ease;
+}
+
+/* Slight gold highlight when hovered */
+.payment-card:hover h4 {
+  background: rgba(245, 197, 66, 0.22);
 }
 
 @media (max-width: 900px) {
   .payment-cards {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .payment-card img {
+    width: 100px;
+    margin: 18px auto 18px;
   }
 }
 
@@ -41,9 +68,12 @@
 .modal {
   display: none;
   position: fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background: rgba(0,0,0,0.85); /* Dark, high-contrast background */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  /* Dark, high-contrast background */
   backdrop-filter: blur(6px);
   z-index: 10000;
   justify-content: center;
@@ -61,9 +91,9 @@
 .modal-content {
   background: var(--bg-soft);
   /* Style matching the games.css login modal */
-  border: 1px solid rgba(255, 255, 255, 0.08); 
-  border-radius: 20px; 
-  padding: 40px 30px; 
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 40px 30px;
   width: 90%;
   max-width: 400px;
   position: relative;
@@ -76,10 +106,11 @@
 /* Modal Close Button */
 .modal-content .close {
   position: absolute;
-  top:15px; right:20px;
-  font-size: 1.5em; 
+  top: 15px;
+  right: 20px;
+  font-size: 1.5em;
   cursor: pointer;
-  color: var(--text-dim); 
+  color: var(--text-dim);
   transition: color 0.3s;
 }
 
@@ -90,8 +121,8 @@
 /* Modal Title */
 .modal-content h3 {
   color: var(--gold);
-  margin-bottom: 25px; 
-  font-size: 1.5em; 
+  margin-bottom: 25px;
+  font-size: 1.5em;
 }
 
 /* ==========================================
@@ -99,31 +130,31 @@
   ========================================== */
 
 /* Form Group Wrapper */
-.modal-content form > div {
-    margin-bottom: 18px; 
-    text-align: left;
+.modal-content form>div {
+  margin-bottom: 18px;
+  text-align: left;
 }
 
 /* Labels */
 .modal-content form label {
   display: block;
-  margin-bottom: 6px; 
+  margin-bottom: 6px;
   color: var(--text-dim);
-  font-size: 0.95em; 
+  font-size: 0.95em;
   font-weight: 500;
-  letter-spacing: 0.5px; 
+  letter-spacing: 0.5px;
 }
 
 /* Inputs */
 .modal-content form input {
   width: 100%;
-  padding: 12px 15px; 
-  margin-bottom: 0; 
-  border-radius: 10px; 
-  border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(0,0,0,0.5); 
+  padding: 12px 15px;
+  margin-bottom: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.5);
   color: var(--text-light);
-  font-size: 1em; 
+  font-size: 1em;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   outline: none;
 }
@@ -131,34 +162,33 @@
 /* Input Focus Glow */
 .modal-content form input:focus {
   border-color: var(--gold);
-  box-shadow: 0 0 10px rgba(245,197,66,0.5); 
+  box-shadow: 0 0 10px rgba(245, 197, 66, 0.5);
 }
 
 /* Submit Button (Matching Gold Button Style) */
 .modal-content form button {
   width: 100%;
-  padding: 12px 0; 
-  margin-top: 15px; 
+  padding: 12px 0;
+  margin-top: 15px;
   /* Pill Shape */
-  border-radius: 30px; 
+  border-radius: 30px;
   border: none;
   /* Gold Gradient */
-  background: linear-gradient(145deg, var(--gold-light), var(--gold));
+  background: var(--gold);
   color: #000;
   font-weight: 600;
-  font-size: 1.0em; 
+  font-size: 1.0em;
   cursor: pointer;
   /* Hover Transition */
-  transition: all 0.3s ease; 
-  box-shadow: 0 0 20px rgba(245,197,66,0.3); 
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(245, 197, 66, 0.3);
   letter-spacing: 0.8px;
 }
 
 /* Button Hover Effect */
 .modal-content form button:hover {
   /* Stronger Gold Glow and Scale */
-  box-shadow: 0 0 35px rgba(245,197,66,0.7);
-  transform: scale(1.03);
+  box-shadow: 0 0 35px rgba(245, 197, 66, 0.7);
 }
 
 /* ==========================================
@@ -168,8 +198,10 @@
   display: none;
   position: fixed;
   z-index: 9999;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.85);
   justify-content: center;
   align-items: center;
@@ -226,14 +258,13 @@
 }
 
 .login-btn.gold {
-  background: linear-gradient(145deg, var(--gold-light), var(--gold));
+  background: var(--gold);
   color: #000;
-  box-shadow: 0 0 20px rgba(245,197,66,0.3);
+  box-shadow: 0 0 20px rgba(245, 197, 66, 0.3);
 }
 
 .login-btn.gold:hover {
-  box-shadow: 0 0 35px rgba(245,197,66,0.7);
-  transform: scale(1.05);
+  box-shadow: 0 0 35px rgba(245, 197, 66, 0.7);
 }
 
 .login-btn.outline {
@@ -243,32 +274,46 @@
 }
 
 .login-btn.outline:hover {
-  background: rgba(245,197,66,0.1);
+  background: rgba(245, 197, 66, 0.1);
 }
 
 /* ==========================================
   ANIMATIONS - Required for modal functionality
   ========================================== */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(40px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .amount-feedback {
-    margin-top: 5px;
-    font-weight: bold;
-    font-size: 0.95em;
+  margin-top: 5px;
+  font-weight: bold;
+  font-size: 0.95em;
 }
 
 .amount-valid {
-    color: var(--gold); /* Matches your gold highlights */
+  color: var(--gold);
+  /* Matches your gold highlights */
 }
 
 .amount-invalid {
-    color: var(--text-dim); /* Matches your dim text for warnings */
+  color: var(--text-dim);
+  /* Matches your dim text for warnings */
 }
