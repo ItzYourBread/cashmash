@@ -83,8 +83,9 @@
 	"Number": "Number",
 	"Amount": "Amount",
 	"Email or User ID": "Email or User ID",
-	"Withdrawal processing time": "After submitting, your withdrawal request will be processed within 24 hours.",
+	"Withdrawal processing time": "After submitting, your withdrawal request will be processed within 48 hours.",
 	"You need to be logged in to withdraw chips.": "You need to be logged in to withdraw BDT.",
 	"BDT": "BDT",
-	"You need to be logged in to withdraw BDT.": "You need to be logged in to withdraw BDT."
+	"You need to be logged in to withdraw BDT.": "You need to be logged in to withdraw BDT.",
+	"Email or Username": "Email or Username"
 }
