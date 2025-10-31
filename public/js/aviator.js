@@ -97,14 +97,12 @@ socket.on('roundState', ({ round, state, multiplier, history, flightOngoing }) =
     // Flight started
     isFlying = true;
 
-    // Preparation for next-round bet during flight
-    placeBetBtn.textContent = 'Betting for Next Round...';
     toggleButton(placeBetBtn, false);
     betAmountInput.disabled = false;
 
     if (flightOngoing) {
       if (!hasBet) {
-        resultText.textContent = '⏳ Flight in progress, wait for next round';
+        resultText.textContent = 'Flight in progress, wait for next round';
         toggleButton(cashOutBtn, false);
       }
       // Show the plane flying for everyone, even non-betters
@@ -145,7 +143,7 @@ socket.on('roundState', ({ round, state, multiplier, history, flightOngoing }) =
       startFlightAnimation();
       toggleButton(cashOutBtn, hasBet && !hasCashedOut);
       if (flightArea) flightArea.classList.add('flight-active');
-      resultText.textContent = `✈️ Flight started!`;
+      resultText.textContent = `Flight started!`;
     }
   }
 
@@ -184,7 +182,7 @@ socket.on('roundCrashed', ({ crashAt }) => {
   planeEl.style.display = 'block';
   showOverlay = false;
 
-  resultText.textContent = `✈️ Flew away!`;
+  resultText.textContent = `Flew away!`;
   placeBetBtn.textContent = 'Place Bet';
   toggleButton(placeBetBtn, true);
   toggleButton(cashOutBtn, false);
@@ -201,7 +199,7 @@ socket.on('roundCrashed', ({ crashAt }) => {
 socket.on('betPlaced', ({ userId: bidderId, amount, username }) => {
   // Show small UI notification in the result area
   if (bidderId === window.user?._id) {
-    resultText.textContent = `✅ Bet placed ${amount}`;
+    resultText.textContent = `Bet placed ${amount}`;
     hasBet = true;
     placeBetBtn.textContent = 'Bet Placed';
     toggleButton(placeBetBtn, false);
@@ -216,7 +214,7 @@ socket.on('betPlaced', ({ userId: bidderId, amount, username }) => {
 socket.on('cashedOut', ({ userId: casherId, username, win, multiplier }) => {
   // Update UI for cashouts
   if (casherId === window.user?._id) {
-    resultText.textContent = `🏁 Cashed out ${win} (${multiplier.toFixed(2)}x)`;
+    resultText.textContent = `Cashed out ${win} (${multiplier.toFixed(2)}x)`;
     hasCashedOut = true;
     toggleButton(cashOutBtn, false);
     toggleButton(placeBetBtn, false);
@@ -273,7 +271,7 @@ placeBetBtn.addEventListener('click', async () => {
     toggleButton(placeBetBtn, false);
     toggleButton(cashOutBtn, true);
     betAmountInput.disabled = true;
-    resultText.textContent = `✅ Bet placed ${amount}`;
+    resultText.textContent = `Bet placed ${amount}`;
   } catch (err) {
     resultText.textContent = 'Server error placing bet';
     toggleButton(placeBetBtn, true);
@@ -313,7 +311,7 @@ cashOutBtn.addEventListener('click', async () => {
     if (data.balance !== undefined && balanceEl) balanceEl.textContent = data.balance;
     hasCashedOut = true;
     toggleButton(cashOutBtn, false);
-    resultText.textContent = `🏁 Cashed out ${data.winnings} (${data.multiplier.toFixed(2)}x)`;
+    resultText.textContent = `Cashed out ${data.winnings} (${data.multiplier.toFixed(2)}x)`;
   } catch (err) {
     resultText.textContent = 'Server error cashing out';
     toggleButton(cashOutBtn, true);

@@ -11,19 +11,18 @@
 const crypto = require('crypto');
 const User = require('../models/User');
 
-// ---------------- CONFIG ----------------
+// ---------------- CONFIG (ADJUSTED FOR SLOWER GROWTH & VEGAS-STYLE RTP) ----------------
 const config = {
-  bettingDurationMs: 5000,     // how long betting is allowed before flight (ms)
+  bettingDurationMs: 6000,     // Betting time (6 seconds)
   interRoundDelayMs: 5000,     // time between end-of-round and next round start (ms)
   tickIntervalMs: 150,         // how frequently multiplier updates are emitted (ms)
   maxMultiplier: 200,          // hard cap for multiplier (safety)
   minMultiplier: 1.0,          // min multiplier
-  houseEdge: 0.01,             // house edge: fraction subtracted from the payout expectation (0.01 = 1%)
-  volatility: 1.0,             // affects crash distribution shape (higher => more volatile)
+  houseEdge: 0.04,             // 0.04 = 4% house edge (96% RTP)
+  volatility: 1.0,             
   revealHashAlgorithm: 'sha256',
-  // Growth model: multiplier(t) = exp(growthRate * tSeconds)
-  // Adjust growthRate to control how fast multiplier climbs visually.
-  growthRatePerSecond: 0.7,    // example: 0.7 => e^(0.7 * t)
+  // ADJUSTED FOR SLOW GROWTH: 0.5 is a noticeably slower, steady climb.
+  growthRatePerSecond: 0.5,    
   // Safety limits:
   maxConcurrentBetsPerUser: 1,
   debug: false,
@@ -31,23 +30,23 @@ const config = {
 
 // ----------------- ROUND STATE -----------------
 let ioInstance = null;
-let roundTimer = null;        // timer used for ticks
-let betCountdownTimer = null; // countdown for betting
+let roundTimer = null;        
+let betCountdownTimer = null; 
 let roundActive = false;
 let roundPhase = 'idle'; // 'idle' | 'betting' | 'flying' | 'ended'
 
 let roundState = {
   id: 0,
-  startedAt: null,         // Date.now() when flight started
-  bettingEndsAt: null,     // Date.now() when betting closes
+  startedAt: null,         
+  bettingEndsAt: null,     
   multiplier: 1.0,
   crashAt: 0,
-  serverSeed: null,        // hidden until reveal
-  serverHash: null,        // emitted at round start
-  bets: {},                // { userId: { amount, cashedOut: false, cashedOutAtMultiplier: null, winnings: 0 } }
+  serverSeed: null,        
+  serverHash: null,        
+  bets: {},                
 };
 
-const roundHistory = []; // store last N rounds (for front-end display)
+const roundHistory = []; 
 const MAX_HISTORY_LENGTH = 50;
 
 // ----------------- HELPERS ----------------
@@ -61,8 +60,7 @@ function sha256Hex(data) {
 
 function randomFloatOpen() {
   // return pseudo-random float in (0,1) using cryptographic RNG
-  // avoid returning 0 exactly.
-  const bytes = crypto.randomBytes(6); // 48 bits
+  const bytes = crypto.randomBytes(6); 
   const int = bytes.readUIntBE(0, 6);
   const max = Math.pow(2, 48);
   let f = int / max;
@@ -73,40 +71,25 @@ function randomFloatOpen() {
 
 /**
  * Provably-fair crash generation:
- * - serverSeed: random hex string kept secret until end of round.
- * - serverHash: sha256(serverSeed) emitted at round start (clients can verify later).
- *
- * We transform a uniform random u in (0,1) into a crash multiplier using an inverse CDF.
- * The distribution shape is tuned by 'volatility' and the houseEdge is applied by scaling result.
- *
- * Formula (simple, tunable):
- *   baseCrash = 1 / (1 - u)  (heavy-tailed)
- *   adjusted = Math.pow(baseCrash, volatility)
- *   afterHouse = adjusted * (1 - houseEdge)
- *   clamp to maxMultiplier
- *
- * You can replace with any provably-fair algorithm and publish the exact math to clients.
  */
 function generateCrashWithSeed(serverSeed) {
-  // Combine seed with a fresh RNG to get a deterministic randomness for this round.
-  // We create a HMAC with serverSeed and random nonce to produce a random float.
-  const nonce = crypto.randomBytes(8).toString('hex'); // per-round nonce for slight unpredictability
+  const nonce = crypto.randomBytes(8).toString('hex'); 
   const hmac = crypto.createHmac('sha256', serverSeed).update(nonce).digest('hex');
-  // convert first 12 hex chars to number
   const slice = hmac.slice(0, 12);
   const intVal = parseInt(slice, 16);
   const maxInt = Math.pow(16, slice.length);
   let u = intVal / maxInt;
-  // ensure u in (0,1)
+
   if (u <= 0) u = randomFloatOpen();
   if (u >= 1) u = 0.999999999999;
 
-  // Inverse transform / heavy-tail
-  const baseCrash = 1.0 / (1.0 - u);            // heavy-tailed
+  // Formula: baseCrash = 1 / (1 - u)
+  const baseCrash = 1.0 / (1.0 - u);            
   const adjusted = Math.pow(baseCrash, config.volatility);
+  
+  // APPLY HOUSE EDGE: adjusted * (1 - 0.04)
   const afterHouse = adjusted * (1 - config.houseEdge);
 
-  // Ensure at least minimal multiplier
   let crash = Math.max(config.minMultiplier, Number(afterHouse.toFixed(2)));
 
   // Safety cap
@@ -117,12 +100,12 @@ function generateCrashWithSeed(serverSeed) {
 
 /**
  * Given elapsed milliseconds since flight start, return multiplier.
- * Uses exponential growth model:
- *    multiplier(t) = exp(growthRatePerSecond * tSeconds)
  */
 function multiplierAtElapsed(elapsedMs) {
   const t = elapsedMs / 1000;
-  const m = Math.exp(config.growthRatePerSecond * t);
+  // Uses the slow growthRatePerSecond: 0.5
+  const m = Math.exp(config.growthRatePerSecond * t); 
+  
   // clamp to safety
   return Math.min(Number(m.toFixed(4)), config.maxMultiplier);
 }
@@ -145,7 +128,6 @@ function pushRoundHistory(r) {
 function startNewRound(io) {
   ioInstance = io;
 
-  // Clean timers if any lingering
   cleanupTimers();
 
   roundState = {
@@ -159,20 +141,18 @@ function startNewRound(io) {
     bets: {},
   };
 
-  // Generate provably-fair seed & crash ahead of starting flight
   const serverSeed = crypto.randomBytes(32).toString('hex');
   const serverHash = sha256Hex(serverSeed);
 
   roundState.serverSeed = serverSeed;
   roundState.serverHash = serverHash;
 
-  // Emit betting-phase round state + provably-fair hash so clients can use it.
   safeEmit('roundState', {
     round: roundState.id,
     state: 'betting',
     multiplier: roundState.multiplier,
     bettingEndsAt: roundState.bettingEndsAt,
-    serverHash, // provably-fair hash to be revealed later
+    serverHash, 
   });
 
   roundPhase = 'betting';
@@ -206,7 +186,7 @@ function startNewRound(io) {
       state: 'flying',
       multiplier: roundState.multiplier,
       flightStartTime: roundState.startedAt,
-      serverHash, // still include hash for clients that may have missed it
+      serverHash, 
     });
 
     // Begin flight ticks
@@ -228,13 +208,11 @@ function beginFlightTicks() {
     const m = multiplierAtElapsed(elapsed);
     roundState.multiplier = m;
 
-    // Emit multiplierUpdate
     safeEmit('multiplierUpdate', { multiplier: m });
 
-    // Optionally emit planePosition (for client visuals), calculated from multiplier
-    // Map multiplier to a reasonable x,y range for client to interpret
+    // Optionally emit planePosition (for client visuals)
     safeEmit('planePosition', {
-      x: Math.min(m / config.maxMultiplier, 1), // normalized 0..1
+      x: Math.min(m / config.maxMultiplier, 1), 
       y: Math.min(Math.pow(m / config.maxMultiplier, 0.6), 1),
     });
 
@@ -247,13 +225,11 @@ function beginFlightTicks() {
 }
 
 async function endRound() {
-  // Stop timers
   cleanupTimers();
   roundActive = false;
   roundPhase = 'ended';
 
-  // Mark uncaught bets as lost (but we still emit them as cashedOut=true for UI - lost)
-  // In this model "cashedOut" means the bet was resolved (either won by cashing out earlier or lost at crash).
+  // Mark uncaught bets as lost (resolved at crash)
   for (const [uid, bet] of Object.entries(roundState.bets)) {
     if (!bet.cashedOut) {
       bet.cashedOut = true;
@@ -262,13 +238,12 @@ async function endRound() {
     }
   }
 
-  // Emit crash event. Reveal serverSeed so clients can verify the crash computation.
+  // Emit crash event. Reveal serverSeed.
   safeEmit('roundCrashed', {
     crashAt: roundState.crashAt,
-    serverSeed: roundState.serverSeed, // reveal for provable fairness verification
+    serverSeed: roundState.serverSeed, 
   });
 
-  // Save history and increment round id implicitly on next start
   pushRoundHistory({
     id: roundState.id,
     crashAt: roundState.crashAt,
@@ -301,7 +276,7 @@ function cleanupTimers() {
 exports.getRoundStateSync = () => ({
   round: roundState.id,
   multiplier: roundState.multiplier,
-  crashAt: roundState.crashAt, // server can choose to omit crashAt for secrecy
+  crashAt: roundState.crashAt, 
   state: roundPhase === 'betting' ? 'betting' : (roundPhase === 'flying' ? 'flying' : 'ended'),
   bettingEndsAt: roundState.bettingEndsAt,
   serverHash: roundState.serverHash,
@@ -309,7 +284,6 @@ exports.getRoundStateSync = () => ({
 
 /**
  * Place bet (HTTP handler)
- * Expects req.user (authenticated) and body.amount
  */
 exports.placeBet = async (req, res) => {
   try {
@@ -320,24 +294,19 @@ exports.placeBet = async (req, res) => {
     const amount = Number(req.body.amount);
     if (!amount || amount <= 0) return res.status(400).json({ ok: false, error: 'Invalid amount' });
 
-    // Check user and balance
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
     if (amount > user.chips) return res.status(400).json({ ok: false, error: 'Insufficient chips' });
 
-    // Prevent multiple concurrent bets (configurable)
     if (roundState.bets[userId] && config.maxConcurrentBetsPerUser <= 1) {
       return res.status(400).json({ ok: false, error: 'Already have an active bet this round' });
     }
 
-    // Deduct chips (atomic operation in DB is recommended — here we do find/save simplistic)
     user.chips -= amount;
     await user.save();
 
-    // Register bet server-side
     roundState.bets[userId] = { amount, cashedOut: false, cashedOutAtMultiplier: null, winnings: 0 };
 
-    // Broadcast betPlaced to sockets (UI)
     safeEmit('betPlaced', {
       userId,
       amount,
@@ -353,7 +322,6 @@ exports.placeBet = async (req, res) => {
 
 /**
  * Cash out (HTTP handler)
- * Expects req.user and round must be flying
  */
 exports.cashOut = async (req, res) => {
   try {
@@ -371,7 +339,6 @@ exports.cashOut = async (req, res) => {
 
     // If currentM >= crashAt, the round already crashed — disallow
     if (currentM >= roundState.crashAt) {
-      // Mark bet lost
       bet.cashedOut = true;
       bet.cashedOutAtMultiplier = roundState.crashAt;
       bet.winnings = 0;
@@ -393,7 +360,7 @@ exports.cashOut = async (req, res) => {
     bet.cashedOutAtMultiplier = currentM;
     bet.winnings = winnings;
 
-    // Notify via sockets; include multiplier and winnings
+    // Notify via sockets
     safeEmit('cashedOut', {
       userId,
       username: user.username,
@@ -414,8 +381,6 @@ exports.cashOut = async (req, res) => {
 };
 
 // ----------------- SOCKET-BASED PLACE/CASH (optional) -----------------
-// If you are also wiring these via socket events with ack callbacks, you can call these functions:
-// Example usage inside io.on('connection', socket) -> socket.on('placeBet', async (data, ack) => { ... })
 exports.socketPlaceBet = async (socket, data, ack) => {
   try {
     const userId = data.userId || (socket.request.user && socket.request.user.id);
@@ -489,10 +454,4 @@ exports.initAviator = (io) => {
   if (!roundActive) {
     startNewRound(io);
   }
-
-  // Optionally: expose socket bindings for convenience
-  // e.g., in your socket connection handler:
-  // socket.on('placeBet', (data, ack) => aviatorController.socketPlaceBet(socket, data, ack));
-  // socket.on('cashOut',  (data, ack) => aviatorController.socketCashOut(socket, data, ack));
 };
-

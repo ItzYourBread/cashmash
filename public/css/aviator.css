@@ -1,277 +1,291 @@
-/* ---------- FLIGHT INFO (MULTIPLIER + RESULT) ---------- */
-.flight-info {
-  position: absolute;
-  top: 32px;
-  left: 50%;
-  transform: translateX(-50%);
+/* =======================================================
+   CASHMASH - AVIATOR
+   ======================================================= */
+
+/* ===================== BASE ===================== */
+html,
+body {
+  margin: 0;
+  padding: 0;
   width: 100%;
-  z-index: 30;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  pointer-events: none;
+  height: 100%;
+  background: radial-gradient(circle at center, #000000 35%, #000000 100%);
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  overflow-x: hidden;
 }
 
-.multiplier-display {
-  font-size: 3.2em;
-  font-weight: 900;
+.balance-container {
+  font-size: 1.1em;
+  font-weight: 600;
   color: #f5c542;
-  margin-bottom: 2px;
-  text-shadow: 0 0 18px #f5c542, 0 0 32px #ffd966;
-  transition: color 0.2s linear;
-  letter-spacing: 1px;
-}
-
-.small-result {
-  font-size: 1em;
-  color: #fff;
-  opacity: 0.85;
-  margin-top: 2px;
-  min-height: 18px;
-  text-shadow: 0 0 4px #000b38;
-}
-
-/* ---------- AVIATOR CONTAINER ---------- */
-.aviator-section {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  box-shadow: inset 0 0 10px rgba(245, 197, 66, 0.3);
+  min-width: 130px;
   text-align: center;
-  padding: 40px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #fff;
-  font-family: 'Arial', sans-serif;
+}
+
+/* ===================== AVIATOR SECTION ===================== */
+.aviator-section {
+    text-align: center;
+    padding: 40px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
 }
 
 .neon-title {
-  font-size: 2.6em;
-  font-weight: 700;
-  color: #f5c542;
-  text-shadow: 0 0 10px #f5c542, 0 0 20px #ffd966;
-  margin-bottom: 18px;
-  animation: pulseGlow 3s infinite;
+    font-size: 2.6em;
+    font-weight: 700;
+    color: #f5c542;
+    text-shadow: 0 0 10px #f5c542, 0 0 20px #ffd966;
+    margin-bottom: 18px;
+    animation: pulseGlow 3s infinite;
 }
 
 @keyframes pulseGlow {
-
-  0%,
-  100% {
-    opacity: 1;
-    text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966;
-  }
-
-  50% {
-    opacity: 0.85;
-    text-shadow: 0 0 6px #f5c542;
-  }
+    0%, 100% { opacity: 1; text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966; }
+    50% { opacity: 0.85; text-shadow: 0 0 6px #f5c542; }
 }
 
-.user-panel {
-  margin-bottom: 14px;
-}
-
-.user-info {
-  background: rgba(255, 255, 255, 0.03);
-  padding: 8px 20px;
-  border-radius: 30px;
-  display: inline-flex;
-  gap: 18px;
-  align-items: center;
-  color: #fff;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-}
-
-/* ---------- GAME TABLE ---------- */
+/* ===================== GAME TABLE ===================== */
 .aviator-table {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 14px;
-  max-width: 700px;
-  width: 100%;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
-  padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 14px;
+    max-width: 700px;
+    width: 100%;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
+    padding: 20px;
 }
 
-/* ---------- FLIGHT AREA ---------- */
+/* ===================== FLIGHT AREA ===================== */
 .flight-area {
-  position: relative;
-  width: 100%;
-  height: 400px;
-  background-color: #111;
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 20px;
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background-color: #111;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
 }
 
-/* ---------- SUNBURST CONTAINER ---------- */
+.flight-info {
+    position: absolute;
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+}
+
+.multiplier-display {
+    font-size: 3.2em;
+    font-weight: 900;
+    color: #f5c542;
+    margin-bottom: 2px;
+    text-shadow: 0 0 18px #f5c542, 0 0 32px #ffd966;
+    transition: color 0.2s linear;
+    letter-spacing: 1px;
+}
+
+.small-result {
+    font-size: 1em;
+    color: #fff;
+    opacity: 0.85;
+    margin-top: 2px;
+    min-height: 18px;
+    text-shadow: 0 0 4px #000b38;
+}
+
+/* ===================== SUNBURST ===================== */
 .sunburst-container {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 2;
-  /* behind interactive elements */
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 2;
 }
 
-/* ---------- SUNBURST EFFECT ---------- */
 .sunburst {
-  position: absolute;
-
-  /* Positioning top-left shifted */
-  top: -100%;
-  left: 0%;
-  transform: translateX(-50%) rotate(0deg);
-
-  width: 400%;
-  height: 400%;
-  border-radius: 50%;
-
-  background:
-    repeating-conic-gradient(from 0deg,
-      #000 0deg 2deg,
-      /* Black Ray */
-      transparent 2deg 6deg
-      /* Transparent Gap (shows the #222 background) */
-    );
-
-  /* Animation applied */
-  transform-origin: center center;
-  background-color: #0c0c0c;
-}
-
-/* ---------- ROTATION ANIMATION ---------- */
-@keyframes rotateSunburst {
-  from {
+    position: absolute;
+    top: -100%;
+    left: 0%;
     transform: translateX(-50%) rotate(0deg);
-  }
-
-  to {
-    /* Rotates the sunburst 360 degrees */
-    transform: translateX(-50%) rotate(360deg);
-  }
+    width: 400%;
+    height: 400%;
+    border-radius: 50%;
+    background: repeating-conic-gradient(from 0deg,
+        #000 0deg 2deg,
+        transparent 2deg 6deg
+    );
+    transform-origin: center center;
+    background-color: #0c0c0c;
 }
 
-/* Only animate during flight */
+@keyframes rotateSunburst {
+    from { transform: translateX(-50%) rotate(0deg); }
+    to { transform: translateX(-50%) rotate(360deg); }
+}
+
 .flight-area.flight-active .sunburst {
-  animation: rotateSunburst 50s linear infinite;
+    animation: rotateSunburst 50s linear infinite;
 }
 
+/* ===================== GRAPH ===================== */
 .graph-svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 12;
-  /* Lower z-index so plane is above it */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 12;
 }
 
 .flight-path {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background-color: #484848;
-  z-index: 1;
-  /* keep background beneath the sunburst overlay */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #484848;
+    z-index: 1;
 }
 
 #flight-path {
-  fill: none;
-  stroke: #3c3c3c;
-  /* The line color */
-  stroke-width: 4;
-  transition: stroke-dasharray 0.05s linear;
-  /* For the animated "draw" effect */
+    fill: none;
+    stroke: #3c3c3c;
+    stroke-width: 4;
+    transition: stroke-dasharray 0.05s linear;
 }
 
-/* ---------- PLANE (IMAGE VERSION) ---------- */
+/* ===================== PLANE ===================== */
 .plane {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 80px; /* Adjust to your image size */
-  height: 40px;
-  background: url('../images/Aviator/plane.png') no-repeat center center;
-  background-size: contain; /* ensures image scales properly */
-  transform-origin: center;
-  transition: transform 0.1s linear;
-  z-index: 20; /* stays above graph and rays */
-  will-change: transform, left, bottom;
-  pointer-events: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 40px;
+    background: url('../images/Aviator/plane.png') no-repeat center center;
+    background-size: contain;
+    transform-origin: center;
+    transition: transform 0.1s linear;
+    z-index: 20;
+    pointer-events: none;
 }
 
-
-/* ---------- TRAIL ---------- */
 .trail {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  animation: fadeTrail 0.7s linear forwards;
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    animation: fadeTrail 0.7s linear forwards;
 }
 
 @keyframes fadeTrail {
-  from {
-    opacity: 0.5;
-  }
-
-  to {
-    opacity: 0;
-    transform: scale(0.5);
-  }
+    from { opacity: 0.5; }
+    to { opacity: 0; transform: scale(0.5); }
 }
 
-/* ---------- CONTROLS ---------- */
+/* ===================== CONTROLS (BALANCE + BET + BUTTONS) ===================== */
 .controls {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }
 
-.bet-controls,
-.action-buttons {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
+.control-line {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
 }
 
 #betAmount {
-  padding: 12px 16px;
-  border-radius: 16px;
-  border: none;
-  outline: none;
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  font-size: 1.1em;
-  width: 100px;
-  text-align: center;
+    height: 45px;
+    width: 100px;
+    text-align: center;
+    font-size: 1.1em;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* ---------- BUTTONS ---------- */
+#betAmount {
+    background: rgba(255,255,255,0.08);
+    border: none;
+    color: #fff;
+    outline: none;
+}
+
 .btn.gold {
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #f5c542, #dca000);
-  color: #000b38;
-  border-radius: 30px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(245, 197, 66, 0.3);
-  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+    height: 45px;
+    min-width: 60px;
+    text-align: center;
+    font-size: 1.1em;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+}
+
+.btn.gold {
+    background: linear-gradient(135deg, #f5c542, #dca000);
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(245,197,66,0.3);
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
 }
 
 .btn.gold:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(245, 197, 66, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(245,197,66,0.5);
 }
 
 .btn.gold:disabled {
-  filter: grayscale(0.7) brightness(0.6);
-  cursor: not-allowed;
-  box-shadow: none;
+    filter: grayscale(0.7) brightness(0.6);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn.cashout {
+  background: linear-gradient(135deg, #ff5555, #d40000);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(255, 85, 85, 0.4);
+}
+
+
+/* ===================== MOBILE RESPONSIVE ===================== */
+@media (max-width: 700px) {
+    .aviator-section { padding: 20px 10px; }
+
+    .neon-title { font-size: 2em; }
+
+    .flight-area { height: 300px; }
+
+    .multiplier-display { font-size: 2.2em; }
+
+    .control-line {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    #balance, #betAmount, .btn.gold {
+        height: 40px;
+        min-width: 80px;
+        font-size: 0.95em;
+    }
 }

@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/aviator.css" />
   <script>
-    // Make user available for JS
     window.user = <% - JSON.stringify(user) %>;
   </script>
 </head>
@@ -23,62 +22,36 @@
         <div class="neon-title">CashMash Aviator</div>
       </div>
 
-      <!-- USER PANEL -->
-      <div class="user-panel">
-        <div class="user-info">
-          <span>👤 <strong>
-              <%= user.username %>
-            </strong></span>
-          <span>💰 Chips: <strong id="balance">
-              <%= user.chips %>
-            </strong></span>
-        </div>
-      </div>
-
       <!-- MAIN GAME AREA -->
       <div class="aviator-table">
-        <div class="table-top">
-
-          <!-- FLIGHT AREA -->
-          <div class="flight-area">
-            <div class="flight-info">
-              <div class="multiplier-display" id="multiplierDisplay">
-                <span id="multiplier">1.00x</span>
-              </div>
-              <div class="result small-result" id="resultText"></div>
+        <div class="flight-area">
+          <div class="flight-info">
+            <div class="multiplier-display" id="multiplierDisplay">
+              <span id="multiplier">1.00x</span>
             </div>
-            <div class="sunburst-container">
-              <div class="sunburst"></div>
-            </div>
-            <div class="flight-path"></div>
-            <svg id="graph-svg" class="graph-svg"></svg>
-            <div class="plane" id="plane"></div>
+            <div class="result small-result" id="resultText"></div>
           </div>
-
+          <div class="sunburst-container">
+            <div class="sunburst"></div>
+          </div>
+          <div class="flight-path"></div>
+          <svg id="graph-svg" class="graph-svg"></svg>
+          <div class="plane" id="plane"></div>
         </div>
 
         <!-- CONTROLS AREA -->
         <div class="controls">
-          <!-- BETTING CONTROLS -->
-          <div class="bet-controls">
+          <div class="control-line">
+            <div class="balance-container">Balance: ৳<span id="balance"><%= user.chips %></span></div>
             <input id="betAmount" type="number" min="1" value="10" />
             <button id="placeBetBtn" class="btn gold">Place Bet</button>
-          </div>
-
-          <!-- ACTION BUTTONS -->
-          <div class="action-buttons">
-            <button id="cashOutBtn" class="btn gold big" disabled>Cash Out</button>
+            <button id="cashOutBtn" class="btn gold" disabled>Cash Out</button>
           </div>
         </div>
-
-    </section>
-
-    </div>
+      </div>
     </section>
 
     <%- include('partials/footer') %>
-
-      <!-- Socket.IO -->
       <script src="/socket.io/socket.io.js"></script>
       <script src="/js/aviator.js"></script>
 </body>
