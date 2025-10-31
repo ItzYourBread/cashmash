@@ -1,16 +1,15 @@
+// config/slotsConfig.js
 const slotsConfig = {
   ClassicSlot: {
+    // ADJUSTED MULTIPLIERS FOR PROFITABILITY
     symbols: [
-      // Low-paying symbols (high frequency, low or negative return)
-      { name: 'cherry', file: '/images/ClassicSlot/cherry.png', multiplier: 1 },
-      { name: 'lemon', file: '/images/ClassicSlot/lemon.png', multiplier: 1 },    
-      { name: 'orange', file: '/images/ClassicSlot/orange.png', multiplier: 1.5 },
-      { name: 'watermelon', file: '/images/ClassicSlot/watermelon.png', multiplier: 2 },
-      
-      // High-paying symbols (low frequency, high return)
-      { name: 'grapes', file: '/images/ClassicSlot/grapes.png', multiplier: 4 },
-      { name: 'star', file: '/images/ClassicSlot/star.png', multiplier: 5 },
-      { name: 'red7', file: '/images/ClassicSlot/red7.png', multiplier: 12 },
+      { name: 'cherry', file: '/images/ClassicSlot/cherry.png', multiplier: 0.8 }, // Reduced
+      { name: 'lemon', file: '/images/ClassicSlot/lemon.png', multiplier: 1 },
+      { name: 'orange', file: '/images/ClassicSlot/orange.png', multiplier: 1.2 },  // Reduced
+      { name: 'watermelon', file: '/images/ClassicSlot/watermelon.png', multiplier: 1.8 }, // Reduced
+      { name: 'grapes', file: '/images/ClassicSlot/grapes.png', multiplier: 3 },   // Reduced
+      { name: 'star', file: '/images/ClassicSlot/star.png', multiplier: 4 },      // Reduced
+      { name: 'red7', file: '/images/ClassicSlot/red7.png', multiplier: 10 },     // Reduced
       { name: 'diamond', file: '/images/ClassicSlot/diamond.png', multiplier: 8 },
       { name: 'bar', file: '/images/ClassicSlot/bar.png', multiplier: 20 },
       { name: 'jackpot', file: '/images/ClassicSlot/jackpot.png', multiplier: 100 },
@@ -19,45 +18,19 @@ const slotsConfig = {
     reels: 5,
     rows: 4,
 
-    // Chance configuration: Total weight is 143.
-    // Cherry and Lemon now account for over 70% of the weights to force a win frequency near 35%.
+    // ADJUSTED CHANCES TO REDUCE FREQUENCY OF BIG WINS
     symbolChances: {
-      cherry: 45,       // Highest chance, very low payout
-      lemon: 30,        // High chance, break-even payout
-      orange: 20,
-      watermelon: 10,
-      grapes: 9,
-      star: 8,
-      red7: 5,
-      diamond: 5,
-      bar: 4,
-      jackpot: 3        // Lowest chance for max profit on the big prize
+      cherry: 50, lemon: 35, orange: 25, watermelon: 15, grapes: 10,
+      star: 8, red7: 3, diamond: 3, bar: 2, jackpot: 1 // High-payers significantly reduced
     },
 
-    // slotsConfig.js - Complete Legit Paylines Array
-
     paylines: [
-      // 1. Straight Horizontal (4)
-      [0, 0, 0, 0, 0], // Top Row
-      [1, 1, 1, 1, 1], // Second Row
-      [2, 2, 2, 2, 2], // Third Row
-      [3, 3, 3, 3, 3], // Bottom Row
-
-      // 2. Main Diagonals (2)
-      [0, 1, 2, 3, 3], // Top-Left to Bottom-Right
-      [3, 2, 1, 0, 0], // Bottom-Left to Top-Right
-
-      // 3. V-Shapes (4)
-      [0, 1, 2, 1, 0], // Wide V-Shape
-      [3, 2, 1, 2, 3], // Inverted Wide V-Shape
-      [1, 2, 3, 2, 1], // Narrow V-Shape
-      [2, 1, 0, 1, 2], // Inverted Narrow V-Shape
-
-      // 4. Zig-Zag / Step Patterns (4)
-      [0, 1, 0, 1, 0], // Top Zig-Zag (W)
-      [3, 2, 3, 2, 3], // Bottom Zig-Zag (M)
-      [0, 0, 1, 1, 2], // Step Down
-      [3, 3, 2, 2, 1]  // Step Up
+      [0, 0, 0, 0, 0], [1, 1, 1, 1, 1], [2, 2, 2, 2, 2], [3, 3, 3, 3, 3],
+      [0, 1, 2, 3, 3], [3, 2, 1, 0, 0],
+      [0, 1, 2, 1, 0], [3, 2, 1, 2, 3],
+      [1, 2, 3, 2, 1], [2, 1, 0, 1, 2],
+      [0, 1, 0, 1, 0], [3, 2, 3, 2, 3],
+      [0, 0, 1, 1, 2], [3, 3, 2, 2, 1]
     ],
 
     spinDuration: 1500

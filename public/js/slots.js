@@ -7,49 +7,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const betInput = document.getElementById('betAmount');
     const resultDisplay = document.getElementById('result');
 
-    // ====================== CONFIG (Incorporating your patterns) ======================
+    // ====================== CONFIG ======================
     const REELS = 5;
     const ROWS = 4;
     const SYMBOL_SIZE = 100;
     const GAP = 8;
-    const CANVAS_WIDTH = REELS * (SYMBOL_SIZE + GAP);
-    const CANVAS_HEIGHT = ROWS * (SYMBOL_SIZE + GAP);
+ 
+    
+    // Adjusted width to include the offset
+    const CANVAS_WIDTH = REELS * (SYMBOL_SIZE + GAP) + -4 * 2; 
+    const CANVAS_HEIGHT = ROWS * (SYMBOL_SIZE + GAP) + -4 * 2;
 
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
+    // NOTE: Initial balance should ideally be loaded from the server
     let currentBalance = parseInt(balanceDisplay.textContent, 10) || 1000;
     balanceDisplay.textContent = currentBalance;
 
+    // Define symbols needed only for image loading and lookup
     const symbols = [
-        { name: 'cherry', file: '/images/ClassicSlot/cherry.png', multiplier: 1 },
-        { name: 'lemon', file: '/images/ClassicSlot/lemon.png', multiplier: 1 },
-        { name: 'orange', file: '/images/ClassicSlot/orange.png', multiplier: 1.5 },
-        { name: 'watermelon', file: '/images/ClassicSlot/watermelon.png', multiplier: 2 },
-        { name: 'grapes', file: '/images/ClassicSlot/grapes.png', multiplier: 4 },
-        { name: 'star', file: '/images/ClassicSlot/star.png', multiplier: 5 },
-        { name: 'red7', file: '/images/ClassicSlot/red7.png', multiplier: 12 },
-        { name: 'diamond', file: '/images/ClassicSlot/diamond.png', multiplier: 8 },
-        { name: 'bar', file: '/images/ClassicSlot/bar.png', multiplier: 20 },
-        { name: 'jackpot', file: '/images/ClassicSlot/jackpot.png', multiplier: 100 },
-    ];
-    
-    const SYMBOL_MULTIPLIERS = symbols.reduce((map, sym) => {
-        map[sym.name] = sym.multiplier;
-        return map;
-    }, {});
-    
-    // Weighted chances for random symbol selection (Total weight is 4594)
-    const SYMBOL_CHANCES = {
-        cherry: 45, lemon: 30, orange: 20, watermelon: 10, grapes: 9, 
-        star: 8, red7: 5, diamond: 5, bar: 4, jackpot: 3
-    };
-    
-    const PAYLINES = [
-        [0, 0, 0, 0, 0], [1, 1, 1, 1, 1], [2, 2, 2, 2, 2], [3, 3, 3, 3, 3],
-        [0, 1, 2, 3, 3], [3, 2, 1, 0, 0], [0, 1, 2, 1, 0], [3, 2, 1, 2, 3],
-        [1, 2, 3, 2, 1], [2, 1, 0, 1, 2], [0, 1, 0, 1, 0], [3, 2, 3, 2, 3],
-        [0, 0, 1, 1, 2], [3, 3, 2, 2, 1]
+        { name: 'cherry', file: '/images/ClassicSlot/cherry.png' },
+        { name: 'lemon', file: '/images/ClassicSlot/lemon.png' },
+        { name: 'orange', file: '/images/ClassicSlot/orange.png' },
+        { name: 'watermelon', file: '/images/ClassicSlot/watermelon.png' },
+        { name: 'grapes', file: '/images/ClassicSlot/grapes.png' },
+        { name: 'star', file: '/images/ClassicSlot/star.png' },
+        { name: 'red7', file: '/images/ClassicSlot/red7.png' },
+        { name: 'diamond', file: '/images/ClassicSlot/diamond.png' },
+        { name: 'bar', file: '/images/ClassicSlot/bar.png' },
+        { name: 'jackpot', file: '/images/ClassicSlot/jackpot.png' },
     ];
     
     // Preload images
@@ -62,138 +49,44 @@ document.addEventListener('DOMContentLoaded', () => {
             loadedCount++;
             if (loadedCount === symbols.length) init();
         };
-        loadedSymbols.push(img);
+        // Store image object AND the associated file path for easy lookup
+        loadedSymbols.push({ img, file: s.file });
     });
 
-    // --- UTILITY FUNCTIONS FOR SERVER MOCK ---
-
-    function getRandomWeightedSymbol() {
-        const totalWeight = Object.values(SYMBOL_CHANCES).reduce((a, b) => a + b, 0);
-        let random = Math.random() * totalWeight;
-
-        for (const name in SYMBOL_CHANCES) {
-            random -= SYMBOL_CHANCES[name];
-            if (random <= 0) {
-                return symbols.find(s => s.name === name);
-            }
-        }
-        // Fallback (shouldn't happen)
-        return symbols[0]; 
-    }
+    // --- SERVER COMMUNICATION ---
 
     /**
-     * Checks the paylines against the resulting symbols grid and marks winning symbols.
+     * Sends the bet to the server and fetches the authoritative spin result.
      */
-    function checkPaylines(symbolGrid) {
-        let totalWinnings = 0;
-        const reels = symbolGrid.length;
-        
-        // Use a mutable copy of the grid where symbols can be marked with `win: true`
-        const winningSymbols = symbolGrid.map(reel => reel.map(symbol => ({...symbol, win: false})));
-
-        for (const payline of PAYLINES) {
-            let winLength = 0;
-            let currentSymbolName = null;
-
-            // Check the payline from left to right (Reel 0 to Reel 4)
-            for (let r = 0; r < reels; r++) {
-                const row = payline[r];
-                const symbol = winningSymbols[r][row]; 
-                const symbolName = symbol.name;
-
-                if (r === 0) {
-                    // Start of the line
-                    currentSymbolName = symbolName;
-                    winLength = 1;
-                } else if (symbolName === currentSymbolName) {
-                    // Match the symbol on the previous reel
-                    winLength++;
-                } else {
-                    // Break the matching sequence
-                    break;
-                }
-            }
-
-            // --- Payout Calculation (Win requires 3 or more symbols) ---
-
-            if (winLength >= 3) {
-                // Get the multiplier for the winning symbol type
-                const multiplier = SYMBOL_MULTIPLIERS[currentSymbolName];
-                
-                // Example Payout Logic (can be adjusted):
-                let payoutFactor = 0;
-                if (winLength === 3) payoutFactor = 1.0;
-                else if (winLength === 4) payoutFactor = 3.0;
-                else if (winLength === 5) payoutFactor = 5.0;
-
-                // For simplicity, we assume the bet is the line bet
-                const linePayout = multiplier * payoutFactor;
-                totalWinnings += linePayout;
-
-                // Mark the winning symbols with win: true
-                for (let r = 0; r < winLength; r++) {
-                    const row = payline[r];
-                    // IMPORTANT: Ensure the symbol object has the `win: true` property set
-                    winningSymbols[r][row].win = true; 
-                }
-            }
-        }
-
-        return { winnings: totalWinnings, finalSymbols: winningSymbols };
-    }
-
-    /**
-     * Mocks the server-side spin, generates results, and checks for wins.
-     */
-    const mockServerSpin = (bet) => {
-        return new Promise(resolve => {
-            // 1. Generate the 5x4 result grid
-            const resultGrid = [];
-            for (let r = 0; r < REELS; r++) {
-                const reelSymbols = [];
-                for (let i = 0; i < ROWS; i++) {
-                    // We generate more than 4 symbols per reel to ensure smooth stopping animation
-                    // (The first 4 are the visible result, the rest are just padding)
-                    reelSymbols.push(getRandomWeightedSymbol());
-                }
-                // Add padding symbols for smooth stop
-                for (let i = 0; i < 4; i++) { 
-                    reelSymbols.push(getRandomWeightedSymbol());
-                }
-                resultGrid.push(reelSymbols);
-            }
-
-            // 2. Check Paylines and calculate winnings
-            const { winnings, finalSymbols } = checkPaylines(resultGrid.map(reel => reel.slice(0, ROWS))); // Pass only the visible 4 rows for check
-            
-            // Re-integrate the marked symbols into the full result grid for the client animation
-            for (let r = 0; r < REELS; r++) {
-                for (let i = 0; i < ROWS; i++) {
-                    resultGrid[r][i] = finalSymbols[r][i];
-                }
-            }
-
-            // 3. Resolve the server response
-            resolve({
-                finalSymbols: resultGrid, // Full grid with win: true flags
-                winnings: winnings * bet, // Scale winnings by the original bet
-                balance: currentBalance + (winnings * bet)
-            });
+    const actualServerSpin = async (bet) => {
+        const response = await fetch('/slots/spin', { // IMPORTANT: Check this is your correct endpoint
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // ADD AUTHORIZATION HEADER HERE (e.g., 'Authorization: Bearer <token>')
+            },
+            body: JSON.stringify({ bet })
         });
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+            throw new Error(data.error || 'Server request failed');
+        }
+        return data;
     };
 
-    // ====================== REEL CLASS (Refined draw method) ======================
+    // ====================== REEL CLASS ======================
     class Reel {
         constructor(x, index) {
             this.x = x;
             this.index = index;
             this.position = 0;
             this.speed = 0;
-            this.target = null;
+            this.target = null; // Final 4 symbols from server for this reel
             this.stopping = false;
             this.settled = false;
             this.blur = 0;
-            this.glowIndices = [];
         }
 
         start() {
@@ -201,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
             this.stopping = false;
             this.settled = false;
             this.blur = 0;
-            this.glowIndices = [];
         }
 
         stop(finalSymbols) {
@@ -234,46 +126,42 @@ document.addEventListener('DOMContentLoaded', () => {
             const yOffset = -this.position;
 
             for (let i = 0; i < ROWS + 2; i++) {
-                let img;
+                let imgData;
                 let isWinningSymbol = false;
                 
                 if (this.settled && this.target) {
-                    const idx = i % this.target.length;
-                    // Find the symbol object from the target array
-                    const symbolData = this.target[idx];
+                    // Use the visible part of the target array (which should be 4 symbols long)
+                    const idx = i % ROWS; 
+                    const symbolData = this.target[idx]; // { name: '...', file: '...', win: true }
                     
-                    // Find the preloaded image based on the symbol's file path
-                    const match = loadedSymbols.find(s => s.src.includes(symbolData.file.split('/').pop()));
-                    img = match || loadedSymbols[0];
+                    // Find the preloaded image object using the file path
+                    const match = loadedSymbols.find(s => s.file === symbolData.file);
+                    imgData = match ? match.img : loadedSymbols[0].img; 
 
-                    // Check if the symbol object has the `win: true` flag set
+                    // Check if the symbol object has the `win: true` flag set (server-determined)
                     if (symbolData.win) { 
                         isWinningSymbol = true;
                     }
 
                 } else {
-                    img = loadedSymbols[Math.floor(Math.random() * loadedSymbols.length)];
+                    // During spin, pick a random loaded image for the animation
+                    imgData = loadedSymbols[Math.floor(Math.random() * loadedSymbols.length)].img;
                 }
 
                 const y = yOffset + i * (SYMBOL_SIZE + GAP);
 
-                // --- DRAWING LOGIC (Applied to each symbol) ---
+                // --- DRAWING LOGIC ---
                 ctx.save(); 
 
-                if (isWinningSymbol && glowing) { // Only glow if it's a winning symbol AND the global `glowing` state is true
-                    // Apply GLOW settings (shadow)
+                if (isWinningSymbol && glowing) { 
                     ctx.shadowBlur = 20;
                     ctx.shadowColor = 'gold'; 
-                    // No motion blur filter when glowing
                 } else {
-                    // Apply MOTION BLUR settings (filter) or 'none' if settled/lost
                     ctx.filter = this.blur > 0 ? `blur(${this.blur}px) brightness(${1 + this.blur * 0.05})` : 'none';
                 }
                 
-                // Draw the image
-                ctx.drawImage(img, this.x, y, SYMBOL_SIZE, SYMBOL_SIZE);
+                ctx.drawImage(imgData, this.x, y, SYMBOL_SIZE, SYMBOL_SIZE);
                 
-                // Restore context to remove shadow/filter for the next symbol
                 ctx.restore(); 
             }
         }
@@ -282,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ====================== SETUP & MAIN SPIN ======================
     const reels = [];
     let spinning = false;
-    let glowing = false; // State to keep animation loop running for glow
+    let glowing = false; 
 
     const init = () => {
         for (let i = 0; i < REELS; i++) {
@@ -297,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
             r.update();
             r.draw();
         });
-        // Loop continues if spinning OR glowing
         if (spinning || glowing) requestAnimationFrame(draw); 
     };
 
@@ -310,26 +197,32 @@ document.addEventListener('DOMContentLoaded', () => {
         resultDisplay.textContent = '';
         spinBtn.disabled = true;
 
+        // Optimistic balance update
         currentBalance -= bet;
         balanceDisplay.textContent = currentBalance;
 
         try {
-            // Call the mock server function
-            const data = await mockServerSpin(bet);
-            const finalSymbols = data.finalSymbols; 
+            // Call the actual server function
+            const data = await actualServerSpin(bet);
             
+            // finalSymbols is the 5x4 grid, with win: true/false flags
+            const finalSymbolsFromServer = data.finalSymbols; 
+
+            // Start animation
             spinning = true;
             reels.forEach(r => r.start());
             draw();
 
             // Stop reels with staggered delay
-            reels.forEach((r, i) => setTimeout(() => r.stop(finalSymbols[i]), i * 800 + 1000));
+            reels.forEach((r, i) => setTimeout(() => r.stop(finalSymbolsFromServer[i]), i * 800 + 1000));
 
             // After all reels settled
             const stopTime = 1000 + REELS * 800 + 2000;
             setTimeout(() => {
                 spinning = false;
-                currentBalance = data.balance;
+                
+                // Update balance from the server's authoritative value
+                currentBalance = data.balance; 
                 balanceDisplay.textContent = currentBalance;
 
                 if (data.winnings > 0) {
@@ -337,13 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // START GLOW ANIMATION
                     glowing = true; 
-                    draw(); // Force redraw to start glow
+                    draw(); 
 
-                    const GLOW_DURATION = 3000; // 3 seconds for the glow
-
+                    const GLOW_DURATION = 3000; 
                     setTimeout(() => {
-                        // End glow effect
-                        glowing = false; // Stops the draw loop
+                        glowing = false; 
                         spinBtn.disabled = false; 
                     }, GLOW_DURATION);
 
@@ -359,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.error(err);
             alert(err.message || 'Spin error');
+            // Revert balance if the spin failed
             currentBalance += bet;
             balanceDisplay.textContent = currentBalance;
             spinBtn.disabled = false;
