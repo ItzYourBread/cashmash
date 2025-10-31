@@ -1,144 +1,111 @@
 /* =======================================================
-   CASHMASH SLOTS - CANVAS VERSION (by Arif Satify Films)
+   CASHMASH - CLASSIC SLOT MACHINE (Las Vegas Edition)
    ======================================================= */
 
 /* ===================== BASE ===================== */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, #000b38 40%, #000218 100%);
+  background: radial-gradient(circle at center, #000000 35%, #000000 100%);
   font-family: 'Poppins', sans-serif;
   color: #fff;
   overflow-x: hidden;
 }
 
-/* ===================== MAIN SECTION ===================== */
+/* ===================== SECTION ===================== */
 .slots-section {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 80vh;
   text-align: center;
   padding: 40px 10px;
-  position: relative;
 }
 
 /* ===================== HEADER ===================== */
 .slot-header {
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
 .neon-title {
-  font-size: 3em;
-  font-weight: 700;
-  color: #f5c542;
-  text-shadow: 0 0 10px #f5c542, 0 0 20px #f5c542, 0 0 30px #f5c542, 0 0 40px #ffd966;
-  animation: pulseGlow 3s infinite alternate;
+  font-size: 1.8em;
+  color: #ffd966;
+  margin-bottom: 15px;
+  text-shadow: 0 0 15px #f5c542, 0 0 25px #ffd966;
+  animation: pulseGlow 2s infinite alternate;
+  text-align: left;
 }
 
 @keyframes pulseGlow {
   0%, 100% {
-    opacity: 1;
-    text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966;
+    text-shadow: 0 0 10px rgba(245, 197, 66, 0.4);
   }
-  50% {
-    opacity: 0.8;
-    text-shadow: 0 0 5px #f5c542, 0 0 10px #fff;
+  60% {
+    text-shadow: 0 0 25px rgba(245, 197, 66, 0.8);
   }
 }
 
-/* ===================== SLOT MACHINE CASING ===================== */
-.slot-machine {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 25px 20px;
-  border-radius: 20px;
-  max-width: 850px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
-  box-shadow: 0 0 45px rgba(0, 0, 0, 0.25);
-  position: relative;
-  border: 1px solid rgba(245, 197, 66, 0.2);
+.machine-name {
+  font-size: 1.8em;
+  color: #ffd966;
+  margin-bottom: 15px;
+  text-shadow: 0 0 15px #f5c542, 0 0 25px #ffd966;
 }
 
-/* ===================== CANVAS AREA ===================== */
+/* ===================== CANVAS ===================== */
 .slot-canvas-wrapper {
-  position: relative;
-  display: inline-block;
-  border-radius: 12px;
+  background: linear-gradient(180deg, #00194f 0%, #000b38 100%);
+  border-radius: 15px;
+  border: 3px solid #f5c542;
+  box-shadow: 0 0 30px rgba(245, 197, 66, 0.3), inset 0 0 20px rgba(245, 197, 66, 0.2);
+  padding: 5px;
 }
 
 #slotCanvas {
   display: block;
-  background: linear-gradient(180deg, #000b38 0%, #000 100%);
-  border: 4px solid #f5c542;
-  border-radius: 12px;
-  box-shadow: inset 0 0 20px rgba(245,197,66,0.5), 0 0 40px rgba(245,197,66,0.3);
-  image-rendering: crisp-edges;
-}
-
-/* ===================== WIN GLOW ===================== */
-.win-glow {
-  position: absolute;
-  pointer-events: none;
-  border-radius: 12px;
-  box-shadow: 0 0 25px #FFD700, 0 0 45px #fff, 0 0 65px #FFD700;
-  animation: glowPulse 1.2s infinite alternate;
-}
-
-@keyframes glowPulse {
-  0% { transform: scale(1); box-shadow: 0 0 15px #FFD700, 0 0 30px #fff; }
-  50% { transform: scale(1.05); box-shadow: 0 0 25px #FFD700, 0 0 50px #fff; }
-  100% { transform: scale(1); box-shadow: 0 0 15px #FFD700, 0 0 30px #fff; }
-}
-
-/* ===================== WIN MESSAGE ===================== */
-.win-message {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 3em;
-  font-weight: 900;
-  color: #FFD700;
-  text-shadow: 0 0 10px #fff, 0 0 20px #FFD700, 0 0 30px #FFD700;
-  pointer-events: none;
-  opacity: 0;
-  z-index: 20;
-}
-
-@keyframes winFadeIn {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
-  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-}
-
-@keyframes winFadeOut {
-  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
+  border-radius: 10px;
+  width: 100%;
+  max-width: 600px;
 }
 
 /* ===================== CONTROLS ===================== */
 .controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 15px;
   flex-wrap: wrap;
+  margin-top: 25px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.balance-container {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #f5c542;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  box-shadow: inset 0 0 10px rgba(245, 197, 66, 0.3);
+  min-width: 130px;
+  text-align: center;
 }
 
 .bet-section {
   display: flex;
-  gap: 10px;
   align-items: center;
+  gap: 10px;
+  flex-grow: 1;
+  justify-content: center;
 }
 
 #betAmount {
-  padding: 14px 20px;
+  padding: 12px 18px;
   font-size: 1.1em;
   border-radius: 30px;
   border: none;
@@ -152,105 +119,66 @@ html, body {
 
 #betAmount:focus {
   background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 8px rgba(245, 197, 66, 0.4);
+  box-shadow: 0 0 10px rgba(245, 197, 66, 0.5);
 }
 
 #spinBtn {
-  padding: 15px 50px;
-  font-size: 1.2em;
+  padding: 14px 45px;
+  font-size: 1.1em;
   border-radius: 35px;
   border: none;
-  background: #f5c542;
+  background: linear-gradient(90deg, #f5c542, #ffd966);
   color: #000b38;
   font-weight: bold;
-  transition: 0.3s;
+  box-shadow: 0 0 15px rgba(245, 197, 66, 0.4);
   cursor: pointer;
-  box-shadow: 0 0 15px rgba(245,197,66,0.3);
+  transition: 0.3s;
 }
 
 #spinBtn:hover {
-  background: #fff;
-  box-shadow: 0 0 20px rgba(245,197,66,0.6);
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #fff6a0, #f5c542);
 }
 
-#spinBtn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background: rgba(245,197,66,0.5);
-  box-shadow: none;
+.info-icon {
+  background: #f5c542;
+  color: #000b38;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(245, 197, 66, 0.3);
+  transition: 0.3s;
+}
+
+.info-icon:hover {
+  transform: rotate(10deg);
+  background: #fff;
 }
 
 #result {
   font-size: 1.4em;
   color: #f5c542;
-  min-height: 32px;
-  font-weight: 600;
-  text-shadow: 0 0 8px rgba(245,197,66,0.4);
-}
-
-/* ===================== BALANCE DISPLAY ===================== */
-.balance-container {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 10px 25px;
-  border-radius: 30px;
-  font-size: 1.2em;
-  color: #f5c542;
-  font-weight: 600;
-  box-shadow: inset 0 0 10px rgba(245,197,66,0.3);
-}
-
-/* ===================== LOADING OVERLAY ===================== */
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 12px;
-  z-index: 10;
-  color: #f5c542;
-  font-size: 1.5em;
-  font-weight: 600;
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.98); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* ===================== CONFETTI ===================== */
-.confetti {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  animation: confettiDrop 1.2s forwards;
-  z-index: 998;
-}
-
-@keyframes confettiDrop {
-  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(350px) rotate(720deg); opacity: 0; }
+  margin-top: 20px;
+  text-shadow: 0 0 8px rgba(245, 197, 66, 0.4);
 }
 
 /* ===================== MODAL ===================== */
 .modal {
   display: none;
   position: fixed;
-  z-index: 999;
   inset: 0;
   width: 100%;
   height: 100%;
   background: rgba(0, 5, 30, 0.85);
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(6px);
   justify-content: center;
   align-items: center;
-  animation: fadeIn 0.3s ease;
+  z-index: 1000;
 }
 
 .modal.active {
@@ -258,7 +186,7 @@ html, body {
 }
 
 .modal-content {
-  background: rgba(5, 10, 40, 0.95);
+  background: rgba(10, 10, 35, 0.95);
   border: 2px solid rgba(245, 197, 66, 0.4);
   border-radius: 20px;
   padding: 40px 45px;
@@ -266,14 +194,8 @@ html, body {
   width: 400px;
   max-width: 90%;
   text-align: left;
-  box-shadow: 0 0 30px rgba(245, 197, 66, 0.3);
+  box-shadow: 0 0 35px rgba(245, 197, 66, 0.3);
   position: relative;
-  animation: popIn 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-@keyframes popIn {
-  0% { transform: translateY(-15px) scale(0.95); opacity: 0; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 .close-btn {
@@ -283,7 +205,7 @@ html, body {
   font-size: 1.8em;
   cursor: pointer;
   color: #f5c542;
-  transition: all 0.2s ease;
+  transition: 0.2s;
 }
 
 .close-btn:hover {
@@ -300,28 +222,16 @@ html, body {
 }
 
 .modal-content ul {
-  margin: 15px 0 10px 5px;
+  margin: 15px 0 10px;
   list-style: none;
   padding: 0;
 }
 
 .modal-content li {
   margin-bottom: 8px;
-  padding-left: 10px;
   font-size: 1.05em;
-  border-left: 3px solid rgba(245,197,66,0.3);
-  transition: all 0.2s ease;
-}
-
-.modal-content li:hover {
-  transform: translateX(4px);
-  border-left-color: #f5c542;
-}
-
-.modal-content li::before {
-  content: '★ ';
-  color: #f5c542;
-  font-size: 1.2em;
+  border-left: 3px solid rgba(245, 197, 66, 0.3);
+  padding-left: 10px;
 }
 
 .mini-symbol {
@@ -331,59 +241,45 @@ html, body {
   margin-right: 8px;
 }
 
-/* ===================== MOBILE RESPONSIVE ===================== */
-@media (max-width: 600px) {
-  .slots-section {
-    padding: 20px 5px;
-  }
-
-  .neon-title {
-    font-size: 2em;
-  }
-
-  .slot-machine {
-    padding: 15px;
-    gap: 20px;
-  }
-
-  #slotCanvas {
-    width: 100% !important;
-    max-width: 360px;
-    border-width: 2px;
-  }
-
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 700px) {
   .controls {
-    flex-direction: column;
-    gap: 12px;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 0 10px;
   }
 
-  .bet-section {
-    width: 100%;
-    justify-content: space-between;
+  .balance-container {
+    font-size: 0.9em;
+    padding: 8px 14px;
+    min-width: auto;
   }
 
   #betAmount {
-    padding: 10px 15px;
-    font-size: 1em;
-    width: 100px;
+    width: 70px;
+    height: 43px;
+    padding: 8px 10px;
+    font-size: 0.9em;
   }
 
   #spinBtn {
-    padding: 10px 30px;
+    padding: 8px 15px;
     font-size: 1em;
+    border-radius: 25px;
+  }
+
+  .info-icon {
+    width: 43px;
+    height: 43px;
+    font-size: 0.9em;
   }
 
   #result {
     font-size: 1.1em;
   }
 
-  .balance-container {
-    font-size: 1em;
-    padding: 8px 18px;
-  }
-
-  .modal-content {
-    width: 90%;
-    padding: 20px;
+  .machine-name {
+    font-size: 1.4em;
   }
 }
