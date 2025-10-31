@@ -4,91 +4,69 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mines | CashMash</title>
+    <title>Classic Mines | CashMash</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/header.css" />
     <link rel="stylesheet" href="/css/footer.css" />
     <link rel="stylesheet" href="/css/mines.css" />
-    <style>
-        /* --- Optional inline styles to enhance UX --- */
-        .grid.locked {
-            pointer-events: none;
-            opacity: 0.4;
-            position: relative;
-        }
-
-        .grid.locked::after {
-            content: "🔒 Press Start to Play";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ffd700;
-            font-weight: bold;
-            font-size: 1.2em;
-            text-shadow: 0 0 10px #000;
-        }
-    </style>
 </head>
 
 <body>
     <%- include('partials/header') %>
 
         <section class="mines-section">
-            <div class="mine-header">
-                <div class="neon-title">CashMash Mines</div>
-            </div>
-
-            <div class="user-panel">
-                <div class="user-info">
-                    <span>👤 <strong>
-                            <%= user.username %>
-                        </strong></span>
-                    <span>💰 Chips: <strong id="balance">
-                            <%= user.chips %>
-                        </strong></span>
-                </div>
-            </div>
-
             <div class="mines-game">
+                <h2 class="neon-title">Mines</h2>
 
-                <!-- 🧩 Grid (locked by default) -->
+
+                <!-- 🧩 Grid -->
                 <div id="grid" class="grid locked"></div>
 
-                <!-- ✅ Controls above grid -->
-                <div class="game-controls top">
-                    <div class="bet-controls">
-                        <label>💰 Bet:</label>
-                        <input type="number" id="betInput" min="1" value="10" />
-                        <label>💥 Mines:</label>
-                        <select id="mineRate">
-                            <option value="3">3</option>
-                            <option value="5">5</option>
-                            <option value="8">8</option>
-                            <option value="10">10</option>
-                            <option value="18">18</option>
-                            <option value="24">24</option>
-                        </select>
-                    </div>
-                    <div class="buttons">
-                        <button id="newGameBtn" class="btn gold">🎮 Start Game</button>
-                        <button id="cashOutBtn" class="btn gold" disabled>💰 Cash Out</button>
-                    </div>
-                </div>
-
-
+                <!-- Status -->
                 <div class="status">
                     Multiplier: <span id="multiplierDisplay">1.00x</span> |
                     Profit: <span id="profitDisplay">0</span>
                 </div>
 
-                <!-- ✨ Popup message -->
+                <!-- ✅ Controls at the bottom -->
+                <div class="game-controls">
+                    <div class="controls-line1">
+                        <div class="balance-container">Balance: ৳<span id="balance">
+                                <%= user.chips %>
+                            </span></div>
+                        <input type="number" id="betInput" min="10" max="1000" value="10" placeholder="Bet" />
+                        <select id="mineRate">
+                            <option value="3">3 Mines</option>
+                            <option value="5">5 Mines</option>
+                            <option value="8">8 Mines</option>
+                            <option value="10">10 Mines</option>
+                            <option value="18">18 Mines</option>
+                            <option value="24">24 Mines</option>
+                        </select>
+                    </div>
+                    <div class="controls-line2">
+                        <button id="newGameBtn" class="btn gold">Start</button>
+                        <button id="cashOutBtn" class="btn gold" disabled>Cash Out</button>
+                    </div>
+                </div>
+
+                <!-- Popup -->
                 <div id="popupMessage" class="popup-message"></div>
+
             </div>
         </section>
 
         <%- include('partials/footer') %>
             <script src="/js/mines.js"></script>
+            <script>
+                const betInput = document.getElementById("betInput");
+                betInput.addEventListener("input", () => {
+                    let val = parseInt(betInput.value);
+                    if (!val) return;
+                    if (val < 10) betInput.value = 10;
+                    if (val > 1000) betInput.value = 1000;
+                });
+            </script>
 </body>
 
 </html>

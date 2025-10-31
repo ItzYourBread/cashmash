@@ -49,13 +49,6 @@ body {
   }
 }
 
-.machine-name {
-  font-size: 1.8em;
-  color: #ffd966;
-  margin-bottom: 15px;
-  text-shadow: 0 0 15px #f5c542, 0 0 25px #ffd966;
-}
-
 /* ===================== CANVAS ===================== */
 .slot-canvas-wrapper {
   background: linear-gradient(180deg, #00194f 0%, #000b38 100%);

@@ -1,99 +1,66 @@
+/* =======================================================
+   CASHMASH - CLASSIC MINES (Las Vegas Edition)
+   ======================================================= */
+
+/* ===================== BASE ===================== */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #000000 35%, #000000 100%);
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* ===================== SECTION ===================== */
 .mines-section {
-  text-align: center;
-  padding: 40px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  min-height: 80vh;
+  padding: 40px 10px;
+  text-align: center;
 }
 
 .neon-title {
-  font-size: 3em;
-  font-weight: 700;
-  color: #f5c542;
-  text-shadow: 0 0 10px #f5c542, 0 0 20px #f5c542, 0 0 40px #ffd966;
-  animation: pulseGlow 3s infinite;
+  font-size: 1.8em;
+  color: #ffd966;
+  margin-bottom: 15px;
+  text-shadow: 0 0 15px #f5c542, 0 0 25px #ffd966;
+  animation: pulseGlow 2s infinite alternate;
+  text-align: left !important;
 }
-
-.mine-header { margin-bottom: 25px; }
 
 @keyframes pulseGlow {
-  0%, 100% { opacity: 1; text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966; }
-  50% { opacity: 0.8; text-shadow: 0 0 5px #f5c542, 0 0 10px #fff; }
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(245, 197, 66, 0.4);
+  }
+  60% {
+    text-shadow: 0 0 25px rgba(245, 197, 66, 0.8);
+  }
 }
 
-.mines-game {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 25px;
-  border-radius: 20px;
-  max-width: 600px;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
-}
-
-.game-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.bet-controls {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.bet-controls input, .bet-controls select {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-  font-size: 1em;
-  width: 80px;
-  text-align: center;
-}
-
-.buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.btn.gold {
-  background: linear-gradient(135deg, #f5c542, #dca000);
-  color: #000;
-  border: none;
-  padding: 10px 25px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
-}
-
-.btn.gold:hover {
-  background: #fff;
-  color: #000;
-  box-shadow: 0 0 20px rgba(245,197,66,0.4);
-}
-
+/* ===================== GRID ===================== */
 .grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
+  gap: 6px; /* tighter spacing */
   justify-content: center;
 }
 
 .tile {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   border-radius: 12px;
   background: linear-gradient(145deg, #141b2f, #0a0f1f);
   border: 2px solid #f5c54233;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
+  font-size: 28px;
   color: #f5c542;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -116,23 +83,118 @@
   border-color: #ff000066;
 }
 
+/* ===================== STATUS ===================== */
 .status {
+  margin-top: 15px;
   color: #f5c542;
   font-weight: 600;
-  margin-top: 15px;
   font-size: 1.1em;
+  text-shadow: 0 0 5px rgba(245,197,66,0.5);
 }
 
-/* ==========================================
-   Popup Message (Same feel as slot pop)
-   ========================================== */
+/* ===================== CONTROLS ===================== */
+.game-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.controls-line1, .controls-line2 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.controls-line1 > *, .controls-line2 > * {
+  height: 45px;
+  min-width: 80px;
+  max-width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
+}
+
+.balance-container {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #f5c542;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  box-shadow: inset 0 0 10px rgba(245, 197, 66, 0.3);
+  min-width: 180px;
+  text-align: center;
+}
+
+#betInput {
+  padding: 12px 18px;
+  font-size: 1.1em;
+  border-radius: 30px;
+  border: none;
+  outline: none;
+  width: 80px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+select#mineRate {
+  padding: 12px 18px;
+  font-size: 1.1em;
+  border-radius: 30px;
+  border: none;
+  outline: none;
+  min-width: 118px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+#betInput:focus, select#mineRate:focus {
+  background: rgba(255,255,255,0.15);
+  box-shadow: 0 0 8px rgba(245,197,66,0.4);
+}
+
+/* Buttons */
+.btn.gold {
+  background: linear-gradient(135deg, #f5c542, #dca000);
+  color: #000b38;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 100%;
+  height: 45px;
+}
+
+.btn.gold:hover {
+  background: linear-gradient(135deg, #fff6a0, #f5c542);
+  color: #000;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(245,197,66,0.4);
+}
+
+.btn.gold:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(245,197,66,0.3);
+  box-shadow: none;
+}
+
+/* ===================== POPUP ===================== */
 .popup-message {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0.9);
-  background: rgba(245, 197, 66, 0.1);
-  border: 1px solid rgba(245, 197, 66, 0.3);
+  background: rgba(245,197,66,0.1);
+  border: 1px solid rgba(245,197,66,0.3);
   padding: 12px 20px;
   border-radius: 10px;
   color: #f5c542;
@@ -141,7 +203,7 @@
   text-shadow: 0 0 10px #f5c542;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: all 0.3s ease;
   z-index: 10;
 }
 
@@ -150,69 +212,72 @@
   transform: translate(-50%, -50%) scale(1);
 }
 
+/* ===================== LOCKED GRID ===================== */
+.grid.locked {
+  pointer-events: none;
+  opacity: 0.4;
+  position: relative;
+}
 
-/* ==========================================
-   MOBILE OPTIMIZATION (< 600px)
-   ========================================== */
-@media (max-width: 600px) {
+.grid.locked::after {
+  content: "🔒 Press Start to Play";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 1.2em;
+  text-shadow: 0 0 10px #000;
+}
 
-  /* Section + Layout adjustments */
-  .mines-section {
-    padding: 20px 5px;
+/* ===================== MOBILE (< 700px) ===================== */
+@media (max-width: 700px) {
+  .machine-name {
+    font-size: 1.5em;
+    margin-bottom: 15px;
   }
 
-  .neon-title {
-    font-size: 2em;
-  }
-
-  .mines-game {
-    padding: 15px;
-    border-radius: 15px;
-    max-width: 95%;
-  }
-
-  .game-controls {
-    gap: 10px;
-  }
-
-  .bet-controls {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .bet-controls input,
-  .bet-controls select {
-    width: 100%;
-    font-size: 0.9em;
-    padding: 8px;
-  }
-
-  .buttons {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .btn.gold {
-    width: 100%;
-    font-size: 1em;
-    padding: 10px;
-  }
-
-  /* Grid shrink */
   .grid {
     grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
+    gap: 4px;
   }
 
   .tile {
-    width: 55px;
-    height: 55px;
-    font-size: 24px;
-    border-radius: 10px;
+    width: 70px;
+    height: 70px;
+    font-size: 22px;
   }
 
   .status {
     font-size: 1em;
-    margin-top: 10px;
+  }
+
+  .controls-line1, .controls-line2 {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .controls-line1 > *, .controls-line2 > * {
+    min-width: 60px;
+    height: 40px;
+    font-size: 0.85em;
+  }
+
+  .btn.gold {
+    height: 40px;
+    font-size: 0.9em;
+  }
+
+  #betInput, select#mineRate {
+    height: 40px;
+    font-size: 0.85em;
+  }
+
+  .balance-container {
+    font-size: 0.9em;
+    padding: 0 8px;
+    height: 40px;
+    min-width: 150px
   }
 }
