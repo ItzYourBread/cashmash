@@ -133,6 +133,7 @@ placeBetBtn.onclick = () => {
   }
   currentBet = bet;
   resultText.textContent = `Bet set to: ${bet} 💰. Click Deal.`;
+  placeBetBtn.disabled = true;
   dealBtn.disabled = false;
 };
 
@@ -325,7 +326,8 @@ function endGame(message, resultType, newBalance) {
   gameActive = false;
   hitBtn.disabled = true;
   standBtn.disabled = true;
-  dealBtn.disabled = false;
+  dealBtn.disabled = true;
+  placeBetBtn.disabled = false;
 
   updateScores(false);
 

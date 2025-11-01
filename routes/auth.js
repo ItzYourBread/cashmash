@@ -8,6 +8,20 @@ const router = express.Router();
 const otpEnable = false; // ⬅️ change to false to disable OTP system
 
 /* =====================================
+   ✅ AUTHENTICATION CHECK MIDDLEWARE
+   ===================================== */
+// This function checks if a user is already authenticated (logged in)
+const isNotLoggedIn = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    // User is logged in, redirect them away from login/register pages
+    // You should change '/dashboard' to your main logged-in page path
+    return res.redirect('/dashboard');
+  }
+  // User is not logged in, proceed to show the login/register page
+  next();
+};
+
+/* =====================================
    🔹 EMAIL TRANSPORTER (Nodemailer)
    ===================================== */
 const transporter = nodemailer.createTransport({
@@ -22,13 +36,13 @@ const transporter = nodemailer.createTransport({
    🔹 GET ROUTES
    ===================================== */
 
-// Render Register Page
-router.get('/register', (req, res) => {
+// Render Register Page - NOW USES isNotLoggedIn
+router.get('/register', isNotLoggedIn, (req, res) => {
   res.render('register', { currentPage: 'register' });
 });
 
-// Render Login Page
-router.get('/login', (req, res) => {
+// Render Login Page - NOW USES isNotLoggedIn
+router.get('/login', isNotLoggedIn, (req, res) => {
   res.render('login', { currentPage: 'login' });
 });
 

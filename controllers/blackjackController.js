@@ -1,5 +1,13 @@
 const User = require('../models/User');
 
+// Function to check if today is Sunday (0) or Monday (1)
+function isLuckyDay() {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); 
+    // 0 = Sunday, 1 = Monday
+    return dayOfWeek === 0 || dayOfWeek === 1;
+}
+
 // --- Utility Functions ---
 function getCardValue(card) {
   const rank = card.rank;
@@ -47,7 +55,7 @@ exports.startGame = async (req, res) => {
     if (bet > user.chips) return res.status(400).json({ message: 'Insufficient chips' });
 
     // Deduct bet from user
-    user.chips -= bet;
+    user.chips -= bet; // MUST deduct before dealing
 
     // Create new deck and deal cards
     const deck = createDeck();
@@ -64,40 +72,50 @@ exports.startGame = async (req, res) => {
     };
 
     const playerScore = calculateScore(playerHand);
-    const dealerScore = calculateScore(dealerHand); // Calculate full dealer score for checks
+    const dealerScore = calculateScore(dealerHand); 
     let result = null;
 
     // Check for immediate Blackjack
     if (playerScore === 21 && playerHand.length === 2) {
-        let dealerHiddenCardRevealed = false;
+        let payout = 0;
+        let winnings = 0;
         
         if (dealerScore === 21) {
             // Push (Player and Dealer Blackjack)
-            user.chips += bet; // Refund bet
-            result = 'Push: Both Blackjack 🤝';
-            gameState[req.user._id].gameOver = true;
-            dealerHiddenCardRevealed = true;
+            payout = bet * 1; // Refund bet
+            winnings = 0;
+            result = `Push: Both Blackjack 🤝 (+৳${winnings.toFixed(2)})`;
         } else {
-            // Player Blackjack Win (1.5x profit, 2.5x total return)
-            const payout = bet * 2.5; 
-            user.chips += payout;
-            result = 'Blackjack! You win 💰';
-            gameState[req.user._id].gameOver = true;
-            dealerHiddenCardRevealed = true; // Dealer reveals card
+            // Player Blackjack Win (Payout adjusted by day)
+            if (isLuckyDay()) {
+                // LUCKY DAYS: 3:2 payout
+                payout = bet * 2.5; 
+                winnings = bet * 1.5;
+                result = `Blackjack! You win 💰 (3:2 Payout) +৳${winnings.toFixed(2)}`;
+            } else {
+                // PROFIT DAYS: 6:5 payout
+                payout = bet * 2.2; 
+                winnings = bet * 1.2;
+                result = `Blackjack! You win 💰 (6:5 Payout) +৳${winnings.toFixed(2)}`;
+            }
         }
+        
+        user.chips += payout; // Add total return to user chips
+        
+        gameState[req.user._id].gameOver = true;
         gameState[req.user._id].result = result;
         
         // If game ended, return full dealer hand
         if (gameState[req.user._id].gameOver) {
             await user.save();
-            delete gameState[req.user._id]; // Clear state immediately
+            delete gameState[req.user._id]; 
             return res.json({
                 playerHand,
-                dealerHand, // Full hand revealed
+                dealerHand, 
                 playerScore,
                 dealerScore,
                 balance: user.chips,
-                result
+                result // TEXT includes winnings
             });
         }
     }
@@ -126,7 +144,7 @@ exports.hit = async (req, res) => {
     if (!state || state.gameOver)
       return res.status(400).json({ message: 'Game not active' });
 
-    const { deck, playerHand } = state;
+    const { deck, playerHand, bet } = state; // Include bet for loss calculation
     playerHand.push(deck.pop());
     const playerScore = calculateScore(playerHand);
     
@@ -134,11 +152,12 @@ exports.hit = async (req, res) => {
     let newBalance = null;
 
     if (playerScore > 21) {
-      state.result = 'Bust! Dealer Wins ❌';
+      // BUST: Player loses the bet amount.
+      const lossAmount = bet; 
+      state.result = `Bust! Dealer Wins ❌ -$${lossAmount.toFixed(2)}`;
       state.gameOver = true;
       result = state.result;
       
-      // Since game is over (Bust), save and clear state
       const user = await User.findById(req.user._id);
       newBalance = user.chips; // Chip deduction already happened in startGame (no refund)
       await user.save();
@@ -148,7 +167,7 @@ exports.hit = async (req, res) => {
     res.json({
       playerHand,
       playerScore,
-      result,
+      result, // TEXT includes loss
       balance: newBalance
     });
   } catch (err) {
@@ -172,47 +191,76 @@ exports.stand = async (req, res) => {
     let dealerScore = calculateScore(dealerHand);
     const finalPlayerScore = calculateScore(playerHand);
 
-    // Dealer hits until 17+
-    while (dealerScore < 17) {
-      dealerHand.push(deck.pop());
-      dealerScore = calculateScore(dealerHand);
-    }
+    // Function check is redefined here to ensure scope, or placed outside of all handlers
+    const isLuckyDay = () => {
+        const today = new Date();
+        const dayOfWeek = today.getDay(); 
+        return dayOfWeek === 0 || dayOfWeek === 1;
+    };
     
-    let amountToReturn = 0;
+    // --- DEALER HIT LOGIC ADJUSTED FOR RTP (~99.5% vs ~99.3%) ---
+    const luckyDay = isLuckyDay();
+
+    while (dealerScore < 17 || 
+           (!luckyDay && dealerScore === 17 && dealerHand.some(c => c.rank === 'A' && getCardValue(c) === 11) && calculateScore(dealerHand) === 17) ) 
+    {
+        dealerHand.push(deck.pop());
+        dealerScore = calculateScore(dealerHand);
+    }
+    // --- END DEALER HIT LOGIC ADJUSTED FOR RTP ---
+    
+    let amountToReturn = 0; // Total chips added back (Profit + Bet Refund)
+    let winnings = 0;       // Pure profit made this hand
     let result = '';
 
     if (finalPlayerScore > 21) {
-      // This should have been caught in hit() but is a safety check
-      result = 'You bust! Dealer wins ❌';
+      result = 'You bust! Dealer wins';
+      amountToReturn = 0;
+      winnings = -bet;
     } else if (dealerScore > 21) {
-      result = 'Dealer busts! You win 💰';
-      amountToReturn = bet * 2; // Win: Return original bet (1x) + Profit (1x)
+      result = 'Dealer busts! You win';
+      amountToReturn = bet * 2; 
+      winnings = bet; 
     } else if (finalPlayerScore > dealerScore) {
-      result = 'You win 💰';
-      amountToReturn = bet * 2; // Win: Return original bet (1x) + Profit (1x)
+      result = 'You win';
+      amountToReturn = bet * 2; 
+      winnings = bet; 
     } else if (finalPlayerScore < dealerScore) {
-      result = 'Dealer wins ❌';
-      amountToReturn = 0; // Loss: Original bet is already deducted
+      result = 'Dealer wins';
+      amountToReturn = 0; 
+      winnings = -bet; 
     } else { // Push
-      result = 'Push 🤝';
-      amountToReturn = bet * 1; // Push: Refund original bet
+      result = 'Push';
+      amountToReturn = bet * 1; 
+      winnings = 0;
     }
     
-    // Apply payout/refund (amountToReturn includes the original bet)
+    // Format the result text based on win/loss/push
+    if (winnings > 0) {
+        result += ` +৳${winnings.toFixed(2)}`;
+    } else if (winnings < 0) {
+        // Use Math.abs to show the loss amount without the extra '-'
+        result += ` -৳${Math.abs(winnings).toFixed(2)}`; 
+    } else if (winnings === 0 && amountToReturn > 0) {
+        result += ` (+৳0.00)`; // explicitly show 0 win on a push
+    }
+    
+    // Apply payout/refund 
     user.chips += amountToReturn;
     
     // Save state and clear
     state.gameOver = true;
-    state.result = result;
+    state.result = result; // Final text result
     await user.save(); 
-    delete gameState[req.user._id]; // Clear state after round end
+    delete gameState[req.user._id]; 
 
     res.json({
-      dealerHand, // Full, final dealer hand
+      dealerHand, 
       dealerScore,
       playerScore: finalPlayerScore,
-      result,
-      payout: amountToReturn,
+      result, // TEXT includes winnings/losses
+      payout: amountToReturn, 
+      winnings: winnings,     
       balance: user.chips
     });
   } catch (err) {

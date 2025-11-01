@@ -15,27 +15,13 @@
   <%- include('partials/header') %>
 
     <section class="blackjack-section">
-      <div class="blackjack-header">
-        <div class="neon-title">CashMash Blackjack</div>
-      </div>
+      <div class="blackjack-game">
 
-      <!-- USER PANEL -->
-      <div class="user-panel">
-        <div class="user-info">
-          <span>👤 <strong>
-              <%= user.username %>
-            </strong></span>
-          <span>💰 Chips: <strong id="balance">
-              <%= user.chips %>
-            </strong></span>
-        </div>
-      </div>
+        <h2 class="neon-title">Blackjack</h2>
 
-      <!-- MAIN BLACKJACK TABLE -->
-      <div class="blackjack-table">
+        <!-- MAIN BLACKJACK TABLE -->
+        <div class="blackjack-table">
 
-        <!-- TABLE AREA -->
-        <div class="table-top">
 
           <!-- DEALER SECTION -->
           <div class="seat dealer-seat">
@@ -55,26 +41,25 @@
 
         <!-- CONTROLS AREA -->
         <div class="controls">
-
-          <!-- BETTING CONTROLS -->
           <div class="bet-controls">
-            <input id="betAmount" type="number" min="1" value="10" />
+            <div class="balance-container">
+              Balance: ৳<strong id="balance">
+                <%= user.chips %>
+              </strong>
+            </div>
+            <input id="betAmount" type="number" min="10" value="10" />
             <button id="placeBetBtn" class="btn gold">Place Bet</button>
           </div>
 
-          <!-- ACTION BUTTONS -->
           <div class="action-buttons">
             <button id="hitBtn" class="btn gold big" disabled>Hit</button>
             <button id="standBtn" class="btn gold big" disabled>Stand</button>
-            <button id="dealBtn" class="btn gold big">Deal</button>
+            <button id="dealBtn" class="btn gold big" disabled>Deal</button>
           </div>
 
-          <!-- RESULT DISPLAY -->
           <div class="result" id="resultText">Place your bet and deal.</div>
-
         </div>
 
-        <!-- GAME HISTORY -->
         <div class="history" id="history"><!-- Results badges added by JS --></div>
       </div>
     </section>

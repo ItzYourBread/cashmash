@@ -1,11 +1,9 @@
-/* blackjack.css — CashMash Golden Theme (Improved and Responsive) */
+/* ================== CASHMASH BLACK & GOLD THEME ================== */
 
-/* -------------------------------------------------- */
-/* BASE / TYPOGRAPHY */
-/* -------------------------------------------------- */
+/* ------------------- BASE ------------------- */
 body {
-    /* Ensure a smooth experience for all animations */
-    perspective: 1000px;
+  perspective: 1000px;
+  font-family: 'Arial', sans-serif;
 }
 
 .blackjack-section {
@@ -17,167 +15,107 @@ body {
 }
 
 .neon-title {
-  font-size: 2.6em;
-  font-weight: 800;
-  color: #f5c542;
-  text-shadow: 0 0 10px #f5c542, 0 0 25px #ffd966;
-  margin-bottom: 18px;
-  animation: pulseGlow 3s infinite;
+  font-size: 1.8em;
+  color: #ffd966;
+  margin-bottom: 15px;
+  text-shadow: 0 0 15px #f5c542, 0 0 25px #ffd966;
+  animation: pulseGlow 2s infinite alternate;
+  text-align: left;
 }
 
 @keyframes pulseGlow {
-  0%,100% { text-shadow: 0 0 25px #f5c542, 0 0 50px #ffd966; }
-  50% { text-shadow: 0 0 10px #f5c542; opacity: 0.9; }
+
+  0%,
+  100% {
+    text-shadow: 0 0 10px rgba(245, 197, 66, 0.4);
+  }
+
+  60% {
+    text-shadow: 0 0 25px rgba(245, 197, 66, 0.8);
+  }
 }
 
-/* -------------------------------------------------- */
-/* USER PANEL */
-/* -------------------------------------------------- */
-.user-panel {
-  margin-bottom: 20px; /* Increased margin for separation */
-}
-
-.user-info {
-  background: rgba(255,255,255,0.05); /* Slightly darker background */
-  padding: 10px 24px; /* Slightly larger padding */
-  border-radius: 30px;
-  display: inline-flex;
-  gap: 24px; /* Increased gap */
-  align-items: center;
-  color: #fff;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.45); /* Sharper shadow */
-  transition: all 0.3s ease;
-}
-.user-info:hover {
-  transform: translateY(-1px);
-}
-
-
-/* -------------------------------------------------- */
-/* TABLE LAYOUT */
-/* -------------------------------------------------- */
+/* ------------------- TABLE ------------------- */
 .blackjack-table {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(245,197,66,0.1); /* Stronger border visibility */
-  border-radius: 18px; /* Softer corners */
-  max-width: 720px; /* Slightly wider table max */
-  width: 100%;
-  box-shadow: 0 10px 50px rgba(0,0,0,0.6); /* Deeper shadow */
-  position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  /* dealer left, player right */
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 500px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(245, 197, 66, 0.1);
+  border-radius: 18px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.6);
+  padding: 20px 30px;
+  margin: 0 auto 30px auto;
 }
 
-.table-top {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  gap: 50px; /* Increased space between dealer & player */
-  padding: 20px 0;
-  position: relative;
-}
-
-/* -------------------------------------------------- */
-/* SEATS & HANDS (Visual Depth) */
-/* -------------------------------------------------- */
+/* ------------------- SEATS ------------------- */
 .seat {
   display: flex;
   flex-direction: column;
-  gap: 12px;
   align-items: center;
-  transition: transform 0.3s ease;
+  gap: 12px;
 }
 
-.dealer-seat .hand {
-  flex-direction: row;
-  justify-content: center;
-  /* Removed transform to keep alignment clean */
+/* hand container: horizontal with overlap */
+.hand {
+  display: flex;
+  align-items: center;
+  min-height: 140px;
 }
 
-.player-seat .hand {
-  flex-direction: row;
-  justify-content: center;
-  /* Removed transform to keep alignment clean */
+.hand .card {
+  width: 90px;
+  height: 130px;
+  margin-left: -60px;
+  /* 30% overlap */
+  perspective: 1000px;
+  flex-shrink: 0;
 }
 
-/* Slight scale difference for depth illusion */
-.dealer-seat {
-  transform: scale(0.95); /* Adjusted scale for subtlety */
-  opacity: 1;
-}
-.player-seat {
-  transform: scale(1);
+.hand .card:first-child {
+  margin-left: 0;
 }
 
 .label {
   font-weight: 900;
   color: #f5c542;
-  letter-spacing: 2px; /* Increased letter spacing */
+  letter-spacing: 2px;
 }
 
-.hand {
-  display: flex;
-  gap: 8px; /* Tighter gap for card overlap potential */
-  align-items: center;
-  justify-content: center;
-  min-height: 140px; /* Ensures enough space for larger cards */
-  position: relative;
-  /* Perspective is moved to the .card element for isolated 3D space */
-}
-
-/* -------------------------------------------------- */
-/* SCORE */
-/* -------------------------------------------------- */
 .score {
-  background: rgba(0,0,0,0.5); /* Darker background for contrast */
+  background: rgba(0, 0, 0, 0.5);
   padding: 8px 16px;
   border-radius: 10px;
-  font-weight: 900; /* Bolder font */
+  font-weight: 900;
   color: #fff;
   margin-top: 8px;
-  min-width: 60px; /* Wider score element */
+  min-width: 60px;
   text-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
-/* -------------------------------------------------- */
-/* DECK STACK (REMOVED: Keeping styles only to prevent errors if elements remain) */
-/* -------------------------------------------------- */
-/* NOTE: These styles are effectively unused if the EJS was updated, 
-         but keeping them clean in case the EJS still has remnants. */
-.deck-stack, .deck, .deck-card, .deck-label { display: none !important; }
-
-/* -------------------------------------------------- */
-/* CARD STYLING & FLIP ANIMATION 🃏 */
-/* -------------------------------------------------- */
-.blackjack-table .card {
-  width: 90px;
-  height: 130px;
+/* ------------------- CARDS ------------------- */
+.card {
   position: relative;
-  /* FIX: Perspective is essential for each individual card to flip correctly */
-  perspective: 1000px; 
-  margin: 0 4px; /* Tighter margin */
-  flex-shrink: 0;
+  perspective: 1000px;
 }
 
-/* Inner container that flips */
 .card-inner {
   position: relative;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); /* Smoother flip curve */
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Flipped state */
 .card.flipped .card-inner {
   transform: rotateY(180deg);
 }
 
-/* Both faces */
 .card-front,
 .card-back {
   position: absolute;
@@ -186,15 +124,13 @@ body {
   border-radius: 8px;
   backface-visibility: hidden;
   overflow: hidden;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.5); /* Better shadow depth */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
 }
 
-/* Card back */
 .card-back {
   background: url("/images/playing-cards/player_card_back_design_1_black.svg") center/cover;
 }
 
-/* Card front */
 .card-front {
   transform: rotateY(180deg);
   background-color: #fff;
@@ -211,73 +147,98 @@ body {
   border-radius: 7px;
 }
 
-/* Dealer’s hidden card (keeps it face-down) */
 .card.hidden-dealer-card .card-inner {
   transform: rotateY(0deg);
 }
 
-/* -------------------------------------------------- */
-/* CONTROLS & BUTTONS */
-/* -------------------------------------------------- */
+/* ------------------- CONTROLS & BALANCE ------------------- */
 .controls {
   display: flex;
   flex-direction: column;
-  gap: 24px; /* Increased gap */
+  gap: 15px;
   align-items: center;
   width: 100%;
   max-width: 500px;
-  padding: 30px 0 10px 0;
+  padding: 20px 0;
   margin-bottom: 20px;
-  border-top: 2px solid rgba(245,197,66,0.15); /* Thicker separator line */
+  border-top: 2px solid rgba(245, 197, 66, 0.15);
 }
 
 .bet-controls {
   display: flex;
-  gap: 20px; /* Increased gap */
+  gap: 12px;
   align-items: center;
   justify-content: center;
 }
 
 #betAmount {
-  padding: 14px 20px; /* Larger input field */
+  padding: 14px 20px;
   border-radius: 18px;
   border: none;
   outline: none;
-  background: rgba(255,255,255,0.1); /* Brighter background for focus */
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
   font-size: 1.2em;
   text-align: center;
-  width: 130px;
+  width: 80px;
   transition: all 0.3s ease;
 }
+
 #betAmount:focus {
-  box-shadow: 0 0 15px rgba(245,197,66,0.6);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 8px rgba(245, 197, 66, 0.4);
 }
 
+.balance-container {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #f5c542;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  box-shadow: inset 0 0 10px rgba(245, 197, 66, 0.3);
+  min-width: 190px;
+  text-align: center;
+}
+
+/* action buttons */
 .action-buttons {
-    display: flex;
-    gap: 15px; /* Space between Hit, Stand, Deal */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.action-buttons > * {
+  height: 45px;
+  min-width: 80px;
+  max-width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1em;
 }
 
 .btn.gold {
   padding: 12px 28px;
-  background: linear-gradient(135deg,#f5c542,#dca000);
+  background: linear-gradient(135deg, #f5c542, #dca000);
   color: #000b38;
   border-radius: 30px;
   font-weight: 800;
   border: none;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(245,197,66,0.3);
+  box-shadow: 0 6px 18px rgba(245, 197, 66, 0.3);
   transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
 }
 
 .btn.gold:hover:not(:disabled) {
-  transform: translateY(-3px); /* More noticeable lift */
-  box-shadow: 0 10px 30px rgba(245,197,66,0.6);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(245, 197, 66, 0.6);
 }
+
 .btn.gold:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn.gold.big {
@@ -285,17 +246,15 @@ body {
   font-size: 1.2em;
 }
 
+/* ------------------- RESULT & HISTORY ------------------- */
 .result {
   color: #f5c542;
   font-weight: 700;
   margin-top: 10px;
   min-height: 25px;
-  font-size: 1.3em; /* Larger result text */
+  font-size: 1.3em;
 }
 
-/* -------------------------------------------------- */
-/* HISTORY & BALANCE (Animated Feedback) */
-/* -------------------------------------------------- */
 .history {
   margin-top: 16px;
   display: flex;
@@ -314,55 +273,46 @@ body {
   font-size: 12px;
   font-weight: bold;
 }
-.hist-win { background: #388e3c; } /* Darker green */
-.hist-loss { background: #c62828; } /* Darker red */
-.hist-push { background: #fbc02d; } /* Darker yellow */
 
-/* Result Text Animation (Already present, maintained) */
-#resultText.show-result {
-  animation: popResult 0.6s ease;
+.hist-win {
+  background: #388e3c;
 }
 
-@keyframes popResult {
-  0% { transform: scale(0.8); opacity: 0; }
-  60% { transform: scale(1.1); opacity: 1; }
-  100% { transform: scale(1); }
+.hist-loss {
+  background: #c62828;
 }
 
+.hist-push {
+  background: #fbc02d;
+}
 
-/* -------------------------------------------------- */
-/* RESPONSIVENESS */
-/* -------------------------------------------------- */
+/* ------------------- RESPONSIVE ------------------- */
 @media (max-width: 600px) {
-  /* Stack buttons for better mobile usability */
-  .action-buttons {
+  .blackjack-table {
     flex-direction: column;
+    align-items: center;
+    max-width: 95%;
+    padding: 15px;
+  }
+
+  .hand .card {
+    width: 75px;
+    height: 108px;
+    margin-left: -50px;
+  }
+
+  .hand {
+    min-height: 110px;
+    gap: 5px;
+  }
+
+  .action-buttons {
     width: 100%;
-    max-width: 250px;
+    max-width: 400px;
     gap: 10px;
   }
-  .btn.gold.big {
-      width: 100%;
-  }
 
-  /* Adjustments for tight screens */
-  .blackjack-table {
-      padding: 15px;
-      max-width: 95%;
-  }
-  .table-top {
-      gap: 30px;
-  }
-  .blackjack-table .card { 
-      width: 75px; 
-      height: 108px;
-      margin: 0 3px;
-  }
-  .hand { 
-      min-height: 110px; 
-      gap: 5px;
-  }
-  .bet-controls {
-      flex-direction: column;
+  .btn.gold.big {
+    width: 100%;
   }
 }

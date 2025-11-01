@@ -87,5 +87,8 @@
 	"You need to be logged in to withdraw chips.": "You need to be logged in to withdraw BDT.",
 	"BDT": "BDT",
 	"You need to be logged in to withdraw BDT.": "You need to be logged in to withdraw BDT.",
-	"Email or Username": "Email or Username"
+	"Email or Username": "Email or Username",
+	"User UID": "User UID",
+	"BinancePay QR Code for User 1055162864": "BinancePay QR Code for User 1055162864",
+	"Scan this QR code using the Binance app.": "Scan this QR code using the Binance app."
 }

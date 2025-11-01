@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= __('Deposit Title') %> | CashMash</title>
+    <title>
+        <%= __('Deposit Title') %> | CashMash
+    </title>
 
     <link rel="stylesheet" href="/css/header.css" />
     <link rel="stylesheet" href="/css/footer.css" />
@@ -15,257 +17,363 @@
 <body>
     <%- include('partials/header') %>
 
-    <section class="dashboard">
-        <div class="dashboard-container">
+        <section class="dashboard">
+            <div class="dashboard-container">
 
-            <aside class="sidebar">
-                <div class="balance-box">
-                    <h3><%= __('Balance') %></h3>
-                    <% if (user) { %>
-                        <p>৳<%= user.chips.toLocaleString() %></p>
-                    <% } else { %>
-                        <p><%= __('Login to see balance') %></p>
-                    <% } %>
-                </div>
+                <aside class="sidebar">
+                    <div class="balance-box">
+                        <h3>
+                            <%= __('Balance') %>
+                        </h3>
+                        <% if (user) { %>
+                            <p>৳<%= user.chips.toLocaleString() %>
+                            </p>
+                            <% } else { %>
+                                <p>
+                                    <%= __('Login to see balance') %>
+                                </p>
+                                <% } %>
+                    </div>
 
-                <ul class="sidebar-menu">
-                    <li class="active" data-tab="ewallets"><%= __('E-Wallets') %></li>
-                    <li data-tab="crypto"><%= __('Crypto') %></li>
-                    <li data-tab="bank"><%= __('Bank') %></li>
-                </ul>
-            </aside>
+                    <ul class="sidebar-menu">
+                        <li class="active" data-tab="ewallets">
+                            <%= __('E-Wallets') %>
+                        </li>
+                        <li data-tab="crypto">
+                            <%= __('Crypto') %>
+                        </li>
+                        <li data-tab="bank">
+                            <%= __('Bank') %>
+                        </li>
+                    </ul>
+                </aside>
 
-            <div class="content-area">
+                <div class="content-area">
 
-                <div id="ewallets" class="content-section active">
-                    <h2><%= __('E-Wallets') %></h2>
-                    <div class="payment-cards">
-                        <div class="payment-card" data-modal="modal-bkash">
-                            <img src="/images/payments/bkash.jpg" alt="Bkash">
-                            <h4>Bkash</h4>
-                        </div>
-                        <div class="payment-card" data-modal="modal-nagad">
-                            <img src="/images/payments/nagad.jpg" alt="Nagad">
-                            <h4>Nagad</h4>
-                        </div>
-                        <div class="payment-card" data-modal="modal-upay">
-                            <img src="/images/payments/upay.jpg" alt="Upay">
-                            <h4>Upay</h4>
-                        </div>
-                        <div class="payment-card" data-modal="modal-binance">
-                            <img src="/images/payments/binance.jpg" alt="Binance">
-                            <h4>BinancePay</h4>
+                    <div id="ewallets" class="content-section active">
+                        <h2>
+                            <%= __('E-Wallets') %>
+                        </h2>
+                        <div class="payment-cards">
+                            <div class="payment-card" data-modal="modal-bkash">
+                                <img src="/images/payments/bkash.jpg" alt="Bkash">
+                                <h4>Bkash</h4>
+                            </div>
+                            <div class="payment-card" data-modal="modal-nagad">
+                                <img src="/images/payments/nagad.jpg" alt="Nagad">
+                                <h4>Nagad</h4>
+                            </div>
+                            <div class="payment-card" data-modal="modal-upay">
+                                <img src="/images/payments/upay.jpg" alt="Upay">
+                                <h4>Upay</h4>
+                            </div>
+                            <div class="payment-card" data-modal="modal-binance">
+                                <img src="/images/payments/binance.jpg" alt="Binance">
+                                <h4>BinancePay</h4>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="crypto" class="content-section">
-                    <h2><%= __('Crypto') %></h2>
-                    <div class="payment-cards">
+                    <div id="crypto" class="content-section">
+                        <h2>
+                            <%= __('Crypto') %>
+                        </h2>
+                        <div class="payment-cards">
                         </div>
-                    <h2 style="margin-top: 20px;"><%= __('Coming Soon...') %></h2>
-                </div>
+                        <h2 style="margin-top: 20px;">
+                            <%= __('Coming Soon...') %>
+                        </h2>
+                    </div>
 
-                <div id="bank" class="content-section">
-                    <h2><%= __('Bank') %></h2>
-                    <div class="payment-cards">
+                    <div id="bank" class="content-section">
+                        <h2>
+                            <%= __('Bank') %>
+                        </h2>
+                        <div class="payment-cards">
                         </div>
-                    <h2 style="margin-top: 20px;"><%= __('Coming Soon...') %></h2>
-                </div>
+                        <h2 style="margin-top: 20px;">
+                            <%= __('Coming Soon...') %>
+                        </h2>
+                    </div>
 
+                </div>
+            </div>
+        </section>
+
+        <div id="modal-bkash" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>
+                    <%= __('Bkash Deposit') %>
+                </h3>
+                <% const bkashAgents=agentPayments['bkash']; const randomBkashAgent=bkashAgents[Math.floor(Math.random()
+                    * bkashAgents.length)]; %>
+                    <h4>
+                        <%= __('Send money to') %>:
+                    </h4>
+                    <p><strong>
+                            <%= randomBkashAgent.full_name %>
+                        </strong>: <%= randomBkashAgent.contact %>
+                    </p>
+                    <form method="POST" action="/deposit/bkash">
+                        <label>
+                            <%= __('Amount (BDT)') %>
+                        </label>
+                        <input type="number" name="amount" id="bkashAmount" required min="300" max="25000">
+                        <div id="bkashFeedback" class="amount-feedback"></div>
+
+                        <label>
+                            <%= __('Transaction ID') %>
+                        </label>
+                        <input type="text" name="transactionId" required>
+                        <p>
+                            <%= __('Deposit confirmation message') %>
+                        </p>
+                        <button type="submit">
+                            <%= __('Confirm') %>
+                        </button>
+                    </form>
             </div>
         </div>
-    </section>
 
-    <div id="modal-bkash" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3><%= __('Bkash Deposit') %></h3>
-            <% const bkashAgents = agentPayments['bkash']; const randomBkashAgent = bkashAgents[Math.floor(Math.random() * bkashAgents.length)]; %>
-            <h4><%= __('Send money to') %>:</h4>
-            <p><strong><%= randomBkashAgent.full_name %></strong>: <%= randomBkashAgent.contact %></p>
-            <form method="POST" action="/deposit/bkash">
-                <label><%= __('Amount (BDT)') %></label>
-                <input type="number" name="amount" id="bkashAmount" required min="300" max="25000">
-                <div id="bkashFeedback" class="amount-feedback"></div>
+        <div id="modal-nagad" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>
+                    <%= __('Nagad Deposit') %>
+                </h3>
+                <% const nagadAgents=agentPayments['Nagad']; const randomNagadAgent=nagadAgents[Math.floor(Math.random()
+                    * nagadAgents.length)]; %>
+                    <h4>
+                        <%= __('Send money to') %>:
+                    </h4>
+                    <p><strong>
+                            <%= randomNagadAgent.full_name %>
+                        </strong>: <%= randomNagadAgent.contact %>
+                    </p>
+                    <form method="POST" action="/deposit/nagad">
+                        <label>
+                            <%= __('Amount (BDT)') %>
+                        </label>
+                        <input type="number" name="amount" id="nagadAmount" required min="300" max="25000">
+                        <div id="nagadFeedback" class="amount-feedback"></div>
 
-                <label><%= __('Transaction ID') %></label>
-                <input type="text" name="transactionId" required>
-                <p><%= __('Deposit confirmation message') %></p>
-                <button type="submit"><%= __('Confirm') %></button>
-            </form>
-        </div>
-    </div>
-
-    <div id="modal-nagad" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3><%= __('Nagad Deposit') %></h3>
-            <% const nagadAgents = agentPayments['Nagad']; const randomNagadAgent = nagadAgents[Math.floor(Math.random() * nagadAgents.length)]; %>
-            <h4><%= __('Send money to') %>:</h4>
-            <p><strong><%= randomNagadAgent.full_name %></strong>: <%= randomNagadAgent.contact %></p>
-            <form method="POST" action="/deposit/nagad">
-                <label><%= __('Amount (BDT)') %></label>
-                <input type="number" name="amount" id="nagadAmount" required min="300" max="25000">
-                <div id="nagadFeedback" class="amount-feedback"></div>
-
-                <label><%= __('Transaction ID') %></label>
-                <input type="text" name="transactionId" required>
-                <p><%= __('Deposit confirmation message') %></p>
-                <button type="submit"><%= __('Confirm') %></button>
-            </form>
-        </div>
-    </div>
-
-    <div id="modal-upay" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3><%= __('Upay Deposit') %></h3>
-            <% const upayAgents = agentPayments['Upay']; const randomUpayAgent = upayAgents[Math.floor(Math.random() * upayAgents.length)]; %>
-            <h4><%= __('Send money to') %>:</h4>
-            <p><strong><%= randomUpayAgent.full_name %></strong>: <%= randomUpayAgent.contact %></p>
-            <form method="POST" action="/deposit/upay">
-                <label><%= __('Amount (BDT)') %></label>
-                <input type="number" name="amount" id="upayAmount" required min="300" max="25000">
-                <div id="upayFeedback" class="amount-feedback"></div>
-
-                <label><%= __('Transaction ID') %></label>
-                <input type="text" name="transactionId" required>
-                <p><%= __('Deposit confirmation message') %></p>
-                <button type="submit"><%= __('Confirm') %></button>
-            </form>
-        </div>
-    </div>
-
-    <div id="modal-binance" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3><%= __('BinancePay Deposit') %></h3>
-            <form method="POST" action="/deposit/binance">
-                <label><%= __('Amount (USD)') %></label>
-                <input type="number" name="amount" id="binanceAmount" required min="5" max="500" step="0.01">
-                <div id="binanceFeedback" class="amount-feedback"></div>
-
-                <label><%= __('Order ID') %></label>
-                <input type="text" name="txnId" required placeholder="<%= __('Enter your Order ID') %>" />
-                <p><%= __('Binance deposit confirmation message') %></p>
-                <button type="submit"><%= __('Confirm') %></button>
-            </form>
-        </div>
-    </div>
-
-    <div class="login-modal" id="loginModal">
-        <div class="login-modal-content">
-            <h2><%= __('Login Required') %></h2>
-            <p><%= __('You need to be logged in to deposit chips.') %></p>
-            <div class="login-modal-actions">
-                <a href="/login" class="login-btn gold"><%= __('Login') %></a>
-                <button class="login-btn outline" id="closeLoginModal"><%= __('Cancel') %></button>
+                        <label>
+                            <%= __('Transaction ID') %>
+                        </label>
+                        <input type="text" name="transactionId" required>
+                        <p>
+                            <%= __('Deposit confirmation message') %>
+                        </p>
+                        <button type="submit">
+                            <%= __('Confirm') %>
+                        </button>
+                    </form>
             </div>
         </div>
-    </div>
 
-    <%- include('partials/footer') %>
+        <div id="modal-upay" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>
+                    <%= __('Upay Deposit') %>
+                </h3>
+                <% const upayAgents=agentPayments['Upay']; const randomUpayAgent=upayAgents[Math.floor(Math.random() *
+                    upayAgents.length)]; %>
+                    <h4>
+                        <%= __('Send money to') %>:
+                    </h4>
+                    <p><strong>
+                            <%= randomUpayAgent.full_name %>
+                        </strong>: <%= randomUpayAgent.contact %>
+                    </p>
+                    <form method="POST" action="/deposit/upay">
+                        <label>
+                            <%= __('Amount (BDT)') %>
+                        </label>
+                        <input type="number" name="amount" id="upayAmount" required min="300" max="25000">
+                        <div id="upayFeedback" class="amount-feedback"></div>
 
-    <script>
-        // Server-injected login status
-        const isLoggedIn = <%= user ? 'true' : 'false' %>;
+                        <label>
+                            <%= __('Transaction ID') %>
+                        </label>
+                        <input type="text" name="transactionId" required>
+                        <p>
+                            <%= __('Deposit confirmation message') %>
+                        </p>
+                        <button type="submit">
+                            <%= __('Confirm') %>
+                        </button>
+                    </form>
+            </div>
+        </div>
 
-        // LOCALIZED STRINGS injected from EJS
-        const L = {
-            amountMustBe: '<%= __('Amount must be between') %>',
-            and: '<%= __('and') %>',
-            bdt: '<%= __(' BDT') %>',
-            usd: '<%= __(' USD') %>',
-            equivalentInBdt: '<%= __('Equivalent in BDT') %>',
-            amountOK: '<%= __('Amount OK') %>'
+        <div id="modal-binance" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>
+                    <%= __('BinancePay Deposit') %>
+                </h3>
+                <form method="POST" action="/deposit/binance">
+                    <h4>
+                        <%= __('Send money to') %>:
+                    </h4>
+                    <p>
+                        <strong>
+                            <%= __('User UID') %>: 1055162864
+                        </strong>
+                    </p>
+
+<div style="text-align: center; margin: 15px 0;">
+    <img 
+        src="/img/binance-qr-code.png" 
+        alt="<%= __('BinancePay QR Code for User 1055162864') %>"
+        style="max-width: 200px; height: auto; border: 1px solid #eee; padding: 5px; border-radius: 5px;"
+    />
+    <p style="font-size: 0.9em; color: #666; margin-top: 5px;">
+        <%= __('Scan this QR code using the Binance app.') %>
+    </p>
+</div>
+                    <label>
+                        <%= __('Amount (USD)') %>
+                    </label>
+                    <input type="number" name="amount" id="binanceAmount" required min="5" max="500" step="0.01">
+                    <div id="binanceFeedback" class="amount-feedback"></div>
+
+                    <label>
+                        <%= __('Order ID') %>
+                    </label>
+                    <input type="text" name="txnId" required placeholder="<%= __('Enter your Order ID') %>" />
+                    <p>
+                        <%= __('Binance deposit confirmation message') %>
+                    </p>
+                    <button type="submit">
+                        <%= __('Confirm') %>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="login-modal" id="loginModal">
+            <div class="login-modal-content">
+                <h2>
+                    <%= __('Login Required') %>
+                </h2>
+                <p>
+                    <%= __('You need to be logged in to deposit chips.') %>
+                </p>
+                <div class="login-modal-actions">
+                    <a href="/login" class="login-btn gold">
+                        <%= __('Login') %>
+                    </a>
+                    <button class="login-btn outline" id="closeLoginModal">
+                        <%= __('Cancel') %>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>
+
+            <script>
+                // Server-injected login status
+                const isLoggedIn = <%= user ? 'true' : 'false' %>;
+
+                // LOCALIZED STRINGS injected from EJS
+                const L = {
+                    amountMustBe: '<%= __('Amount must be between') %>',
+                    and: '<%= __('and') %>',
+                    bdt: '<%= __(' BDT') %>',
+                    usd: '<%= __(' USD') %>',
+                    equivalentInBdt: '<%= __('Equivalent in BDT') %>',
+                    amountOK: '<%= __('Amount OK') %>'
         };
 
-        // Tabs
-        const tabs = document.querySelectorAll('.sidebar-menu li');
-        const sections = document.querySelectorAll('.content-section');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                sections.forEach(s => s.classList.remove('active'));
-                tab.classList.add('active');
-                document.getElementById(tab.dataset.tab).classList.add('active');
-            });
-        });
+                // Tabs
+                const tabs = document.querySelectorAll('.sidebar-menu li');
+                const sections = document.querySelectorAll('.content-section');
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        tabs.forEach(t => t.classList.remove('active'));
+                        sections.forEach(s => s.classList.remove('active'));
+                        tab.classList.add('active');
+                        document.getElementById(tab.dataset.tab).classList.add('active');
+                    });
+                });
 
-        // Modals
-        const cards = document.querySelectorAll('.payment-card');
-        const modals = document.querySelectorAll('.modal');
-        const closes = document.querySelectorAll('.close');
+                // Modals
+                const cards = document.querySelectorAll('.payment-card');
+                const modals = document.querySelectorAll('.modal');
+                const closes = document.querySelectorAll('.close');
 
-        // Login modal elements
-        const loginModal = document.getElementById('loginModal');
-        const closeLoginModal = document.getElementById('closeLoginModal');
+                // Login modal elements
+                const loginModal = document.getElementById('loginModal');
+                const closeLoginModal = document.getElementById('closeLoginModal');
 
-        cards.forEach(card => {
-            const modal = document.getElementById(card.dataset.modal);
-            card.addEventListener('click', () => {
-                if (!isLoggedIn) {
-                    loginModal.classList.add('show');
-                } else {
-                    modal.style.display = 'flex';
+                cards.forEach(card => {
+                    const modal = document.getElementById(card.dataset.modal);
+                    card.addEventListener('click', () => {
+                        if (!isLoggedIn) {
+                            loginModal.classList.add('show');
+                        } else {
+                            modal.style.display = 'flex';
+                        }
+                    });
+                });
+
+                closes.forEach(c => {
+                    c.addEventListener('click', () => c.closest('.modal').style.display = 'none');
+                });
+
+                window.addEventListener('click', e => {
+                    if (e.target.classList.contains('modal')) e.target.style.display = 'none';
+                    if (e.target === loginModal) loginModal.classList.remove('show');
+                });
+
+                closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
+
+                // ==================== Deposit Validations ====================
+                const usdToBdt = 122.24; // Static conversion example
+
+                function validateAmount(inputId, feedbackId, min, max, isUsd = false) {
+                    const amountInput = document.getElementById(inputId);
+                    const feedback = document.getElementById(feedbackId);
+                    amountInput.addEventListener('input', () => {
+                        const value = parseFloat(amountInput.value);
+
+                        if (isNaN(value)) {
+                            feedback.textContent = '';
+                            return;
+                        }
+
+                        const currencyUnit = isUsd ? L.usd : L.bdt;
+                        const minUnit = isUsd ? ' USD' : ' BDT';
+
+                        if (value < min || value > max) {
+                            // Localized validation error message
+                            feedback.textContent = `${L.amountMustBe} ${min}${minUnit} ${L.and} ${max}${minUnit}`;
+                            feedback.className = 'amount-feedback amount-invalid';
+                        } else {
+                            let display = value;
+                            if (isUsd) {
+                                display = (value * usdToBdt).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                // Localized equivalent message
+                                feedback.textContent = `${L.equivalentInBdt}: ৳${display}`;
+                            } else {
+                                // Localized 'Amount OK' message
+                                feedback.textContent = `${L.amountOK}: ৳${display.toLocaleString()}`;
+                            }
+                            feedback.className = 'amount-feedback amount-valid';
+                        }
+                    });
                 }
-            });
-        });
 
-        closes.forEach(c => {
-            c.addEventListener('click', () => c.closest('.modal').style.display = 'none');
-        });
+                validateAmount('bkashAmount', 'bkashFeedback', 300, 25000);
+                validateAmount('nagadAmount', 'nagadFeedback', 300, 25000);
+                validateAmount('upayAmount', 'upayFeedback', 300, 25000);
+                validateAmount('binanceAmount', 'binanceFeedback', 5, 500, true);
 
-        window.addEventListener('click', e => {
-            if (e.target.classList.contains('modal')) e.target.style.display = 'none';
-            if (e.target === loginModal) loginModal.classList.remove('show');
-        });
-
-        closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
-
-        // ==================== Deposit Validations ====================
-        const usdToBdt = 122.24; // Static conversion example
-
-        function validateAmount(inputId, feedbackId, min, max, isUsd=false) {
-            const amountInput = document.getElementById(inputId);
-            const feedback = document.getElementById(feedbackId);
-            amountInput.addEventListener('input', () => {
-                const value = parseFloat(amountInput.value);
-                
-                if (isNaN(value)) {
-                    feedback.textContent = '';
-                    return;
-                }
-                
-                const currencyUnit = isUsd ? L.usd : L.bdt;
-                const minUnit = isUsd ? ' USD' : ' BDT';
-
-                if (value < min || value > max) {
-                    // Localized validation error message
-                    feedback.textContent = `${L.amountMustBe} ${min}${minUnit} ${L.and} ${max}${minUnit}`;
-                    feedback.className = 'amount-feedback amount-invalid';
-                } else {
-                    let display = value;
-                    if (isUsd) {
-                        display = (value * usdToBdt).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                        // Localized equivalent message
-                        feedback.textContent = `${L.equivalentInBdt}: ৳${display}`;
-                    } else {
-                        // Localized 'Amount OK' message
-                        feedback.textContent = `${L.amountOK}: ৳${display.toLocaleString()}`;
-                    }
-                    feedback.className = 'amount-feedback amount-valid';
-                }
-            });
-        }
-
-        validateAmount('bkashAmount','bkashFeedback',300,25000);
-        validateAmount('nagadAmount','nagadFeedback',300,25000);
-        validateAmount('upayAmount','upayFeedback',300,25000);
-        validateAmount('binanceAmount','binanceFeedback',5,500,true);
-
-    </script>
+            </script>
 </body>
 
 </html>
