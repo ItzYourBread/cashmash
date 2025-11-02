@@ -84,11 +84,16 @@
 	"Amount": "Amount",
 	"Email or User ID": "Email or User ID",
 	"Withdrawal processing time": "After submitting, your withdrawal request will be processed within 48 hours.",
-	"You need to be logged in to withdraw chips.": "You need to be logged in to withdraw BDT.",
 	"BDT": "BDT",
 	"You need to be logged in to withdraw BDT.": "You need to be logged in to withdraw BDT.",
 	"Email or Username": "Email or Username",
 	"User UID": "User UID",
 	"BinancePay QR Code for User 1055162864": "BinancePay QR Code for User 1055162864",
-	"Scan this QR code using the Binance app.": "Scan this QR code using the Binance app."
+	"Scan this QR code using the Binance app.": "Scan this QR code using the Binance app.",
+	"Password must be at least 6 characters long.": "Password must be at least 6 characters long.",
+	"Username available": "Username available",
+	"Username already taken": "Username already taken",
+	"Error checking username": "Error checking username",
+	"Username must be at least 3 characters": "Username must be at least 3 characters",
+	"Password must be at least 6 characters long": "Password must be at least 6 characters long"
 }

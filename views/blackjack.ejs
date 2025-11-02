@@ -43,12 +43,10 @@
         <div class="controls">
           <div class="bet-controls">
             <div class="balance-container">
-              Balance: ৳<strong id="balance">
-                <%= user.chips %>
-              </strong>
+              Balance: ৳<strong id="balance"><%= user.chips %></strong>
             </div>
             <input id="betAmount" type="number" min="10" value="10" />
-            <button id="placeBetBtn" class="btn gold">Place Bet</button>
+            <button id="placeBetBtn" class="btn gold" style="width: 100px;">Place Bet</button>
           </div>
 
           <div class="action-buttons">

@@ -85,10 +85,15 @@
 	"Amount": "পরিমাণ",
 	"Email or User ID": "ইমেল অথবা ইউজার আইডি",
 	"Withdrawal processing time": "জমা দেওয়ার পরে, আপনার উত্তোলনের অনুরোধটি ৪৮ ঘন্টার মধ্যে প্রক্রিয়া করা হবে।",
-	"You need to be logged in to withdraw chips.": "BDT উত্তোলন করার জন্য আপনাকে লগইন করতে হবে।",
 	"BDT": "BDT",
-	"You need to be logged in to withdraw BDT.": "You need to be logged in to withdraw BDT.",
-	"User UID": "User UID",
-	"BinancePay QR Code for User 1055162864": "BinancePay QR Code for User 1055162864",
-	"Scan this QR code using the Binance app.": "Scan this QR code using the Binance app."
+	"You need to be logged in to withdraw BDT.": "BDT উত্তোলনের জন্য আপনাকে লগইন করতে হবে।",
+	"User UID": "ব্যবহারকারীর UID",
+	"BinancePay QR Code for User 1055162864": "ব্যবহারকারী 1055162864-এর জন্য BinancePay QR কোড",
+	"Scan this QR code using the Binance app.": "Binance অ্যাপ ব্যবহার করে এই QR কোডটি স্ক্যান করুন।",
+	"Password must be at least 6 characters long.": "পাসওয়ার্ড অবশ্যই অন্তত ৬ অক্ষরের হতে হবে।",
+	"Username available": "ইউজারনেমটি ব্যবহার করা যেতে পারে",
+	"Username already taken": "ইউজারনেমটি ইতিমধ্যেই নেওয়া হয়েছে",
+	"Error checking username": "ইউজারনেম যাচাই করার সময় একটি ত্রুটি ঘটেছে",
+	"Username must be at least 3 characters": "ইউজারনেমে অন্তত ৩টি অক্ষর থাকতে হবে",
+	"Password must be at least 6 characters long": "পাসওয়ার্ডে অন্তত ৬টি অক্ষর থাকতে হবে"
 }
