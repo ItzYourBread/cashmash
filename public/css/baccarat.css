@@ -1,6 +1,6 @@
-/* baccarat.css - CashMash Baccarat styling (theme matched) */
+/* baccarat.css - CashMash Baccarat styling (theme matched, updated layout) */
 
-/* Page + header */
+/* ---------- PAGE + HEADER ---------- */
 .baccarat-section {
   text-align: center;
   padding: 40px 12px;
@@ -19,108 +19,92 @@
 }
 
 @keyframes pulseGlow {
-  0%,100% { opacity:1; text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966; }
-  50% { opacity:0.85; text-shadow: 0 0 6px #f5c542; }
+  0%, 100% { opacity: 1; text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966; }
+  50% { opacity: 0.85; text-shadow: 0 0 6px #f5c542; }
 }
 
-.user-panel { margin-bottom: 14px; }
-.user-info {
-  background: rgba(255,255,255,0.03);
-  padding: 8px 20px;
-  border-radius: 30px;
-  display: inline-flex;
-  gap: 18px;
-  align-items: center;
-  color: #fff;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-}
-
-/* Table wrapper */
+/* ---------- TABLE WRAPPER ---------- */
 .baccarat-table {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(245,197,66,0.06);
   padding: 18px;
   border-radius: 14px;
-  max-width: 700px;
+  max-width: 550px;
   width: 100%;
   box-shadow: 0 8px 40px rgba(0,0,0,0.45);
   position: relative;
-  /* Use Flexbox for the table interior */
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* --- NEW LAYOUT: Table Top (Cards) --- */
+/* ---------- TABLE TOP (PLAYER & BANKER) ---------- */
 .table-top {
-  /* This container now holds just the Player and Banker seats */
   display: flex;
-  justify-content: center; /* Center the hands */
-  gap: 60px; /* Increased space between player and banker hands */
-  align-items: flex-start; /* Align elements at the top */
+  justify-content: space-between;
+  align-items: flex-start;
   width: 100%;
-  padding-bottom: 30px;
+  gap: 40px;
 }
 
-/* Seats (Player/Banker) */
 .seat {
-  /* Flex basis removed, let content determine size */
-  flex: 0 0 auto; 
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
   align-items: center;
-  padding: 12px;
+  justify-content: center;
+  position: relative;
 }
 
 .label {
   font-weight: 900;
   color: #f5c542;
   letter-spacing: 1px;
+  margin-bottom: 8px;
 }
 
-/* card hand */
+/* ---------- CARD HAND ---------- */
 .hand {
   display: flex;
-  gap: 10px;
-  align-items: center;
   justify-content: center;
-  min-height: 120px; 
+  align-items: center;
+  position: relative;
 }
 
-/* Card Slot for Flipping */
 .card-slot {
-    width: 92px;
-    height: 138px;
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.6s;
-    transform: rotateY(0deg);
-    perspective: 1000px;
+  width: 92px;
+  height: 138px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  perspective: 1000px;
+  margin-left: -60px; /* overlap by ~30% */
 }
 
-/* Card images inside the slot */
+.card-slot:first-child {
+  margin-left: 0;
+}
+
 .card {
-    width: 100%;
-    height: 100%;
-    border-radius: 6px;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.6);
-    backface-visibility: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+  backface-visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .card-placeholder {
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    box-shadow: none;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  box-shadow: none;
 }
 
-
-
-/* score badges */
+/* ---------- SCORE BADGES ---------- */
 .score {
   background: rgba(0,0,0,0.35);
   padding: 6px 12px;
@@ -132,66 +116,41 @@
   text-align: center;
 }
 
-/* --- NEW LAYOUT: Center Controls (now below hands) --- */
-.controls {
-  /* Removed flex-basis and fixed width for better responsiveness */
+/* ---------- BUTTONS ---------- */
+.buttons {
   display: flex;
-  flex-direction: column;
-  gap: 18px; /* Increased gap for cleaner look */
-  align-items: center;
-  width: 100%; /* Take full width of parent (baccarat-table) */
-  max-width: 480px; /* Limit max width for a central look */
-  padding: 20px 0;
-  margin-bottom: 20px;
-  border-top: 1px solid rgba(245,197,66,0.1); /* Separator line */
-}
-
-.bet-controls {
-  display: flex;
-  gap: 15px; /* Increased gap */
-  align-items: center;
+  gap: 10px;
   justify-content: center;
   width: 100%;
 }
 
-#betAmount, #betOn {
-  padding: 12px 16px; /* Slightly larger input/select */
-  border-radius: 16px;
-  border: none;
-  outline: none;
-  background: rgba(255,255,255,0.08); /* Slightly brighter background */
-  color: #fff;
-  font-size: 1.1em;
-}
-
-/* buttons */
-.buttons { display: flex; gap: 10px; justify-content: center; width: 100%; }
 .btn.gold.big {
-  padding: 14px 32px; /* Larger button */
-  background: linear-gradient(135deg,#f5c542,#dca000);
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #f5c542, #dca000);
   color: #000b38;
   border-radius: 30px;
-  font-weight: 800; /* Bold */
+  font-weight: 800;
   border: none;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(245,197,66,0.3); /* Stronger shadow */
+  box-shadow: 0 6px 18px rgba(245,197,66,0.3);
   transition: transform 0.2s, box-shadow 0.2s;
 }
+
 .btn.gold.big:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(245,197,66,0.5);
 }
 
-/* result text */
+/* ---------- RESULT TEXT ---------- */
 .result {
   color: #f5c542;
   font-weight: 700;
   margin-top: 6px;
   min-height: 22px;
-  font-size: 1.2em; /* Larger result text */
+  font-size: 1.2em;
 }
 
-/* history row */
+/* ---------- HISTORY ROW ---------- */
 .history {
   margin-top: 16px;
   display: flex;
@@ -210,24 +169,114 @@
   font-size: 12px;
   font-weight: bold;
 }
+
 .hist-player { background: #2196f3; }
 .hist-banker { background: #e53935; }
 .hist-tie { background: #ffc107; }
 
+/* ---------- MULTI BET CONTROLS ---------- */
+.multi-bet {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 25px auto;
+  flex-wrap: wrap;
+}
 
-/* small screens */
+.control-line {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.bet-option {
+  background-color: #0d0d0d;
+  border-radius: 12px;
+  padding: 12px 16px;
+  width: 120px;
+  text-align: center;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.bet-option label {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: #ffd700;
+  margin-bottom: 8px;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.bet-option input {
+  width: 100%;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.balance-container {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #f5c542;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  box-shadow: inset 0 0 10px rgba(245, 197, 66, 0.3);
+  min-width: 190px;
+  text-align: center;
+}
+
+/* ---------- RESPONSIVE ---------- */
 @media (max-width: 900px) {
-  /* Reverted from column to a cleaner centered column layout */
-  .table-top { gap: 30px; padding-bottom: 20px; }
-  .controls { width: 90%; max-width: none; }
-  .seat { width: auto; align-items: center; }
-  .card-slot { width: 72px; height: 108px; }
-  .bet-controls { flex-direction: column; gap: 10px; }
-  #betAmount, #betOn { width: 90%; text-align: center; }
-  .btn.gold.big { width: 90%; }
+  .table-top {
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+  }
+
+  .seat {
+    width: 100%;
+    align-items: center;
+  }
+
+  .card-slot {
+    width: 72px;
+    height: 108px;
+    margin-left: -45px;
+  }
+
+  .bet-option {
+    width: 110px;
+  }
+
+  .btn.gold.big {
+    width: 90%;
+  }
+
+  .multi-bet {
+    gap: 10px;
+  }
 }
 
 @media (max-width: 480px) {
-  .card-slot { width: 56px; height: 84px; }
-  .neon-title { font-size: 1.6em; }
+  .card-slot {
+    width: 56px;
+    height: 84px;
+    margin-left: -35px;
+  }
+
+  .neon-title {
+    font-size: 1.6em;
+  }
 }

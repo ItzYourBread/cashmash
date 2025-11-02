@@ -42,7 +42,7 @@ body {
   /* dealer left, player right */
   justify-content: space-between;
   align-items: flex-start;
-  max-width: 500px;
+  max-width: 550px;
   width: 100%;
   background: rgba(0, 0, 0, 0.03);
   border: 1px solid rgba(245, 197, 66, 0.1);

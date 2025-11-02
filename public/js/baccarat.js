@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // --- DOM Elements ---
   const dealBtn = document.getElementById("dealBtn");
   const resultText = document.getElementById("resultText");
   const playerHandDiv = document.getElementById("playerHand");
@@ -6,27 +7,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const playerScoreDiv = document.getElementById("playerScore");
   const bankerScoreDiv = document.getElementById("bankerScore");
   const balanceSpan = document.getElementById("balance");
-  const historyDiv = document.getElementById("history");
+  const betPlayerInput = document.getElementById("betPlayer");
+  const betBankerInput = document.getElementById("betBanker");
+  const betTieInput = document.getElementById("betTie");
 
-  // Removed deck visual elements and related functions (createCardBack, createCardFront, dealCardAnimation)
-
+  // --- Card Helper Functions ---
   function createCardFace(card, isBack = false, color = "black") {
     const img = document.createElement("img");
     img.classList.add("card", isBack ? "card-back" : "card-front");
-    img.style.backfaceVisibility = "hidden"; // Key for flip effect
+    img.style.backfaceVisibility = "hidden";
 
     if (isBack) {
-      // NOTE: Using 'red' for player, 'black' for banker as per existing logic
-      const cardColor = color === 'red' ? 'red' : 'black';
-      img.src = `/images/playing-cards/player_card_back_design_1_${cardColor}.svg`;
-      img.style.transform = "rotateY(0deg)"; // Start facing forward (showing back)
+      // Assuming card back image path
+      img.src = `/images/playing-cards/player_card_back_design_1_${color}.svg`; 
+      img.style.transform = "rotateY(0deg)";
     } else {
-      img.src = `/images/playing-cards/${card.file}`;
+      // Assuming card front image path is based on the file property from the controller
+      img.src = `/images/playing-cards/${card.file}`; 
       img.alt = `${card.rank} of ${card.suit}`;
       img.style.position = "absolute";
       img.style.top = "0";
       img.style.left = "0";
-      img.style.transform = "rotateY(180deg)"; // Start flipped (showing front's back)
+      img.style.transform = "rotateY(180deg)";
     }
     return img;
   }
@@ -34,153 +36,126 @@ document.addEventListener("DOMContentLoaded", () => {
   function placeInitialCard(targetContainer, color) {
     const slot = document.createElement("div");
     slot.classList.add("card-slot");
-    slot.style.transformStyle = "preserve-3d"; // Key for flip effect
-    slot.style.position = "relative"; // Ensure children position correctly
-
+    slot.style.transformStyle = "preserve-3d";
+    slot.style.position = "relative";
     const back = createCardFace(null, true, color);
     slot.appendChild(back);
-
     targetContainer.appendChild(slot);
-    return slot; // Return the slot to be used later for flipping
+    return slot;
   }
 
   async function flipCardAnimation(cardSlot, cardData, delay) {
     return new Promise((resolve) => {
       setTimeout(() => {
+        // Safety check: only proceed if there is card data to show
+        if (!cardData) return resolve(); 
+
         const back = cardSlot.querySelector(".card-back");
-        // Ensure cardData is valid before creating the front face
-        if (!cardData) {
-          console.error("Missing card data for flip animation.");
-          return resolve();
-        }
         const front = createCardFace(cardData, false);
         cardSlot.appendChild(front);
 
-        // Apply flip transition to the slot
         cardSlot.style.transition = "transform 0.6s ease";
         cardSlot.style.transform = "rotateY(180deg)";
 
         setTimeout(() => {
-          // Clean up the back image (optional, but good practice)
           if (back) back.remove();
           resolve();
-        }, 400);
+        }, 400); // 400ms is halfway through the 600ms transition
       }, delay);
     });
   }
 
-  function addHistory(winner) {
-    const badge = document.createElement("span");
-    badge.classList.add("history-badge");
-    badge.textContent = winner.charAt(0).toUpperCase();
-    badge.classList.add(`hist-${winner}`);
-    historyDiv.appendChild(badge);
-    if (historyDiv.children.length > 12) {
-      historyDiv.removeChild(historyDiv.firstChild);
-    }
-  }
-
-  // =======================================================
-  // NEW: Initial Card Placement on Page Load
-  // This function sets up the visual card backs before the first deal.
   function setupInitialHands() {
-    // Clear the EJS placeholders if they exist
     playerHandDiv.innerHTML = "";
     bankerHandDiv.innerHTML = "";
     playerScoreDiv.textContent = "0";
     bankerScoreDiv.textContent = "0";
 
-    // Place 3 card backs for Player (2 visible, 1 hidden)
+    // Create 3 card slots for each hand (3rd card initially hidden)
     for (let i = 0; i < 3; i++) {
-      const slot = placeInitialCard(playerHandDiv, "red");
-      if (i === 2) slot.style.display = 'none';
-    }
-
-    // Place 3 card backs for Banker (2 visible, 1 hidden)
-    for (let i = 0; i < 3; i++) {
-      const slot = placeInitialCard(bankerHandDiv, "black");
-      if (i === 2) slot.style.display = 'none';
+      const pSlot = placeInitialCard(playerHandDiv, "red");
+      const bSlot = placeInitialCard(bankerHandDiv, "black");
+      if (i === 2) {
+        pSlot.style.display = "none";
+        bSlot.style.display = "none";
+      }
     }
   }
 
-  // Execute on load
   setupInitialHands();
-  // =======================================================
 
-
+  // --- Deal Button Logic ---
   dealBtn.addEventListener("click", async () => {
-    const bet = parseFloat(document.getElementById("betAmount").value);
-    const choice = document.getElementById("betOn").value;
+    const betPlayer = parseFloat(betPlayerInput.value) || 0;
+    const betBanker = parseFloat(betBankerInput.value) || 0;
+    const betTie = parseFloat(betTieInput.value) || 0;
 
-    if (!bet || bet <= 0) {
-      alert("Please enter a valid bet amount.");
+    if (betPlayer + betBanker + betTie <= 0) {
+      alert("Please place at least one bet.");
       return;
     }
 
-    resultText.textContent = "Placing bet...";
-
-    // Call setupInitialHands to reset the visuals before dealing
-    setupInitialHands();
-
-    // Re-select the slots after they've been placed by setupInitialHands
-    const playerSlots = Array.from(playerHandDiv.querySelectorAll('.card-slot'));
-    const bankerSlots = Array.from(bankerHandDiv.querySelectorAll('.card-slot'));
-
-
-    resultText.textContent = "Cards dealt, awaiting reveal...";
+    resultText.textContent = "Dealing cards...";
+    setupInitialHands(); // Reset hands to initial card backs
     dealBtn.disabled = true;
 
+    const playerSlots = Array.from(playerHandDiv.querySelectorAll(".card-slot"));
+    const bankerSlots = Array.from(bankerHandDiv.querySelectorAll(".card-slot"));
+
     try {
+      // Call the fixed Baccarat controller endpoint
       const response = await fetch("/baccarat/play", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bet, choice })
+        body: JSON.stringify({ betPlayer, betBanker, betTie }),
       });
 
       const data = await response.json();
       if (!data.success) throw new Error(data.message || "Server error");
 
-      // 2. Flip Animations
       let delay = 200;
 
-      // Flip all cards dealt (2 or 3)
-      for (let i = 0; i < data.player.cards.length; i++) {
-        // Player's 3rd card is at index 2
-        if (i > 1 && playerSlots[i]) playerSlots[i].style.display = 'block'; // Show 3rd card slot if it exists
-        if (playerSlots[i]) await flipCardAnimation(playerSlots[i], data.player.cards[i], delay);
+      // 1. Animate the first two cards for Player and Banker
+      for (let i = 0; i < 2; i++) {
+        await flipCardAnimation(playerSlots[i], data.player.cards[i], delay);
+        await flipCardAnimation(bankerSlots[i], data.banker.cards[i], delay);
         delay += 300;
       }
-      for (let i = 0; i < data.banker.cards.length; i++) {
-        // Banker's 3rd card is at index 2
-        if (i > 1 && bankerSlots[i]) bankerSlots[i].style.display = 'block'; // Show 3rd card slot if it exists
-        if (bankerSlots[i]) await flipCardAnimation(bankerSlots[i], data.banker.cards[i], delay);
+      
+      // 2. Animate Player's third card (if it exists)
+      if (data.player.cards.length === 3) {
+        playerSlots[2].style.display = "block"; // Show the slot
+        await flipCardAnimation(playerSlots[2], data.player.cards[2], delay);
         delay += 300;
+      } else {
+        playerSlots[2].style.display = "none"; // Ensure the slot is hidden if no 3rd card was drawn
       }
 
-      // If no 3rd card was dealt, hide the placeholder slots (they are already present)
-      if (data.player.cards.length < 3 && playerSlots[2]) playerSlots[2].style.display = 'none';
-      if (data.banker.cards.length < 3 && bankerSlots[2]) bankerSlots[2].style.display = 'none';
-
-
+      // 3. Animate Banker's third card (if it exists)
+      if (data.banker.cards.length === 3) {
+        bankerSlots[2].style.display = "block"; // Show the slot
+        await flipCardAnimation(bankerSlots[2], data.banker.cards[2], delay);
+        delay += 300;
+      } else {
+        bankerSlots[2].style.display = "none"; // Ensure the slot is hidden if no 3rd card was drawn
+      }
+      
+      // 4. Update scores and final results after animations finish
       setTimeout(() => {
         playerScoreDiv.textContent = data.player.points;
         bankerScoreDiv.textContent = data.banker.points;
 
         let winnerText = "";
-        if (data.result === "player") winnerText = "Player Wins!";
-        else if (data.result === "banker") winnerText = "Banker Wins!";
-        else winnerText = "It's a Tie!";
+        if (data.result === "player") winnerText = "Player Wins! (1:1)";
+        else if (data.result === "banker") winnerText = "Banker Wins! (0.95:1)";
+        else winnerText = "Tie! (8:1)";
 
         resultText.textContent = `${winnerText} | Profit: ${data.profit.toFixed(2)}`;
 
-        // Update chips
-        const currentBalance = parseFloat(balanceSpan.textContent);
-        balanceSpan.textContent = (currentBalance + data.profit).toFixed(2);
-
-        // History
-        addHistory(data.result);
+        balanceSpan.textContent = data.balance.toFixed(2);
         dealBtn.disabled = false;
-      }, delay + 150);
+      }, delay + 150); // Small final pause
+
     } catch (err) {
       console.error(err);
       resultText.textContent = "Error: " + (err.message || "Server error");
