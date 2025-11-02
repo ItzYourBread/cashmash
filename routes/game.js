@@ -14,6 +14,7 @@ function ensureAuth(req, res, next) {
 
 // --- SLOTS ROUTES ---
 router.get('/slots', ensureAuth, (req, res) => res.render('slots', { user: req.user, currentPage: 'games' }));
+router.get('/slots-pharaohsriches', ensureAuth, (req, res) => res.render('PharaohsRichesSlots', { user: req.user, currentPage: 'games' }));
 router.post('/slots/spin', ensureAuth, spin);
 
 // --- MINES ROUTES ---
@@ -40,6 +41,8 @@ router.get('/aviator', ensureAuth, async (req, res) => {
 });
 router.post('/aviator/bet', ensureAuth, aviatorController.placeBet);
 router.post('/aviator/cashout', ensureAuth, aviatorController.cashOut);
+
+// router.get('/european-roulette', ensureAuth, (req, res) => res.render('european-roulette', { user: req.user, currentPage: 'games' }));
 
 
 module.exports = router;

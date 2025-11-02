@@ -33,7 +33,7 @@ const ENDPOINTS = {
 // --------------------------------------------------
 
 // --------------------------------------------------
-// CARD / SCORE UTILS (Kept for local display purposes)
+// CARD / SCORE UTILS (Updated with safety check 👈)
 // --------------------------------------------------
 function cardValue(card) {
   const val = card.rank || card.val;
@@ -43,6 +43,11 @@ function cardValue(card) {
 }
 
 function calcScore(cards) {
+  // 🐛 FIX: Check if cards is a valid array before attempting to reduce it
+  if (!Array.isArray(cards) || cards.length === 0) {
+    return 0;
+  }
+  
   let score = cards.reduce((a, c) => a + cardValue(c), 0);
   let aces = cards.filter(c => (c.rank || c.val) === 'A').length;
   while (score > 21 && aces > 0) {
@@ -101,6 +106,20 @@ function renderCard(card, container, hidden = false, delay = 0) {
   return div; // Return the card element for later use (like flipping hidden card)
 }
 
+// --------------------------------------------------
+// UTILITY: Card Flipping
+// --------------------------------------------------
+/**
+ * Finds the currently hidden dealer card element and flips it to be visible.
+ */
+function flipHiddenDealerCard() {
+  const hiddenCardEl = dealerHand.querySelector('.hidden-dealer-card');
+  if (hiddenCardEl) {
+    hiddenCardEl.classList.remove('hidden-dealer-card');
+    // Add a slight delay for the flip animation to look good
+    setTimeout(() => hiddenCardEl.classList.add('flipped'), 10);
+  }
+}
 
 // --------------------------------------------------
 // SCORE / BALANCE DISPLAY (Remains the same)
@@ -109,10 +128,12 @@ function updateScores(hideDealer = true) {
   playerScoreEl.textContent = `Player: ${calcScore(playerCards)}`;
 
   if (hideDealer) {
+    // This relies on calcScore being safe with null/undefined data
     const visibleCard = dealerCards.find(c => !c.hidden);
     const visibleScore = visibleCard ? cardValue(visibleCard) : '?';
     dealerScoreEl.textContent = `Dealer: ${visibleScore} + ?`;
   } else {
+    // This relies on calcScore being safe with null/undefined data
     dealerScoreEl.textContent = `Dealer: ${calcScore(dealerCards)}`;
   }
 }
@@ -123,7 +144,7 @@ function updateBalanceDisplay(newBalance) {
 }
 
 // --------------------------------------------------
-// MAIN GAME FLOW (Remains the same)
+// MAIN GAME FLOW
 // --------------------------------------------------
 placeBetBtn.onclick = () => {
   const bet = parseFloat(betAmountEl.value);
@@ -137,7 +158,7 @@ placeBetBtn.onclick = () => {
   dealBtn.disabled = false;
 };
 
-// DEAL CARDS (Remains the same)
+// DEAL CARDS (Updated for immediate game end)
 dealBtn.onclick = async () => {
   if (currentBet <= 0) {
     resultText.textContent = 'Place your bet first.';
@@ -184,6 +205,8 @@ dealBtn.onclick = async () => {
     setTimeout(() => {
       updateScores(true);
       if (data.result) {
+        // REVEAL DEALER CARD on immediate game end (Blackjack/Push)
+        flipHiddenDealerCard(); 
         endGame(data.result, data.result.includes('win') ? 'win' : 'loss', data.balance);
       } else {
         resultText.textContent = 'Hit or Stand?';
@@ -199,7 +222,7 @@ dealBtn.onclick = async () => {
   }
 };
 
-// PLAYER ACTIONS (Remains the same)
+// PLAYER ACTIONS (Fixed the state update on bust 👈)
 hitBtn.onclick = async () => {
   if (!gameActive) return;
 
@@ -216,13 +239,22 @@ hitBtn.onclick = async () => {
       standBtn.disabled = false;
       return;
     }
-
+    
+    // Always update playerCards to the full hand received from the server
+    playerCards = data.playerHand; 
     const newCard = data.playerHand[data.playerHand.length - 1];
-    playerCards.push(newCard);
+    // Note: If the backend already sent the full array, pushing here would double the card.
+    // Assuming the backend sends the full array *including* the new card:
     renderCard(newCard, playerHand, false, 150);
     updateScores(true);
 
     if (data.result) {
+      // 🐛 CRITICAL FIX: Ensure both playerCards and dealerCards are set from data.
+      // playerCards was updated above.
+      dealerCards = data.dealerHand; 
+
+      // REVEAL DEALER CARD on player bust
+      flipHiddenDealerCard();
       endGame(data.result, 'loss', data.balance); // Pass balance for immediate bust/end
     } else {
       hitBtn.disabled = false;
@@ -237,6 +269,7 @@ hitBtn.onclick = async () => {
   }
 };
 
+// STAND (Updated to use flipHiddenDealerCard)
 standBtn.onclick = async () => {
   if (!gameActive) return;
 
@@ -254,22 +287,11 @@ standBtn.onclick = async () => {
     }
 
     // Flip the hidden dealer card
-    const hiddenCardEl = dealerHand.querySelector('.hidden-dealer-card');
-    if (hiddenCardEl) {
-      // Find the index of the hidden card (should be the second card)
-      const hiddenCardIndex = dealerCards.findIndex(c => c.hidden);
-
-      // Update local dealerCards state *before* flipping
-      // The server response `data.dealerHand` contains the now-revealed card.
-      dealerCards = data.dealerHand;
-
-      // Remove the hidden class and add the flipped class
-      hiddenCardEl.classList.remove('hidden-dealer-card');
-      setTimeout(() => hiddenCardEl.classList.add('flipped'), 10);
-
-      // Update score now that the first two cards are visible
-      updateScores(false);
-    }
+    dealerCards = data.dealerHand; // Update local state with the now-revealed card
+    flipHiddenDealerCard(); 
+    
+    // Update score now that the first two cards are visible
+    updateScores(false);
 
     // Animate the dealer's play and then end the game
     await playDealerSequence(data);
@@ -322,6 +344,9 @@ async function playDealerSequence(data) {
 // --------------------------------------------------
 // END GAME + PAYOUTS (Remains the same)
 // --------------------------------------------------
+// --------------------------------------------------
+// END GAME + PAYOUTS (Updated with delay)
+// --------------------------------------------------
 function endGame(message, resultType, newBalance) {
   gameActive = false;
   hitBtn.disabled = true;
@@ -329,18 +354,20 @@ function endGame(message, resultType, newBalance) {
   dealBtn.disabled = true;
   placeBetBtn.disabled = false;
 
-  updateScores(false);
+  setTimeout(() => {
+    updateScores(false); // Now displays the final, revealed dealer score
 
-  if (newBalance !== undefined) {
-    updateBalanceDisplay(newBalance);
-  }
+    if (newBalance !== undefined) {
+      updateBalanceDisplay(newBalance);
+    }
 
-  currentBet = 0;
+    currentBet = 0;
 
-  resultText.classList.remove('show-result');
-  void resultText.offsetWidth;
-  resultText.textContent = message;
-  resultText.classList.add('show-result');
+    resultText.classList.remove('show-result');
+    void resultText.offsetWidth;
+    resultText.textContent = message;
+    resultText.classList.add('show-result');
+  }, 100); // 100ms should be sufficient for the flip animation
 }
 
 // --------------------------------------------------

@@ -293,6 +293,7 @@ body {
     align-items: center;
     max-width: 95%;
     padding: 15px;
+    min-width: 220px;
   }
 
   .hand .card {

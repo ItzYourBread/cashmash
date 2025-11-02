@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>European Roulette | CashMash</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
+    <link rel="stylesheet" href="/css/roulette.css" />
+</head>
+
+<body>
+    <%- include('partials/header') %>
+        <section class="blackjack-section">
+            <div class="roulette-game">
+
+                <h2 class="neon-title">European Roulette</h2>
+
+                <div class="timer-display">
+                    <div class="label">NEXT SPIN IN</div>
+                    <div id="countdownTimer" class="score neon-title">30</div>
+                </div>
+
+                <div class="roulette-table-container">
+                    <div id="rouletteBoard" class="roulette-board">
+                        <canvas id="rouletteCanvas"></canvas>
+                    </div>
+
+                    <div class="controls">
+                        <div class="bet-controls">
+                            <div class="balance-container">
+                                Balance: ৳<strong id="balance">
+                                    <%= user.chips %>
+                                </strong>
+                            </div>
+                            <div class="chip-palette" id="chipPalette">
+                                <button data-value="10" class="chip-btn active">৳10</button>
+                                <button data-value="50" class="chip-btn">৳50</button>
+                                <button data-value="100" class="chip-btn">৳100</button>
+                                <button data-value="500" class="chip-btn">৳500</button>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button id="spinBtn" class="btn gold big" disabled>SPIN</button>
+                            <button id="clearWagersBtn" class="btn gold" disabled>Clear Wagers</button>
+                            <button id="undoWagerBtn" class="btn gold" disabled>Undo Last</button>
+                        </div>
+
+                        <div class="result" id="resultText">Select a wager value and place bets on the board.</div>
+                    </div>
+
+                    <div id="spinModal" class="modal-overlay hidden">
+                        <div class="modal-content">
+                            <h3 class="neon-title">NO MORE BETS PLEASE!</h3>
+                            <div id="rouletteWheelAnimation">
+                                <p>... Spinning Wheel Animation ...</p>
+                            </div>
+                            <div id="winningNumberDisplay" class="score neon-title"></div>
+                        </div>
+                    </div>
+
+                    <div class="history" id="history">
+                    </div>
+                </div>
+        </section>
+
+        <%- include('partials/footer') %>
+            <script src="/js/roulette.js"></script>
+</body>
+
+</html>
