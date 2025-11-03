@@ -12,8 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Image paths ---
     const MINE_IMAGE = "images/Mines/bomb.png";
     const SAFE_IMAGE = "images/Mines/green-diamond.png";
-    const UNREVEALED_TEXT = "❔"; // Keeping text for unrevealed, as no image was provided for it.
-    // -------------------
+    const UNREVEALED_TEXT = "❔";
+
 
     function showPopup(message, duration = 1500) {
         popupMessage.textContent = message;
@@ -27,7 +27,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let mineCount = 3;
     let gameActive = false;
     let tiles = [];
-    let balance = parseFloat(balanceDisplay.textContent) || 0;
+    
+    // Initialize balance, prioritizing the raw data attribute
+    let balance = parseFloat(balanceDisplay.dataset.rawChips) || parseFloat(balanceDisplay.textContent) || 1000;
+    
+    // Set initial display using the formatter
+    balanceDisplay.textContent = formatBalance(balance);
 
     // 🧱 Build locked grid initially
     function buildLockedGrid() {
@@ -44,7 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ⚡ Update balance display smoothly
     function updateBalanceDisplay() {
-        balanceDisplay.textContent = balance.toFixed(2);
+        // FIX: Reference the correct 'balance' variable and use 'formatBalance'
+        balanceDisplay.textContent = formatBalance(balance);
     }
 
     // Function to set the content of a tile to an image
@@ -83,7 +89,8 @@ document.addEventListener("DOMContentLoaded", () => {
             gameActive = true;
             tiles = [];
             multiplierDisplay.textContent = "1.00x";
-            profitDisplay.textContent = "0";
+            // FIX: Use formatChips for initial profit display (should show 0.00)
+            profitDisplay.textContent = formatBalance(0);
             cashOutBtn.disabled = false;
             newGameBtn.textContent = "In Progress...";
             newGameBtn.disabled = true;
@@ -102,6 +109,9 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (err) {
             console.error("Start game error:", err);
             alert("Server error while starting game");
+            // Refund bet on error
+            balance += bet;
+            updateBalanceDisplay();
         }
     }
 
@@ -119,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!data.ok) {
                 if (data.hitMine) {
-                    // 💣 Hit mine - USE BOMB IMAGE
+                    // 💣 Hit mine - game ends
                     tile.classList.add("mine");
                     setTileImage(tile, MINE_IMAGE);
                     revealAllMines(data.mines);
@@ -136,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Safe click - USE SAFE IMAGE (green diamond)
+            // Safe click
             tile.classList.add("safe");
             setTileImage(tile, SAFE_IMAGE);
             multiplier = data.multiplier;
@@ -149,18 +159,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 📊 Update Stats
     function updateStats() {
-        const profit = (bet * multiplier).toFixed(2);
+        const profit = (bet * multiplier);
         multiplierDisplay.textContent = `${multiplier.toFixed(2)}x`;
-        profitDisplay.textContent = profit;
+        // FIX: Use formatChips for profit display
+        profitDisplay.textContent = formatBalance(profit);
     }
 
     // 💣 Reveal all mines
     function revealAllMines(mines) {
         mines.forEach(i => {
-            if (tiles[i].classList.contains("safe")) return;
-            tiles[i].classList.add("mine");
-            // Set image for all unrevealed mines
-            setTileImage(tiles[i], MINE_IMAGE);
+            // Added check for tiles[i] to prevent errors if the grid is somehow incomplete
+            if (tiles[i] && !tiles[i].classList.contains("safe")) {
+                tiles[i].classList.add("mine");
+                setTileImage(tiles[i], MINE_IMAGE);
+            }
         });
     }
 
@@ -181,7 +193,8 @@ document.addEventListener("DOMContentLoaded", () => {
             balance += data.winnings;
             updateBalanceDisplay();
 
-            showPopup(`You Cashed Out ${data.winnings} chips!!`);
+            // FIX: Format winnings for the pop-up message
+            showPopup(`You Cashed Out ৳${formatBalance(data.winnings)}!!`);
             gameActive = false;
             cashOutBtn.disabled = true;
             newGameBtn.textContent = "Next Game";
@@ -190,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (err) {
             console.error("Cashout error:", err);
             alert("Server error during cashout");
-        }
+        }   
     }
 
     // 🖱️ Event Listeners

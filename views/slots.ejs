@@ -14,57 +14,61 @@
 <body>
   <%- include('partials/header') %>
 
-  <section class="slots-section">
-    <div class="slot-machine">
-      <h2 class="neon-title">Classic Slot Machine</h2>
+    <section class="slots-section">
+      <div class="slot-machine">
+        <h2 class="neon-title">Classic Slot Machine</h2>
 
-      <div class="slot-canvas-wrapper">
-        <canvas id="slotCanvas"></canvas>
-      </div>
-
-      <div class="controls">
-        <div class="balance-container">
-          Balance: ৳<strong id="balance"><%= user.chips %></strong>
+        <div class="slot-canvas-wrapper">
+          <canvas id="slotCanvas"></canvas>
         </div>
 
-        <div class="bet-section">
-          <input type="number" id="betAmount" placeholder="10–1000" min="10" max="1000" value="10" />
-          <button id="spinBtn" class="btn gold big">SPIN</button>
+        <div class="controls">
+          <div class="balance-container">
+            Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
+            <%= formatBalance(user.chips) %>
+            </strong>
+          </div>
+
+          <div class="bet-section">
+            <input type="number" id="betAmount" placeholder="10–1000" min="10" max="1000" value="10" />
+            <button id="spinBtn" class="btn gold big">SPIN</button>
+          </div>
+
+          <div class="info-icon" id="infoBtn">?</div>
         </div>
 
-        <div class="info-icon" id="infoBtn">?</div>
+        <p id="result">Place your bet and spin!</p>
       </div>
+    </section>
 
-      <p id="result">Place your bet and spin!</p>
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Winning Info</h2>
+        <p>Payouts require 5-of-a-kind on any of the 14 active paylines.</p>
+
+        <h3>Multipliers (5-of-a-Kind)</h3>
+        <ul>
+          <li><img src="/images/ClassicSlot/cherry.png" alt="Cherry" class="mini-symbol" /> Cherry: x0.8</li>
+          <li><img src="/images/ClassicSlot/lemon.png" alt="Lemon" class="mini-symbol" /> Lemon: x1</li>
+          <li><img src="/images/ClassicSlot/orange.png" alt="Orange" class="mini-symbol" /> Orange: x1.2</li>
+          <li><img src="/images/ClassicSlot/watermelon.png" alt="Watermelon" class="mini-symbol" /> Watermelon: x1.8
+          </li>
+          <li><img src="/images/ClassicSlot/grapes.png" alt="Grapes" class="mini-symbol" /> Grapes: x3</li>
+          <li><img src="/images/ClassicSlot/star.png" alt="Star" class="mini-symbol" /> Star: x4</li>
+          <li><img src="/images/ClassicSlot/diamond.png" alt="Diamond" class="mini-symbol" /> Diamond: x8</li>
+          <li><img src="/images/ClassicSlot/red7.png" alt="Red 7" class="mini-symbol" /> Red 7: x10</li>
+          <li><img src="/images/ClassicSlot/bar.png" alt="Bar" class="mini-symbol" /> Bar: x20</li>
+          <li><img src="/images/ClassicSlot/jackpot.png" alt="Jackpot" class="mini-symbol" /> Jackpot: x100</li>
+        </ul>
+      </div>
     </div>
-  </section>
 
-  <!-- Info Modal -->
-  <div id="infoModal" class="modal">
-    <div class="modal-content">
-      <span class="close-btn">&times;</span>
-      <h2>Winning Info</h2>
-      <p>Payouts require 5-of-a-kind on any of the 14 active paylines.</p>
-
-      <h3>Multipliers (5-of-a-Kind)</h3>
-      <ul>
-        <li><img src="/images/ClassicSlot/cherry.png" alt="Cherry" class="mini-symbol" /> Cherry: x0.8</li>
-        <li><img src="/images/ClassicSlot/lemon.png" alt="Lemon" class="mini-symbol" /> Lemon: x1</li>
-        <li><img src="/images/ClassicSlot/orange.png" alt="Orange" class="mini-symbol" /> Orange: x1.2</li>
-        <li><img src="/images/ClassicSlot/watermelon.png" alt="Watermelon" class="mini-symbol" /> Watermelon: x1.8</li>
-        <li><img src="/images/ClassicSlot/grapes.png" alt="Grapes" class="mini-symbol" /> Grapes: x3</li>
-        <li><img src="/images/ClassicSlot/star.png" alt="Star" class="mini-symbol" /> Star: x4</li>
-        <li><img src="/images/ClassicSlot/diamond.png" alt="Diamond" class="mini-symbol" /> Diamond: x8</li>
-        <li><img src="/images/ClassicSlot/red7.png" alt="Red 7" class="mini-symbol" /> Red 7: x10</li>
-        <li><img src="/images/ClassicSlot/bar.png" alt="Bar" class="mini-symbol" /> Bar: x20</li>
-        <li><img src="/images/ClassicSlot/jackpot.png" alt="Jackpot" class="mini-symbol" /> Jackpot: x100</li>
-      </ul>
-    </div>
-  </div>
-
-  <%- include('partials/footer') %>
-  <script type="module" src="/js/slots.js"></script>
-  <script type="module" src="/js/slotsModal.js"></script>
+    <%- include('partials/footer') %>
+      <script src="/js/formatBalance.js"></script>
+      <script type="module" src="/js/slots.js"></script>
+      <script type="module" src="/js/slotsModal.js"></script>
 </body>
 
 </html>

@@ -42,7 +42,11 @@
         <!-- CONTROLS AREA -->
         <div class="controls">
           <div class="control-line">
-            <div class="balance-container">Balance: ৳<span id="balance"><%= user.chips %></span></div>
+            <div class="balance-container">
+              Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
+              <%= formatBalance(user.chips) %>
+              </strong>
+            </div>
             <input id="betAmount" type="number" min="1" value="10" />
             <button id="placeBetBtn" class="btn gold">Place Bet</button>
             <button id="cashOutBtn" class="btn gold" disabled>Cash Out</button>
@@ -53,6 +57,7 @@
 
     <%- include('partials/footer') %>
       <script src="/socket.io/socket.io.js"></script>
+      <script src="/js/formatBalance.js"></script>
       <script src="/js/aviator.js"></script>
 </body>
 

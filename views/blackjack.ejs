@@ -43,7 +43,9 @@
         <div class="controls">
           <div class="bet-controls">
             <div class="balance-container">
-              Balance: ৳<strong id="balance"><%= user.chips %></strong>
+              Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
+              <%= formatBalance(user.chips) %>
+              </strong>
             </div>
             <input id="betAmount" type="number" min="10" value="10" />
             <button id="placeBetBtn" class="btn gold" style="width: 100px;">Place Bet</button>
@@ -63,6 +65,7 @@
     </section>
 
     <%- include('partials/footer') %>
+      <script src="/js/formatBalance.js"></script>
       <script src="/js/blackjack.js"></script>
 </body>
 

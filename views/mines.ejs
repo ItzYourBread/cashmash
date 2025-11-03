@@ -31,9 +31,11 @@
                 <!-- ✅ Controls at the bottom -->
                 <div class="game-controls">
                     <div class="controls-line1">
-                        <div class="balance-container">Balance: ৳<span id="balance">
-                                <%= user.chips %>
-                            </span></div>
+                        <div class="balance-container">
+                            Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
+                            <%= formatBalance(user.chips) %>
+                            </strong>
+                        </div>
                         <input type="number" id="betInput" min="10" max="1000" value="10" placeholder="Bet" />
                         <select id="mineRate">
                             <option value="3">3 Mines</option>
@@ -57,6 +59,7 @@
         </section>
 
         <%- include('partials/footer') %>
+            <script src="/js/formatBalance.js"></script>
             <script src="/js/mines.js"></script>
             <script>
                 const betInput = document.getElementById("betInput");

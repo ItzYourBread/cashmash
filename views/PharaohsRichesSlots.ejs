@@ -24,8 +24,8 @@
 
         <div class="controls">
           <div class="balance-container">
-            Balance: ৳<strong id="balance">
-              <%= user.chips %>
+            Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
+            <%= formatBalance(user.chips) %>
             </strong>
           </div>
 
@@ -53,8 +53,6 @@
           <li><img src="/images/PharaohsRichesSlots/pharaoh.png" alt="Pharaoh" class="mini-symbol" /> Pharaoh: x5</li>
           <li><img src="/images/PharaohsRichesSlots/sphinx.png" alt="Sphinx" class="mini-symbol" /> Sphinx: x4</li>
           <li><img src="/images/PharaohsRichesSlots/ankh.png" alt="Ankh" class="mini-symbol" /> Ankh: x3.5</li>
-          <li><img src="/images/PharaohsRichesSlots/eyeOfHorus.png" alt="Eye of Horus" class="mini-symbol" /> Eye of
-            Horus: x3</li>
           <li><img src="/images/PharaohsRichesSlots/scarab.png" alt="Scarab" class="mini-symbol" /> Scarab: x2.5</li>
           <li><img src="/images/PharaohsRichesSlots/pyramid.png" alt="Pyramid" class="mini-symbol" /> Pyramid: x2</li>
           <li><img src="/images/PharaohsRichesSlots/goldCoin.png" alt="Gold Coin" class="mini-symbol" /> Gold Coin: x1.5
@@ -69,67 +67,9 @@
     </div>
 
     <%- include('partials/footer') %>
+      <script src="/js/formatBalance.js"></script>
       <script type="module" src="/js/PharaohsRichesSlots.js"></script>
       <script type="module" src="/js/slotsModal.js"></script>
-      <script>
-        const betInput = document.getElementById('betAmount');
-        const spinBtn = document.getElementById('spinBtn');
-        const minBet = 50;
-        const maxBet = 2000;
-
-        // Check bet when user leaves input field
-        betInput.addEventListener('blur', () => {
-          validateBet();
-        });
-
-        // Check bet before spinning
-        spinBtn.addEventListener('click', (e) => {
-          const valid = validateBet();
-          if (!valid) e.preventDefault();
-        });
-
-        function validateBet() {
-          let value = parseInt(betInput.value, 10);
-          const result = document.getElementById('result');
-
-          if (isNaN(value)) value = minBet;
-
-          if (value < minBet) {
-            betInput.value = minBet;
-            showWarning(`Minimum bet is ৳${minBet}`);
-            return false;
-          } else if (value > maxBet) {
-            betInput.value = maxBet;
-            showWarning(`Maximum bet is ৳${maxBet}`);
-            return false;
-          }
-          betInput.classList.remove('input-warning');
-          result.textContent = "Place your bet and spin!";
-          result.style.color = "#fff";
-          return true;
-        }
-
-        function showWarning(msg) {
-          const result = document.getElementById('result');
-          result.textContent = msg;
-          result.style.color = "gold";
-          betInput.classList.add('input-warning');
-          setTimeout(() => {
-            betInput.classList.remove('input-warning');
-          }, 1000);
-        }
-
-        // Add a subtle warning style
-        const style = document.createElement('style');
-        style.textContent = `
-    .input-warning {
-      border: 2px solid gold;
-      box-shadow: 0 0 8px gold;
-      transition: all 0.3s ease;
-    }
-  `;
-        document.head.appendChild(style);
-      </script>
 </body>
 
 </html>

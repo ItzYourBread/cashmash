@@ -14,6 +14,31 @@ const hitBtn = document.getElementById('hitBtn');
 const standBtn = document.getElementById('standBtn');
 const balanceEl = document.getElementById('balance');
 
+// ====================== UTILITY FUNCTION (K/M FORMAT) ======================
+/**
+ * Formats the chip amount for display using K (thousands) or M (millions) notation.
+ * If the number is less than 1000, it defaults to two decimal places.
+ * @param {number} amount - The raw chip amount.
+ * @returns {string} The formatted compact string (e.g., 12345 -> 12.3K).
+ */
+const formatChips = (amount) => {
+    // If the number is small, just use standard fixed decimal format
+    if (Math.abs(amount) < 1000) {
+        return parseFloat(amount).toFixed(2);
+    }
+    
+    // Use Intl.NumberFormat for compact notation (K, M, etc.)
+    const formatter = new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        compactDisplay: 'short', 
+        minimumFractionDigits: 1, 
+        maximumFractionDigits: 1,
+    });
+
+    return formatter.format(amount);
+};
+// ===========================================================================
+
 // NOTE: deck, playerCards, dealerCards, gameActive, balance are now primarily
 // managed by the backend. We'll keep local copies for rendering/display.
 let playerCards = [];
@@ -21,7 +46,10 @@ let dealerCards = [];
 let gameActive = false;
 let currentBet = 0;
 // Initial balance is read once, subsequent changes come from the backend response.
-let balance = parseFloat(balanceEl.textContent) || 0;
+// FIX: Ensure balance is parsed as a number from the formatted display if data-raw-chips isn't used
+let balance = parseFloat(balanceEl.dataset.rawChips) || parseFloat(balanceEl.textContent) || 1000;
+// FIX: Apply K/M formatting to the initial display
+balanceEl.textContent = formatChips(balance);
 
 // --- UTILITY: Server Endpoint Configuration ---
 const API_URL = '/blackjack';
@@ -33,7 +61,7 @@ const ENDPOINTS = {
 // --------------------------------------------------
 
 // --------------------------------------------------
-// CARD / SCORE UTILS (Updated with safety check 👈)
+// CARD / SCORE UTILS (Updated with safety check)
 // --------------------------------------------------
 function cardValue(card) {
   const val = card.rank || card.val;
@@ -43,7 +71,7 @@ function cardValue(card) {
 }
 
 function calcScore(cards) {
-  // 🐛 FIX: Check if cards is a valid array before attempting to reduce it
+  // Check if cards is a valid array before attempting to reduce it
   if (!Array.isArray(cards) || cards.length === 0) {
     return 0;
   }
@@ -64,7 +92,7 @@ function getCardFilename(card) {
 }
 
 // --------------------------------------------------
-// RENDER (FIXED)
+// RENDER
 // --------------------------------------------------
 function renderCard(card, container, hidden = false, delay = 0) {
   const div = document.createElement('div');
@@ -84,14 +112,13 @@ function renderCard(card, container, hidden = false, delay = 0) {
   front.classList.add('card-front');
   inner.appendChild(front);
 
-  // 🚨 FIX: Set the image source for all non-placeholder cards
+  // Set the image source for all non-placeholder cards
   if (!card.placeholder) {
     const filename = getCardFilename(card);
     front.innerHTML = `<img src="/images/playing-cards/${filename}" alt="${card.rank} of ${card.suit}">`;
   }
 
-  // 🚨 FIX: Handle hidden cards (should only be the dealer's initial second card)
-  // If the server explicitly marks it as hidden, or if 'hidden' flag is passed (for initial dealer card)
+  // Handle hidden cards (should only be the dealer's initial second card)
   if (card.hidden || hidden) {
     div.classList.add('hidden-dealer-card');
   }
@@ -99,7 +126,7 @@ function renderCard(card, container, hidden = false, delay = 0) {
   container.appendChild(div);
 
   setTimeout(() => {
-    // 🚨 FIX: Flip the card only if it's NOT supposed to be hidden
+    // Flip the card only if it's NOT supposed to be hidden
     if (!card.hidden && !hidden) div.classList.add('flipped');
   }, delay);
 
@@ -122,7 +149,7 @@ function flipHiddenDealerCard() {
 }
 
 // --------------------------------------------------
-// SCORE / BALANCE DISPLAY (Remains the same)
+// SCORE / BALANCE DISPLAY 
 // --------------------------------------------------
 function updateScores(hideDealer = true) {
   playerScoreEl.textContent = `Player: ${calcScore(playerCards)}`;
@@ -140,7 +167,8 @@ function updateScores(hideDealer = true) {
 
 function updateBalanceDisplay(newBalance) {
   balance = parseFloat(newBalance.toFixed(2));
-  balanceEl.textContent = balance;
+  // FIX: Use formatChips for K/M notation
+  balanceEl.textContent = formatChips(balance);
 }
 
 // --------------------------------------------------
@@ -153,7 +181,8 @@ placeBetBtn.onclick = () => {
     return;
   }
   currentBet = bet;
-  resultText.textContent = `Bet set to: ${bet} 💰. Click Deal.`;
+  // FIX: Format the displayed bet amount
+  resultText.textContent = `Bet set to: ৳${formatChips(bet)}. Click Deal.`;
   placeBetBtn.disabled = true;
   dealBtn.disabled = false;
 };
@@ -222,7 +251,7 @@ dealBtn.onclick = async () => {
   }
 };
 
-// PLAYER ACTIONS (Fixed the state update on bust 👈)
+// PLAYER ACTIONS
 hitBtn.onclick = async () => {
   if (!gameActive) return;
 
@@ -243,14 +272,12 @@ hitBtn.onclick = async () => {
     // Always update playerCards to the full hand received from the server
     playerCards = data.playerHand; 
     const newCard = data.playerHand[data.playerHand.length - 1];
-    // Note: If the backend already sent the full array, pushing here would double the card.
-    // Assuming the backend sends the full array *including* the new card:
+
     renderCard(newCard, playerHand, false, 150);
     updateScores(true);
 
     if (data.result) {
-      // 🐛 CRITICAL FIX: Ensure both playerCards and dealerCards are set from data.
-      // playerCards was updated above.
+      // Ensure both playerCards and dealerCards are set from data.
       dealerCards = data.dealerHand; 
 
       // REVEAL DEALER CARD on player bust
@@ -269,7 +296,7 @@ hitBtn.onclick = async () => {
   }
 };
 
-// STAND (Updated to use flipHiddenDealerCard)
+// STAND
 standBtn.onclick = async () => {
   if (!gameActive) return;
 
@@ -304,7 +331,7 @@ standBtn.onclick = async () => {
 };
 
 // --------------------------------------------------
-// DEALER LOGIC (FIXED)
+// DEALER LOGIC
 // --------------------------------------------------
 async function playDealerSequence(data) {
   // We already rendered the first two cards. Start rendering from the third card (index 2).
@@ -324,7 +351,7 @@ async function playDealerSequence(data) {
 
     const cardToRender = newCards[i];
 
-    // 🚨 FIX: Render the card. It will automatically flip due to renderCard fix.
+    // Render the card. It will automatically flip due to renderCard logic.
     renderCard(cardToRender, dealerHand, false, 200);
 
     // Update score for each hit
@@ -342,10 +369,7 @@ async function playDealerSequence(data) {
 }
 
 // --------------------------------------------------
-// END GAME + PAYOUTS (Remains the same)
-// --------------------------------------------------
-// --------------------------------------------------
-// END GAME + PAYOUTS (Updated with delay)
+// END GAME + PAYOUTS
 // --------------------------------------------------
 function endGame(message, resultType, newBalance) {
   gameActive = false;
@@ -371,7 +395,7 @@ function endGame(message, resultType, newBalance) {
 }
 
 // --------------------------------------------------
-// INITIALIZATION (Remains the same)
+// INITIALIZATION
 // --------------------------------------------------
 function initializeTable() {
   const dummyCard = { rank: 'D', suit: 'D', placeholder: true };

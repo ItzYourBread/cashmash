@@ -84,19 +84,19 @@ exports.startGame = async (req, res) => {
             // Push (Player and Dealer Blackjack)
             payout = bet * 1; // Refund bet
             winnings = 0;
-            result = `Push: Both Blackjack 🤝 (+৳${winnings.toFixed(2)})`;
+            result = `Push: Both Blackjack (+৳${winnings.toFixed(2)})`;
         } else {
             // Player Blackjack Win (Payout adjusted by day)
             if (isLuckyDay()) {
                 // LUCKY DAYS: 3:2 payout
                 payout = bet * 2.5; 
                 winnings = bet * 1.5;
-                result = `Blackjack! You win 💰 (3:2 Payout) +৳${winnings.toFixed(2)}`;
+                result = `Blackjack! You win (3:2 Payout) +৳${winnings.toFixed(2)}`;
             } else {
                 // PROFIT DAYS: 6:5 payout
                 payout = bet * 2.2; 
                 winnings = bet * 1.2;
-                result = `Blackjack! You win 💰 (6:5 Payout) +৳${winnings.toFixed(2)}`;
+                result = `Blackjack! You win (6:5 Payout) +৳${winnings.toFixed(2)}`;
             }
         }
         
@@ -154,7 +154,7 @@ exports.hit = async (req, res) => {
     if (playerScore > 21) {
       // BUST: Player loses the bet amount.
       const lossAmount = bet; 
-      state.result = `Bust! Dealer Wins ❌ -$${lossAmount.toFixed(2)}`;
+      state.result = `Bust! Dealer Wins -৳${lossAmount.toFixed(2)}`;
       state.gameOver = true;
       result = state.result;
       

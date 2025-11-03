@@ -5,6 +5,7 @@ const minesController = require('../controllers/minesController');
 const baccaratController = require("../controllers/baccaratController");
 const blackjackController = require('../controllers/blackjackController');
 const aviatorController = require('../controllers/aviatorController');
+const formatBalance = require('../utils/formatBalance'); // <--- Ensure this path is correct
 
 // ensureAuth middleware
 function ensureAuth(req, res, next) {
@@ -12,23 +13,36 @@ function ensureAuth(req, res, next) {
   res.status(401).json({ error: 'Unauthorized' });
 }
 
+// --- COMMON RENDER OBJECT ---
+// This object contains all the common variables and the utility function
+// to be passed to every single game view.
+function getCommonRenderData(req) {
+    return {
+        user: req.user,
+        currentPage: 'games',
+        // Make the utility function available to the EJS template
+        formatBalance: formatBalance
+    };
+}
+// ----------------------------
+
 // --- SLOTS ROUTES ---
-router.get('/slots', ensureAuth, (req, res) => res.render('slots', { user: req.user, currentPage: 'games' }));
-router.get('/slots-pharaohsriches', ensureAuth, (req, res) => res.render('PharaohsRichesSlots', { user: req.user, currentPage: 'games' }));
+router.get('/slots', ensureAuth, (req, res) => res.render('slots', getCommonRenderData(req)));
+router.get('/slots-pharaohsriches', ensureAuth, (req, res) => res.render('PharaohsRichesSlots', getCommonRenderData(req)));
 router.post('/slots/spin', ensureAuth, spin);
 
 // --- MINES ROUTES ---
-router.get('/mines', ensureAuth, (req, res) => res.render('mines', { user: req.user, currentPage: 'games' }));
+router.get('/mines', ensureAuth, (req, res) => res.render('mines', getCommonRenderData(req)));
 router.post('/mines/start', ensureAuth, minesController.start);
 router.post('/mines/reveal', ensureAuth, minesController.reveal);
 router.post('/mines/cashout', ensureAuth, minesController.cashout);
 
 // --- BACCARAT ROUTES ---
-router.get('/baccarat', ensureAuth, (req, res) => res.render('baccarat', { user: req.user, currentPage: 'games' }));
+router.get('/baccarat', ensureAuth, (req, res) => res.render('baccarat', getCommonRenderData(req)));
 router.post("/baccarat/play", ensureAuth, baccaratController.playBaccarat);
 
 // --- BLACKJACK ROUTES ---
-router.get('/blackjack', ensureAuth, (req, res) => res.render('blackjack', { user: req.user, currentPage: 'games' }));
+router.get('/blackjack', ensureAuth, (req, res) => res.render('blackjack', getCommonRenderData(req)));
 router.post('/blackjack/start', ensureAuth, blackjackController.startGame);
 router.post('/blackjack/hit', ensureAuth, blackjackController.hit);
 router.post('/blackjack/stand', ensureAuth, blackjackController.stand);
@@ -37,12 +51,19 @@ router.post('/blackjack/stand', ensureAuth, blackjackController.stand);
 router.get('/aviator', ensureAuth, async (req, res) => {
   // Get current round state for initial render
   const roundState = aviatorController.getRoundStateSync();
-  res.render('aviator', { user: req.user, roundState, currentPage: 'games' });
+  
+  // Merge the common data with the specific aviator data
+  const renderData = {
+    ...getCommonRenderData(req), // Spread the common data first
+    roundState, 
+  };
+  
+  res.render('aviator', renderData);
 });
 router.post('/aviator/bet', ensureAuth, aviatorController.placeBet);
 router.post('/aviator/cashout', ensureAuth, aviatorController.cashOut);
 
-// router.get('/european-roulette', ensureAuth, (req, res) => res.render('european-roulette', { user: req.user, currentPage: 'games' }));
+// router.get('/european-roulette', ensureAuth, (req, res) => res.render('european-roulette', getCommonRenderData(req)));
 
 
 module.exports = router;

@@ -1,4 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // ====================== UTILITY FUNCTION (K/M FORMAT) ======================
+  /**
+   * Formats the chip amount for display using K (thousands) or M (millions) notation.
+   * If the number is less than 1000, it defaults to two decimal places.
+   * @param {number} amount - The raw chip amount.
+   * @returns {string} The formatted compact string (e.g., 12345 -> 12.3K).
+   */
+  const formatChips = (amount) => {
+    // If the number is small, just use standard fixed decimal format
+    if (Math.abs(amount) < 1000) {
+        return parseFloat(amount).toFixed(2);
+    }
+    
+    // Use Intl.NumberFormat for compact notation (K, M, etc.)
+    const formatter = new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        compactDisplay: 'short', 
+        minimumFractionDigits: 1, 
+        maximumFractionDigits: 1,
+    });
+
+    return formatter.format(amount);
+  };
+  // ===========================================================================
+
   // --- DOM Elements ---
   const dealBtn = document.getElementById("dealBtn");
   const resultText = document.getElementById("resultText");
@@ -10,6 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const betPlayerInput = document.getElementById("betPlayer");
   const betBankerInput = document.getElementById("betBanker");
   const betTieInput = document.getElementById("betTie");
+
+  // FIX: Initialize balance and set initial display using formatChips
+  let balance = parseFloat(balanceSpan.dataset.rawChips) || parseFloat(balanceSpan.textContent) || 0;
+  balanceSpan.textContent = formatChips(balance);
 
   // --- Card Helper Functions ---
   function createCardFace(card, isBack = false, color = "black") {
@@ -103,6 +132,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const bankerSlots = Array.from(bankerHandDiv.querySelectorAll(".card-slot"));
 
     try {
+      // Deduct bet from local balance for immediate display update
+      const totalBet = betPlayer + betBanker + betTie;
+      balance -= totalBet;
+      balanceSpan.textContent = formatChips(balance);
+
       // Call the fixed Baccarat controller endpoint
       const response = await fetch("/baccarat/play", {
         method: "POST",
@@ -111,7 +145,12 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const data = await response.json();
-      if (!data.success) throw new Error(data.message || "Server error");
+      if (!data.success) {
+        // Refund bet on server error
+        balance += totalBet;
+        balanceSpan.textContent = formatChips(balance);
+        throw new Error(data.message || "Server error");
+      }
 
       let delay = 200;
 
@@ -150,9 +189,12 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (data.result === "banker") winnerText = "Banker Wins! (0.95:1)";
         else winnerText = "Tie! (8:1)";
 
-        resultText.textContent = `${winnerText} | Profit: ${data.profit.toFixed(2)}`;
+        // FIX: Format the profit display using formatChips
+        resultText.textContent = `${winnerText} | Profit: ${formatChips(data.profit)}`;
 
-        balanceSpan.textContent = data.balance.toFixed(2);
+        // FIX: Update balance from server data and apply formatChips
+        balance = data.balance;
+        balanceSpan.textContent = formatChips(balance);
         dealBtn.disabled = false;
       }, delay + 150); // Small final pause
 
@@ -161,5 +203,5 @@ document.addEventListener("DOMContentLoaded", () => {
       resultText.textContent = "Error: " + (err.message || "Server error");
       dealBtn.disabled = false;
     }
-  });
 });
+  });

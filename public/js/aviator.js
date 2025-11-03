@@ -1,5 +1,31 @@
 const socket = io();
 
+// ====================== UTILITY FUNCTION (K/M FORMAT) ======================
+/**
+ * Formats the chip amount for display using K (thousands) or M (millions) notation.
+ * If the number is less than 1000, it defaults to two decimal places.
+ * @param {number} amount - The raw chip amount.
+ * @returns {string} The formatted compact string (e.g., 12345 -> 12.3K).
+ */
+const formatChips = (amount) => {
+    // If the number is small, just use standard fixed decimal format
+    if (Math.abs(amount) < 1000) {
+        return parseFloat(amount).toFixed(2);
+    }
+    
+    // Use Intl.NumberFormat for compact notation (K, M, etc.)
+    const formatter = new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        compactDisplay: 'short', 
+        minimumFractionDigits: 1, 
+        maximumFractionDigits: 1,
+    });
+
+    return formatter.format(amount);
+};
+// ===========================================================================
+
+
 const multiplierEl = document.getElementById('multiplier');
 const resultText = document.getElementById('resultText');
 const placeBetBtn = document.getElementById('placeBetBtn');
@@ -11,6 +37,17 @@ const timeBarEl = document.getElementById('timeBar');
 const graphSvgEl = document.getElementById('graph-svg'); // The SVG container
 const graphPathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path'); // The path element
 const balanceEl = document.getElementById('balance');
+
+// FIX: Initial balance formatting
+if (balanceEl) {
+    let initialBalance = parseFloat(balanceEl.textContent) || 0;
+    // Check for a data attribute containing the raw balance first
+    if (balanceEl.dataset.rawChips) {
+        initialBalance = parseFloat(balanceEl.dataset.rawChips);
+    }
+    balanceEl.textContent = formatChips(initialBalance);
+}
+
 
 // A DOM container for small fading trail dots
 const trailContainer = document.createElement('div');
@@ -199,7 +236,8 @@ socket.on('roundCrashed', ({ crashAt }) => {
 socket.on('betPlaced', ({ userId: bidderId, amount, username }) => {
   // Show small UI notification in the result area
   if (bidderId === window.user?._id) {
-    resultText.textContent = `Bet placed ${amount}`;
+    // FIX: Format the displayed bet amount
+    resultText.textContent = `Bet placed ${formatChips(amount)}`;
     hasBet = true;
     placeBetBtn.textContent = 'Bet Placed';
     toggleButton(placeBetBtn, false);
@@ -214,7 +252,8 @@ socket.on('betPlaced', ({ userId: bidderId, amount, username }) => {
 socket.on('cashedOut', ({ userId: casherId, username, win, multiplier }) => {
   // Update UI for cashouts
   if (casherId === window.user?._id) {
-    resultText.textContent = `Cashed out ${win} (${multiplier.toFixed(2)}x)`;
+    // FIX: Format the win amount
+    resultText.textContent = `Cashed out ${formatChips(win)} (${multiplier.toFixed(2)}x)`;
     hasCashedOut = true;
     toggleButton(cashOutBtn, false);
     toggleButton(placeBetBtn, false);
@@ -265,13 +304,15 @@ placeBetBtn.addEventListener('click', async () => {
     }
 
     // Success: server returns new balance
-    if (data.balance !== undefined && balanceEl) balanceEl.textContent = data.balance;
+    // FIX: Format the balance update
+    if (data.balance !== undefined && balanceEl) balanceEl.textContent = formatChips(data.balance);
     hasBet = true;
     placeBetBtn.textContent = 'Bet Placed';
     toggleButton(placeBetBtn, false);
     toggleButton(cashOutBtn, true);
     betAmountInput.disabled = true;
-    resultText.textContent = `Bet placed ${amount}`;
+    // FIX: Format the displayed bet amount
+    resultText.textContent = `Bet placed ${formatChips(amount)}`;
   } catch (err) {
     resultText.textContent = 'Server error placing bet';
     toggleButton(placeBetBtn, true);
@@ -308,10 +349,12 @@ cashOutBtn.addEventListener('click', async () => {
     }
 
     // Update balance and UI
-    if (data.balance !== undefined && balanceEl) balanceEl.textContent = data.balance;
+    // FIX: Format the balance update
+    if (data.balance !== undefined && balanceEl) balanceEl.textContent = formatChips(data.balance);
     hasCashedOut = true;
     toggleButton(cashOutBtn, false);
-    resultText.textContent = `Cashed out ${data.winnings} (${data.multiplier.toFixed(2)}x)`;
+    // FIX: Format the winnings
+    resultText.textContent = `Cashed out ${formatChips(data.winnings)} (${data.multiplier.toFixed(2)}x)`;
   } catch (err) {
     resultText.textContent = 'Server error cashing out';
     toggleButton(cashOutBtn, true);

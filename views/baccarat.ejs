@@ -56,20 +56,21 @@
 
           <div class="control-line">
             <div class="balance-container">
-              Balance: ৳<strong id="balance">
-                <%= user.chips %>
+              Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
+              <%= formatBalance(user.chips) %>
               </strong>
             </div>
             <button id="dealBtn" class="btn gold big">Deal</button>
           </div>
 
 
-          <div class="result" id="resultText">Place your bets and deal.</div>
         </div>
+        <div class="result"  id="resultText">Place your bets and deal.</div>
       </div>
     </section>
 
     <%- include('partials/footer') %>
+      <script src="/js/formatBalance.js"></script>
       <script src="/js/baccarat.js"></script>
 </body>
 
