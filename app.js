@@ -18,6 +18,9 @@ connectDB();
 // Passport
 require('./config/passport')(passport);
 
+// Rakeback Job
+require('./cron/rakebackJob');
+
 // --- i18n Configuration ---
 i18n.configure({
     locales: ['en', 'bn', 'hi'],

@@ -36,6 +36,15 @@ const gameHistorySchema = new mongoose.Schema({
   playedAt: { type: Date, default: Date.now }
 });
 
+// ✅ NEW: Rakeback History Schema
+const rakebackHistorySchema = new mongoose.Schema({
+  amount: { type: Number, required: true },
+  weekStart: { type: Date, required: true },
+  weekEnd: { type: Date, required: true },
+  creditedAt: { type: Date, default: Date.now },
+  note: { type: String, default: 'Weekly rakeback credited' }
+});
+
 // ----------------- MAIN USER SCHEMA -----------------
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, trim: true },
@@ -47,6 +56,12 @@ const userSchema = new mongoose.Schema({
   deposits: [depositSchema],
   withdrawals: [withdrawSchema],
   gameHistory: [gameHistorySchema],
+
+  // ✅ Rakeback System Fields
+  totalWagered: { type: Number, default: 0 },          // Tracks total bets for rakeback calculation
+  rakebackPercent: { type: Number, default: 5 },       // 5% weekly rakeback (can be dynamic)
+  rakebackBalance: { type: Number, default: 0 },       // Pending rakeback before credited
+  rakebackHistory: [rakebackHistorySchema],            // Stores past weekly rakebacks
 
   otp: { type: String },
   otpExpiresAt: { type: Date },
@@ -86,7 +101,7 @@ userSchema.methods.addChips = async function (amount) {
 };
 
 userSchema.methods.deductChips = async function (amount) {
-  if (this.chips < amount) throw new Error('Insufficient chips');
+  if (this.chips < amount) throw new Error('Insufficient Balance');
   this.chips -= amount;
   await this.save();
   return this.chips;
@@ -95,6 +110,16 @@ userSchema.methods.deductChips = async function (amount) {
 userSchema.methods.logGame = async function (data) {
   this.gameHistory.push(data);
   await this.save();
+};
+
+// ✅ NEW: Method to log rakeback automatically
+userSchema.methods.addRakeback = async function (amount, weekStart, weekEnd, note = 'Weekly rakeback credited') {
+  this.chips += amount;
+  this.rakebackBalance = 0;
+  this.totalWagered = 0; // Reset for next week
+  this.rakebackHistory.push({ amount, weekStart, weekEnd, note });
+  await this.save();
+  return this.chips;
 };
 
 module.exports = mongoose.model('User', userSchema);

@@ -1,4 +1,32 @@
 document.addEventListener("DOMContentLoaded", () => {
+    
+    // ====================== UTILITY FUNCTION (K/M FORMAT) ======================
+    /**
+     * Formats the chip amount for display using K (thousands) or M (millions) notation.
+     * If the number is less than 1000, it defaults to two decimal places.
+     * @param {number} amount - The raw chip amount.
+     * @returns {string} The formatted compact string (e.g., 12345 -> 12.3K).
+     */
+    const formatChips = (amount) => {
+      // If the number is small, just use standard fixed decimal format
+      if (Math.abs(amount) < 1000) {
+          // Ensure it's treated as a number before fixing decimals
+          return parseFloat(amount).toFixed(2);
+      }
+      
+      // Use Intl.NumberFormat for compact notation (K, M, etc.)
+      const formatter = new Intl.NumberFormat('en-US', {
+          notation: 'compact',
+          compactDisplay: 'short', 
+          minimumFractionDigits: 1, 
+          maximumFractionDigits: 1,
+      });
+
+      return formatter.format(amount);
+    };
+    // ===========================================================================
+
+
     const grid = document.getElementById("grid");
     const betInput = document.getElementById("betInput");
     const mineRate = document.getElementById("mineRate");
@@ -32,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let balance = parseFloat(balanceDisplay.dataset.rawChips) || parseFloat(balanceDisplay.textContent) || 1000;
     
     // Set initial display using the formatter
-    balanceDisplay.textContent = formatBalance(balance);
+    balanceDisplay.textContent = formatChips(balance);
 
     // 🧱 Build locked grid initially
     function buildLockedGrid() {
@@ -49,8 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ⚡ Update balance display smoothly
     function updateBalanceDisplay() {
-        // FIX: Reference the correct 'balance' variable and use 'formatBalance'
-        balanceDisplay.textContent = formatBalance(balance);
+        // Reference the correct 'balance' variable and use 'formatChips'
+        balanceDisplay.textContent = formatChips(balance);
     }
 
     // Function to set the content of a tile to an image
@@ -89,8 +117,8 @@ document.addEventListener("DOMContentLoaded", () => {
             gameActive = true;
             tiles = [];
             multiplierDisplay.textContent = "1.00x";
-            // FIX: Use formatChips for initial profit display (should show 0.00)
-            profitDisplay.textContent = formatBalance(0);
+            // Use formatChips for initial profit display (should show 0.00)
+            profitDisplay.textContent = formatChips(0);
             cashOutBtn.disabled = false;
             newGameBtn.textContent = "In Progress...";
             newGameBtn.disabled = true;
@@ -161,8 +189,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateStats() {
         const profit = (bet * multiplier);
         multiplierDisplay.textContent = `${multiplier.toFixed(2)}x`;
-        // FIX: Use formatChips for profit display
-        profitDisplay.textContent = formatBalance(profit);
+        // Use formatChips for profit display
+        profitDisplay.textContent = formatChips(profit);
     }
 
     // 💣 Reveal all mines
@@ -193,8 +221,8 @@ document.addEventListener("DOMContentLoaded", () => {
             balance += data.winnings;
             updateBalanceDisplay();
 
-            // FIX: Format winnings for the pop-up message
-            showPopup(`You Cashed Out ৳${formatBalance(data.winnings)}!!`);
+            // Format winnings for the pop-up message
+            showPopup(`You Cashed Out ৳${formatChips(data.winnings)}!!`);
             gameActive = false;
             cashOutBtn.disabled = true;
             newGameBtn.textContent = "Next Game";

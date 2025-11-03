@@ -303,6 +303,9 @@ exports.placeBet = async (req, res) => {
     }
 
     user.chips -= amount;
+
+    user.totalWagered = (user.totalWagered || 0) + amount;
+
     await user.save();
 
     roundState.bets[userId] = { amount, cashedOut: false, cashedOutAtMultiplier: null, winnings: 0 };
@@ -399,6 +402,9 @@ exports.socketPlaceBet = async (socket, data, ack) => {
     }
 
     user.chips -= amount;
+
+    user.totalWagered = (user.totalWagered || 0) + amount;
+
     await user.save();
 
     roundState.bets[userId] = { amount, cashedOut: false, cashedOutAtMultiplier: null, winnings: 0 };

@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Read the raw number from the data attribute for calculations.
     // The radix for parseInt should be 10, not 50.
-    let currentBalance = parseInt(balanceDisplay.dataset.rawChips, 10) || parseInt(balanceDisplay.textContent, 10) || 1000;
+    let currentBalance = parseFloat(balanceDisplay.dataset.rawChips) || parseFloat(balanceDisplay.textContent) || 0;
 
     // Set initial balance display using the new K/M formatter
     balanceDisplay.textContent = formatChips(currentBalance); 
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (data.winnings > 0) {
                     // FIX: Format winnings using formatChips
-                    resultDisplay.textContent = `🎉 You won ${formatChips(data.winnings)} chips!`;
+                    resultDisplay.textContent = `You won ৳${formatChips(data.winnings)}!`;
                     glowing = true;
                     draw();
                     setTimeout(() => {
@@ -253,7 +253,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                resultDisplay.textContent = '😢 No win this time!';
                 spinBtn.disabled = false;
             }, stopTime);
 

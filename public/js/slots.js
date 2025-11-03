@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.height = CANVAS_HEIGHT;
 
     // FIX: Get raw balance from a data attribute if available, or default.
-    let currentBalance = parseInt(balanceDisplay.dataset.rawChips, 10) || parseInt(balanceDisplay.textContent, 10) || 1000;
+    let currentBalance = parseFloat(balanceDisplay.dataset.rawChips) || parseFloat(balanceDisplay.textContent) || 0;
     
     // FIX: Set initial balance display using the formatter (Now defined!)
     balanceDisplay.textContent = formatChips(currentBalance); 
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // --- BRIGHT LINE BORDER (Clear, bright lines) ---
                 if (isWinningSymbol && glowing) {
-                    ctx.strokeStyle = 'cyan'; // Using cyan for high visibility
+                    ctx.strokeStyle = 'gold'; // Using cyan for high visibility
                     ctx.lineWidth = 4;        
                     ctx.lineJoin = 'round';
 
@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (data.winnings > 0) {
                     // FIX: Use formatChips for winnings display
-                    resultDisplay.textContent = `🎉 You won ${formatChips(data.winnings)} chips!`;
+                    resultDisplay.textContent = `You won ৳${formatChips(data.winnings)}!`;
 
                     // START BRIGHT LINE ANIMATION
                     glowing = true;
@@ -268,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // No win - loss condition
-                resultDisplay.textContent = '😢 No win this time!';
                 spinBtn.disabled = false;
 
             }, stopTime);
