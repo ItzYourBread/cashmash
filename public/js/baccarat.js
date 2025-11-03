@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const betBankerInput = document.getElementById("betBanker");
   const betTieInput = document.getElementById("betTie");
 
-  // FIX: Initialize balance and set initial display using formatChips
+  // Initialize balance and set initial display using formatChips
   let balance = parseFloat(balanceSpan.dataset.rawChips) || parseFloat(balanceSpan.textContent) || 0;
   balanceSpan.textContent = formatChips(balance);
 
@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
       balance -= totalBet;
       balanceSpan.textContent = formatChips(balance);
 
-      // Call the fixed Baccarat controller endpoint
+      // Call the Baccarat controller endpoint
       const response = await fetch("/baccarat/play", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -189,10 +189,10 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (data.result === "banker") winnerText = "Banker Wins! (0.95:1)";
         else winnerText = "Tie! (8:1)";
 
-        // FIX: Format the profit display using formatChips
+        // Display the profit
         resultText.textContent = `${winnerText} | Profit: ${formatChips(data.profit)}`;
 
-        // FIX: Update balance from server data and apply formatChips
+        // Update balance from server data
         balance = data.balance;
         balanceSpan.textContent = formatChips(balance);
         dealBtn.disabled = false;
@@ -203,5 +203,5 @@ document.addEventListener("DOMContentLoaded", () => {
       resultText.textContent = "Error: " + (err.message || "Server error");
       dealBtn.disabled = false;
     }
-});
   });
+});
