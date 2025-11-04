@@ -15,7 +15,6 @@
 
     <section class="dashboard">
       <div class="dashboard-container">
-        <!-- Sidebar -->
         <aside class="sidebar">
           <div class="balance-box">
             <h3>Balance</h3>
@@ -29,189 +28,265 @@
             <li data-section="deposit">Deposits</li>
             <li data-section="withdraw">Withdrawals</li>
             <li data-section="history">Game History</li>
+            <li data-section="rakeback">Rakeback</li>
             <li data-section="account">Account Management</li>
           </ul>
         </aside>
 
-        <!-- Content -->
         <div class="content-area">
 
-          <!-- Statistics -->
-          <div id="statistics" class="content-section active">
-            <h2>Welcome, <%= user.username %> 👋</h2>
-            <p>Joined: <%= new Date(user.joinedAt).toLocaleDateString() %>
-            </p>
-            <p>Email: <%= user.email || 'N/A' %>
-            </p>
-            <p>Phone: <%= user.phone || 'N/A' %>
-            </p>
-          </div>
+          <% const renderPagination=(current_page, total_pages, section_id)=> {
+            // Ensure total_pages is at least 1
+            if (total_pages <= 1) return; let startPage=Math.max(1, current_page - 2); let endPage=Math.min(total_pages,
+              current_page + 2); if (total_pages> 5) {
+              if (current_page <= 3) { startPage=1; endPage=5; } else if (current_page>= total_pages - 2) {
+                startPage = total_pages - 4;
+                endPage = total_pages;
+                }
+                } else {
+                startPage = 1;
+                }
+                %>
 
-          <!-- Deposits -->
-          <div id="deposit" class="content-section">
-            <h2>Your Deposits</h2>
-            <% if (user.deposits.length) { %>
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% user.deposits.forEach(dep=> { %>
-                    <tr>
-                      <td>
-                        <%= new Date(dep.createdAt).toLocaleDateString() %>
-                      </td>
-                      <td>
-                        ৳<%= dep.amount %>
-                      </td>
-                      <td>
-                        <%= dep.method %>
-                      </td>
-                      <td>
-                        <%= dep.status %>
-                      </td>
-                    </tr>
-                    <% }) %>
-                </tbody>
-              </table>
-              <% } else { %>
-                <p>No deposits yet.</p>
-                <% } %>
-          </div>
+                <div class="pagination-controls">
+                  <% if (current_page> 1) { %>
+                    <a href="/dashboard?section=<%= section_id %>&page=<%= current_page - 1 %>" class="btn">&laquo;</a>
+                    <% } else { %>
+                      <span class="btn disabled">&laquo;</span>
+                      <% } %>
 
-          <!-- Withdrawals -->
-          <!-- Withdrawals -->
-          <div id="withdraw" class="content-section">
-            <h2>Your Withdrawals</h2>
-            <% if (user.withdrawals.length) { %>
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% user.withdrawals.forEach(w=> { %>
-                    <tr>
-                      <td>
-                        <%= new Date(w.createdAt).toLocaleDateString() %>
-                      </td>
-                      <td>
-                        ৳<%= w.amount %>
-                      </td>
-                      <td>
-                        <%= w.method %>
-                      </td>
-                      <td>
-                        <%= w.status %>
-                      </td>
-                      <td>
-                        <% if (w.status==='Pending' ) { %>
-                          <form action="/withdraw/cancel/<%= w._id %>" method="POST"
-                            onsubmit="return confirm('Cancel this withdrawal?')">
-                            <button type="submit" class="btn cancel">Cancel</button>
-                          </form>
-                          <% } else { %>
-                            <span class="text-dim">—</span>
-                            <% } %>
-                      </td>
-                    </tr>
-                    <% }) %>
-                </tbody>
-              </table>
-              <% } else { %>
-                <p>No withdrawals yet.</p>
-                <% } %>
-          </div>
+                        <% for (let i=startPage; i <=endPage; i++) { %>
+                          <a href="/dashboard?section=<%= section_id %>&page=<%= i %>"
+                            class="btn <%= i === current_page ? 'active' : '' %>">
+                            <%= i %>
+                          </a>
+                          <% } %>
 
-          <!-- Game History -->
-          <div id="history" class="content-section">
-            <h2>Game History</h2>
-            <% if (user.gameHistory.length) { %>
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Game</th>
-                    <th>Bet</th>
-                    <th>Multiplier</th>
-                    <th>Win</th>
-                    <th>Result</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% user.gameHistory.forEach(g=> { %>
-                    <tr>
-                      <td>
-                        <%= new Date(g.playedAt).toLocaleDateString() %>
-                      </td>
-                      <td>
-                        <%= g.gameType %>
-                      </td>
-                      <td>
-                        <%= g.betAmount %>
-                      </td>
-                      <td>
-                        <%= g.multiplier %>x
-                      </td>
-                      <td>
-                        <%= g.winAmount %>
-                      </td>
-                      <td>
-                        <%= g.result %>
-                      </td>
-                    </tr>
-                    <% }) %>
-                </tbody>
-              </table>
-              <% } else { %>
-                <p>No game history yet.</p>
-                <% } %>
-          </div>
+                            <% if (current_page < total_pages) { %>
+                              <a href="/dashboard?section=<%= section_id %>&page=<%= current_page + 1 %>"
+                                class="btn">&raquo;</a>
+                              <% } else { %>
+                                <span class="btn disabled">&raquo;</span>
+                                <% } %>
+                </div>
 
-          <!-- Account Management -->
-          <div id="account" class="content-section">
-            <h2>Manage Account</h2>
-            <form method="POST" action="/account/update" class="account-form">
-              <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="text" id="phone" name="phone" value="<%= user.phone || '' %>">
-              </div>
+                <% }; // End of renderPagination helper %>
+                  <div id="statistics" class="content-section active">
+                    <h2>Welcome, <%= user.username %> 👋</h2>
+                    <p>Joined: <%= new Date(user.joinedAt).toLocaleDateString() %>
+                    </p>
+                    <p>Email: <%= user.email || 'N/A' %>
+                    </p>
+                    <p>Phone: <%= user.phone || 'N/A' %>
+                    </p>
+                  </div>
 
-              <div class="form-buttons">
-                <button type="submit" class="btn gold">Save Changes</button>
-              </div>
-            </form>
+                  <div id="deposit" class="content-section">
+                    <h2>Your Deposits</h2>
+                    <% if (deposits.length || depositPages> 0) { %>
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <% for(let i=deposits.length - 1; i>= 0; i--) { %>
+                            <% const dep=deposits[i]; %>
+                              <tr>
+                                <td>
+                                  <%= new Date(dep.createdAt).toLocaleDateString() %>
+                                </td>
+                                <td>
+                                  ৳<%= parseFloat(dep.amount.toFixed(2)).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2 }) %>
+                                </td>
+                                <td>
+                                  <%= dep.method %>
+                                </td>
+                                <td>
+                                  <%= dep.status %>
+                                </td>
+                              </tr>
+                              <% } %>
+                        </tbody>
+                      </table>
+                      <%= renderPagination(depositPage, depositPages, 'deposit' ) %>
+                        <% } else { %>
+                          <p>No deposits yet.</p>
+                          <% } %>
+                  </div>
 
-            <form action="/change-password" method="POST" class="password-form">
-              <h3>Change Password</h3>
+                  <div id="withdraw" class="content-section">
+                    <h2>Your Withdrawals</h2>
+                    <% if (withdrawals.length || withdrawalPages> 0) { %>
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <% for(let i=withdrawals.length - 1; i>= 0; i--) { %>
+                            <% const w=withdrawals[i]; %>
+                              <tr>
+                                <td>
+                                  <%= new Date(w.createdAt).toLocaleDateString() %>
+                                </td>
+                                <td>
+                                  ৳<%= parseFloat(w.amount.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits:
+                                    2 }) %>
+                                </td>
+                                <td>
+                                  <%= w.method %>
+                                </td>
+                                <td>
+                                  <%= w.status %>
+                                </td>
+                                <td>
+                                  <% if (w.status==='Pending' ) { %>
+                                    <form action="/withdraw/cancel/<%= w._id %>" method="POST"
+                                      onsubmit="return confirm('Cancel this withdrawal?')">
+                                      <button type="submit" class="btn cancel">Cancel</button>
+                                    </form>
+                                    <% } else { %>
+                                      <span class="text-dim">—</span>
+                                      <% } %>
+                                </td>
+                              </tr>
+                              <% } %>
+                        </tbody>
+                      </table>
+                      <%= renderPagination(withdrawalPage, withdrawalPages, 'withdraw' ) %>
+                        <% } else { %>
+                          <p>No withdrawals yet.</p>
+                          <% } %>
+                  </div>
 
-              <label for="currentPassword">Current Password</label>
-              <input type="password" name="currentPassword" required />
+                  <div id="history" class="content-section">
+                    <h2>Game History</h2>
+                    <% if (gameHistory.length || historyPages> 0) { %>
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Game</th>
+                            <th>Bet</th>
+                            <th>Multiplier</th>
+                            <th>Win</th>
+                            <th>Result</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <% for(let i=gameHistory.length - 1; i>= 0; i--) { %>
+                            <% const g=gameHistory[i]; %>
+                              <tr>
+                                <td>
+                                  <%= new Date(g.playedAt).toLocaleDateString() %>
+                                </td>
+                                <td>
+                                  <%= g.gameType %>
+                                </td>
+                                <td>
+                                  <%= parseFloat(g.betAmount.toFixed(2)).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2 }) %>
+                                </td>
+                                <td>
+                                  <%= g.multiplier.toFixed(2) %>x
+                                </td>
+                                <td>
+                                  <%= parseFloat(g.winAmount.toFixed(2)).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2 }) %>
+                                </td>
+                                <td>
+                                  <%= g.result %>
+                                </td>
+                              </tr>
+                              <% } %>
+                        </tbody>
+                      </table>
+                      <%= renderPagination(historyPage, historyPages, 'history' ) %>
+                        <% } else { %>
+                          <p>No game history yet.</p>
+                          <% } %>
+                  </div>
 
-              <label for="newPassword">New Password</label>
-              <input type="password" name="newPassword" required minlength="6" />
+                  <div id="rakeback" class="content-section">
+                    <h2>Rakeback</h2>
 
-              <label for="confirmPassword">Confirm New Password</label>
-              <input type="password" name="confirmPassword" required minlength="6" />
+                    <h3>Weekly Rakeback Summary</h3>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Weekly Wagered</th>
+                          <th>Percent</th>
+                          <th>Rakeback Added</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% rakebackHistory.forEach(rb=> { %>
+                          <tr>
+                            <td>
+                              <%= rb.date.toLocaleDateString() %>
+                            </td>
+                            <td>৳<%= rb.weeklyWagered.toLocaleString() %>
+                            </td>
+                            <td>
+                              <%= rb.percent %>%
+                            </td>
+                            <td>৳<%= rb.rakeback.toLocaleString('en-US', { minimumFractionDigits: 2 }) %>
+                            </td>
+                          </tr>
+                          <% }) %>
+                      </tbody>
+                    </table>
 
-              <button type="submit">Update Password</button>
-            </form>
 
-            <form method="POST" action="/account/delete"
-              onsubmit="return confirm('Are you sure? This will permanently delete your account.')">
-              <button type="submit" class="btn danger">Delete Account</button>
-            </form>
-          </div>
+
+                    <%= renderPagination(rakePage, rakePages, 'rakeback' ) %>
+                  </div>
+
+                  <div id="account" class="content-section">
+                    <h2>Manage Account</h2>
+                    <form method="POST" action="/account/update" class="account-form">
+                      <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" id="phone" name="phone" value="<%= user.phone || '' %>">
+                      </div>
+
+                      <div class="form-buttons">
+                        <button type="submit" class="btn gold">Save Changes</button>
+                      </div>
+                    </form>
+
+                    <form action="/change-password" method="POST" class="password-form">
+                      <h3>Change Password</h3>
+
+                      <label for="currentPassword">Current Password</label>
+                      <input type="password" name="currentPassword" required />
+
+                      <label for="newPassword">New Password</label>
+                      <input type="password" name="newPassword" required minlength="6" />
+
+                      <label for="confirmPassword">Confirm New Password</label>
+                      <input type="password" name="confirmPassword" required minlength="6" />
+
+                      <button type="submit">Update Password</button>
+                    </form>
+
+                    <form method="POST" action="/account/delete"
+                      onsubmit="return confirm('Are you sure? This will permanently delete your account.')">
+                      <button type="submit" class="btn danger">Delete Account</button>
+                    </form>
+                  </div>
         </div>
       </div>
     </section>
@@ -221,17 +296,67 @@
       <script>
         const menuItems = document.querySelectorAll('.sidebar-menu li');
         const sections = document.querySelectorAll('.content-section');
+        const sectionIds = Array.from(menuItems).map(item => item.dataset.section);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeSection = urlParams.get('section') || 'statistics';
+
+        function activateSection(targetId) {
+          menuItems.forEach(i => {
+            i.classList.remove('active');
+            if (i.dataset.section === targetId) i.classList.add('active');
+          });
+          sections.forEach(sec => {
+            sec.classList.remove('active');
+            if (sec.id === targetId) sec.classList.add('active');
+          });
+        }
+
+        // Set initial active state based on URL/server
+        activateSection(activeSection);
+
+        // Add click handlers
         menuItems.forEach(item => {
           item.addEventListener('click', () => {
-            menuItems.forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
             const target = item.dataset.section;
-            sections.forEach(sec => {
-              sec.classList.remove('active');
-              if (sec.id === target) sec.classList.add('active');
-            });
+            // Navigate to the section and reset page to 1
+            history.pushState(null, '', `/dashboard?section=${target}&page=1`);
+            activateSection(target);
           });
         });
+
+        // --- Arrow Key Navigation ---
+        document.addEventListener('keydown', (e) => {
+          // Check if user is typing in an input field (e.g., in Account Management)
+          if (document.activeElement.tagName === 'INPUT') {
+            return;
+          }
+
+          const currentActiveItem = document.querySelector('.sidebar-menu li.active');
+          if (!currentActiveItem) return;
+
+          const currentActiveIndex = sectionIds.indexOf(currentActiveItem.dataset.section);
+          let nextIndex = currentActiveIndex;
+
+          if (e.key === 'ArrowRight') {
+            e.preventDefault(); // Prevent page scrolling
+            nextIndex = Math.min(currentActiveIndex + 1, sectionIds.length - 1);
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault(); // Prevent page scrolling
+            nextIndex = Math.max(currentActiveIndex - 1, 0);
+          } else {
+            return;
+          }
+
+          if (nextIndex !== currentActiveIndex) {
+            const target = sectionIds[nextIndex];
+            // Navigate to the new section (page query is preserved or defaults to 1 by server)
+            history.pushState(null, '', `/dashboard?section=${target}`);
+            activateSection(target);
+          }
+        });
+        // --- END Arrow Key Navigation ---
+
       </script>
 </body>
 

@@ -95,5 +95,11 @@
 	"Username already taken": "ইউজারনেমটি ইতিমধ্যেই নেওয়া হয়েছে",
 	"Error checking username": "ইউজারনেম যাচাই করার সময় একটি ত্রুটি ঘটেছে",
 	"Username must be at least 3 characters": "ইউজারনেমে অন্তত ৩টি অক্ষর থাকতে হবে",
-	"Password must be at least 6 characters long": "পাসওয়ার্ডে অন্তত ৬টি অক্ষর থাকতে হবে"
+	"Password must be at least 6 characters long": "পাসওয়ার্ডে অন্তত ৬টি অক্ষর থাকতে হবে",
+	"Please enter a valid amount and transaction ID.": "অনুগ্রহ করে একটি বৈধ পরিমাণ এবং লেনদেন আইডি লিখুন।",
+    "Conversion error. Please re-enter the amount.": "রূপান্তর ত্রুটি। অনুগ্রহ করে পরিমাণটি আবার লিখুন।",
+    "Insufficient Balance": "অপর্যাপ্ত ব্যালেন্স",
+    "Minimum amount is": "সর্বনিম্ন পরিমাণ হলো",
+    "Balance is sufficient": "ব্যালেন্স যথেষ্ট",
+    "Enter Amount": "পরিমাণ লিখুন"
 }

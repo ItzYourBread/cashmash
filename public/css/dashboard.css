@@ -446,3 +446,116 @@ body {
   }
 
 }
+
+/* ============================
+   PAGINATION CONTROLS
+   ============================ */
+.dashboard .pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 25px;
+  gap: 8px; /* Space between buttons */
+  user-select: none; /* Prevent selection of button text */
+}
+
+.dashboard .pagination-controls .btn {
+  /* Inherit general btn styles but override appearance */
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  background: #1a1a1a;
+  color: var(--text-dim);
+  text-decoration: none;
+  border: 1px solid #333;
+}
+
+.dashboard .pagination-controls .btn:hover {
+  background: #222;
+  color: var(--gold);
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(245, 197, 66, 0.3);
+  transform: none; /* Override stat-card hover effect if present */
+}
+
+.dashboard .pagination-controls .btn.active {
+  background: var(--gold); /* Highlight active page */
+  color: #000;
+  border-color: var(--gold);
+  font-weight: 700;
+  box-shadow: 0 0 15px rgba(245, 197, 66, 0.5);
+  cursor: default; /* Active button shouldn't look clickable */
+}
+
+.dashboard .pagination-controls .btn.active:hover {
+    background: var(--gold); /* Lock hover effect on active button */
+    color: #000;
+}
+
+.dashboard .pagination-controls .btn.disabled {
+  background: #0f0f0f;
+  color: #444;
+  border-color: #1a1a1a;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dashboard .pagination-controls .btn.disabled:hover {
+  box-shadow: none;
+  color: #444;
+}
+
+/* Specific styling for arrows to ensure consistency */
+.dashboard .pagination-controls .btn:first-child,
+.dashboard .pagination-controls .btn:last-child {
+  padding: 8px 12px; /* Slightly narrower padding for arrows */
+}
+
+/* ============================
+   RESPONSIVE LAYOUT (Mobile Table Fix)
+   ============================ */
+/* Re-applying and ensuring table scrolling for better mobile usability */
+@media (max-width: 768px) {
+    /* Wrap the table in a container to enable horizontal scrolling of the table only */
+    .dashboard .content-section {
+        overflow-x: auto; 
+    }
+    
+    .dashboard .table {
+        min-width: 600px; /* Ensure the table is wide enough to scroll */
+    }
+    
+    /* Center pagination controls on smaller screens */
+    .dashboard .pagination-controls {
+        justify-content: center;
+        padding-bottom: 10px;
+    }
+}
+
+.rakeback-progress {
+  margin: 20px 0;
+  background: #121212;
+  padding: 20px;
+  border-radius: 10px;
+  color: #fff;
+}
+
+.progress-bar-container {
+  width: 100%;
+  background: #2b2b2b;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 20px;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #ff9800, #ffc107);
+  height: 100%;
+  text-align: center;
+  color: #000;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: width 0.5s ease;
+}

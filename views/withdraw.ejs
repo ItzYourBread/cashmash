@@ -8,6 +8,28 @@
     <link rel="stylesheet" href="/css/footer.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
     <link rel="stylesheet" href="/css/payment.css" />
+    <style>
+        /* Optional: Add a style for the disabled button state if not already in payment.css */
+        .modal-content button:disabled {
+            background-color: #444;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .amount-feedback {
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            padding: 5px;
+            border-radius: 4px;
+            width: 300px;
+            margin-left: 20px;
+        }
+        .amount-invalid {
+            color: #ff4d4d;
+        }
+        .amount-valid {
+            color: #79f291;
+        }
+    </style>
 </head>
 <body>
     <%- include('partials/header') %>
@@ -17,7 +39,7 @@
                     <div class="balance-box">
                         <h3><%= __('Balance') %></h3>
                         <% if (user) { %>
-                            <p>
+                            <p id="userBalanceDisplay">
                                 ৳<%= user.chips.toLocaleString() %>
                             </p>
                             <% } else { %>
@@ -63,6 +85,7 @@
                 </div>
             </div>
         </section>
+
         <% ['bkash', 'nagad' , 'upay' ].forEach(method=> { %>
             <div id="modal-<%= method %>" class="modal">
                 <div class="modal-content">
@@ -78,13 +101,16 @@
                         </label>
                         <input type="text" name="contact" required>
                         <label><%= __('Amount') %> (<%= __('BDT') %>)</label>
-                        <input type="number" name="amount" required min="10">
+                        <input type="number" name="amount" id="<%= method %>Amount" required min="300">
+                        <div id="<%= method %>Feedback" class="amount-feedback"></div>
+
                         <p><%= __('Withdrawal processing time') %></p>
-                        <button type="submit"><%= __('Confirm') %></button>
+                        <button type="submit" id="<%= method %>ConfirmBtn" disabled><%= __('Confirm') %></button>
                     </form>
                 </div>
             </div>
             <% }) %>
+
                 <div id="modal-binance" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
@@ -93,12 +119,15 @@
                             <label><%= __('Email or User ID') %></label>
                             <input type="text" name="userIdOrEmail" required>
                             <label><%= __('Amount') %> (<%= __('BDT') %>)</label>
-                            <input type="number" name="amount" required min="10">
+                            <input type="number" name="amount" id="binanceAmount" required min="300">
+                            <div id="binanceFeedback" class="amount-feedback"></div>
+
                             <p><%= __('Withdrawal processing time') %></p>
-                            <button type="submit"><%= __('Confirm') %></button>
+                            <button type="submit" id="binanceConfirmBtn" disabled><%= __('Confirm') %></button>
                         </form>
                     </div>
                 </div>
+
                 <div class="login-modal" id="loginModal">
                     <div class="login-modal-content">
                         <h2><%= __('Login Required') %></h2>
@@ -110,43 +139,124 @@
                     </div>
                 </div>
                 <%- include('partials/footer') %>
-                    <script>
-                        const isLoggedIn = <%= user ? 'true' : 'false' %>;
-                        // Tabs
-                        const tabs = document.querySelectorAll('.sidebar-menu li');
-                        const sections = document.querySelectorAll('.content-section');
-                        tabs.forEach(tab => {
-                            tab.addEventListener('click', () => {
-                                tabs.forEach(t => t.classList.remove('active'));
-                                sections.forEach(s => s.classList.remove('active'));
-                                tab.classList.add('active');
-                                document.getElementById(tab.dataset.tab).classList.add('active');
-                            });
+
+                <script>
+                    // --- Configuration ---
+                    const MIN_WITHDRAWAL_AMOUNT = 300;
+                    
+                    const isLoggedIn = <%= user ? 'true' : 'false' %>;
+                    // Extract user chips, converting to a number from the server-side EJS injection
+                    const userBalance = isLoggedIn ? parseFloat("<%= user.chips %>") : 0; 
+                    
+                    // Localization strings
+                    const L = {
+                        insufficientBalance: '<%= __('Insufficient Balance') %>',
+                        minAmount: '<%= __('Minimum amount is') %>',
+                        balanceOK: '<%= __('Balance is sufficient') %>',
+                        bdt: '<%= __('BDT') %>',
+                        enterAmount: '<%= __('Enter Amount') %>',
+                    };
+
+                    // --- Tab and Modal Logic (Unchanged) ---
+                    const tabs = document.querySelectorAll('.sidebar-menu li');
+                    const sections = document.querySelectorAll('.content-section');
+                    tabs.forEach(tab => {
+                        tab.addEventListener('click', () => {
+                            tabs.forEach(t => t.classList.remove('active'));
+                            sections.forEach(s => s.classList.remove('active'));
+                            tab.classList.add('active');
+                            document.getElementById(tab.dataset.tab).classList.add('active');
                         });
-                        // Modals
-                        const cards = document.querySelectorAll('.payment-card');
-                        const modals = document.querySelectorAll('.modal');
-                        const closes = document.querySelectorAll('.close');
-                        const loginModal = document.getElementById('loginModal');
-                        const closeLoginModal = document.getElementById('closeLoginModal');
-                        cards.forEach(card => {
-                            const modal = document.getElementById(card.dataset.modal);
-                            card.addEventListener('click', () => {
-                                if (!isLoggedIn) {
-                                    loginModal.classList.add('show');
-                                } else {
-                                    modal.style.display = 'flex';
-                                }
-                            });
+                    });
+
+                    const cards = document.querySelectorAll('.payment-card');
+                    const modals = document.querySelectorAll('.modal');
+                    const closes = document.querySelectorAll('.close');
+                    const loginModal = document.getElementById('loginModal');
+                    const closeLoginModal = document.getElementById('closeLoginModal');
+                    
+                    cards.forEach(card => {
+                        const modal = document.getElementById(card.dataset.modal);
+                        card.addEventListener('click', () => {
+                            if (!isLoggedIn) {
+                                loginModal.classList.add('show');
+                            } else {
+                                modal.style.display = 'flex';
+                            }
                         });
-                        closes.forEach(c => {
-                            c.addEventListener('click', () => c.closest('.modal').style.display = 'none');
-                        });
-                        window.addEventListener('click', e => {
-                            if (e.target.classList.contains('modal')) e.target.style.display = 'none';
-                            if (e.target === loginModal) loginModal.classList.remove('show');
-                        });
-                        closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
-                    </script>
+                    });
+                    
+                    closes.forEach(c => {
+                        c.addEventListener('click', () => c.closest('.modal').style.display = 'none');
+                    });
+                    
+                    window.addEventListener('click', e => {
+                        if (e.target.classList.contains('modal')) e.target.style.display = 'none';
+                        if (e.target === loginModal) loginModal.classList.remove('show');
+                    });
+                    
+                    closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
+
+                    // ==================== Withdrawal Validation Logic (Updated Min Amount) ====================
+
+                    /**
+                     * Sets up live validation for a withdrawal amount input.
+                     * @param {string} inputId - ID of the amount input field.
+                     * @param {string} feedbackId - ID of the feedback div.
+                     * @param {string} buttonId - ID of the confirm button.
+                     */
+                    function setupWithdrawalValidation(inputId, feedbackId, buttonId) {
+                        const amountInput = document.getElementById(inputId);
+                        const feedback = document.getElementById(feedbackId);
+                        const confirmBtn = document.getElementById(buttonId);
+
+                        if (!amountInput || !feedback || !confirmBtn) return;
+
+                        const validate = () => {
+                            const amount = parseFloat(amountInput.value);
+                            
+                            // Check 1: Empty or Invalid Input
+                            if (isNaN(amount) || amount <= 0) {
+                                feedback.textContent = L.enterAmount;
+                                feedback.className = 'amount-feedback';
+                                confirmBtn.disabled = true;
+                                return;
+                            }
+                            
+                            // Check 2: Minimum Amount (using the global config)
+                            if (amount < MIN_WITHDRAWAL_AMOUNT) {
+                                feedback.textContent = `${L.minAmount} ${MIN_WITHDRAWAL_AMOUNT} ${L.bdt}.`;
+                                feedback.className = 'amount-feedback amount-invalid';
+                                confirmBtn.disabled = true;
+                                return;
+                            }
+
+                            // Check 3: Insufficient Balance (Only runs if logged in)
+                            if (isLoggedIn && amount > userBalance) {
+                                feedback.textContent = `${L.insufficientBalance}: ৳${userBalance.toLocaleString()}`;
+                                feedback.className = 'amount-feedback amount-invalid';
+                                confirmBtn.disabled = true;
+                                return;
+                            }
+
+                            // All Checks Passed
+                            feedback.textContent = L.balanceOK;
+                            feedback.className = 'amount-feedback amount-valid';
+                            confirmBtn.disabled = false;
+                        };
+
+                        amountInput.addEventListener('input', validate);
+                        
+                        // Ensure the check runs once on load/modal open if data is prefilled
+                        validate();
+                    }
+
+                    // Apply validation to all withdrawal forms, no need to pass min amount now
+                    setupWithdrawalValidation('bkashAmount', 'bkashFeedback', 'bkashConfirmBtn');
+                    setupWithdrawalValidation('nagadAmount', 'nagadFeedback', 'nagadConfirmBtn');
+                    setupWithdrawalValidation('upayAmount', 'upayFeedback', 'upayConfirmBtn');
+                    setupWithdrawalValidation('binanceAmount', 'binanceFeedback', 'binanceConfirmBtn');
+
+                </script>
 </body>
 </html>

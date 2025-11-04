@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 // ----------------- SUBSCHEMAS -----------------
 const depositSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
+  amountUSD: { type: Number, required: false, default: 0 },
   method: { type: String, enum: ['Bkash', 'Nagad', 'Upay', 'BinancePay'], required: true },
   txnId: { type: String },
   status: { 
@@ -17,13 +18,20 @@ const depositSchema = new mongoose.Schema({
 
 const withdrawSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
+  method: { type: String, enum: ['Bkash', 'Nagad', 'Upay', 'BinancePay'], required: true },
+  
+  // Fields needed to match the main Withdraw model (made them optional in the subschema)
+  fullName: { type: String },
+  contact: { type: String },
+  userIdOrEmail: { type: String }, 
+  
   status: { 
     type: String, 
     enum: ['Pending', 'Completed', 'Failed', 'Cancelled'], 
     default: 'Pending' 
   },
-  method: { type: String, default: 'Binance Pay' },
-  walletAddress: { type: String },
+  // NOTE: You previously had 'walletAddress' here, changed it to match new fields
+  // walletAddress: { type: String }, 
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -39,6 +47,8 @@ const gameHistorySchema = new mongoose.Schema({
 // ✅ NEW: Rakeback History Schema
 const rakebackHistorySchema = new mongoose.Schema({
   amount: { type: Number, required: true },
+  wagered: { type: Number, required: true, default: 0 },
+  percent: { type: Number, required: true, default: 0 },
   weekStart: { type: Date, required: true },
   weekEnd: { type: Date, required: true },
   creditedAt: { type: Date, default: Date.now },

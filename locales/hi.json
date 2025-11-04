@@ -95,5 +95,11 @@
 	"Username already taken": "उपयोगकर्ता नाम पहले से लिया जा चुका है",
 	"Error checking username": "उपयोगकर्ता नाम की जांच में त्रुटि हुई",
 	"Username must be at least 3 characters": "उपयोगकर्ता नाम कम से कम 3 अक्षरों का होना चाहिए",
-	"Password must be at least 6 characters long": "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए"
+	"Password must be at least 6 characters long": "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए",
+	"Please enter a valid amount and transaction ID.": "कृपया एक वैध राशि और लेनदेन आईडी दर्ज करें।",
+    "Conversion error. Please re-enter the amount.": "रूपांतरण त्रुटि। कृपया राशि पुनः दर्ज करें।",
+    "Insufficient Balance": "अपर्याप्त बैलेंस",
+    "Minimum amount is": "न्यूनतम राशि है",
+    "Balance is sufficient": "बैलेंस पर्याप्त है",
+    "Enter Amount": "राशि दर्ज करें"
 }

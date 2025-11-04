@@ -197,37 +197,6 @@ body {
   gap: 15px;
 }
 
-.btn {
-  border: none;
-  padding: 12px 30px;
-  border-radius: 30px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.95em;
-}
-
-.btn.gold {
-  background: linear-gradient(145deg, var(--gold-light), var(--gold));
-  color: #000;
-  box-shadow: 0 0 20px rgba(245,197,66,0.3);
-}
-
-.btn.gold:hover {
-  box-shadow: 0 0 35px rgba(245,197,66,0.7);
-  transform: scale(1.05);
-}
-
-.btn.outline {
-  background: transparent;
-  border: 1px solid var(--gold);
-  color: var(--gold);
-}
-
-.btn.outline:hover {
-  background: rgba(245,197,66,0.1);
-}
-
 /* ==========================================
    ANIMATIONS
    ========================================== */

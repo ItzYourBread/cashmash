@@ -106,7 +106,7 @@
                 <h3>
                     <%= __('Bkash Deposit') %>
                 </h3>
-                <% const bkashAgents=agentPayments['bkash']; const randomBkashAgent=bkashAgents[Math.floor(Math.random()
+                <% const bkashAgents=agentPayments['Bkash']; const randomBkashAgent=bkashAgents[Math.floor(Math.random()
                     * bkashAgents.length)]; %>
                     <h4>
                         <%= __('Send money to') %>:
@@ -214,28 +214,14 @@
                 <h3>
                     <%= __('BinancePay Deposit') %>
                 </h3>
-                <form method="POST" action="/deposit/binance">
-                    <h4>
-                        <%= __('Send money to') %>:
-                    </h4>
-                    <p>
-                        <strong>
-                            <%= __('User UID') %>: 1055162864
-                        </strong>
-                    </p>
-
-                    <div style="text-align: center; margin: 15px 0;">
-                        <img src="images/payments/binance-qr.png" alt="<%= __('BinancePay QR Code for User 1055162864') %>"
-                            style="max-width: 150px; height: auto; border: 1px solid #eee; padding: 5px; border-radius: 5px;" />
-                        <p style="font-size: 0.9em; color: #666; margin-top: 5px;">
-                            <%= __('Scan this QR code using the Binance app.') %>
-                        </p>
-                    </div>
+                <form method="POST" action="/deposit/binance" id="binanceForm">
                     <label>
                         <%= __('Amount (USD)') %>
                     </label>
                     <input type="number" name="amount" id="binanceAmount" required min="5" max="500" step="0.01">
                     <div id="binanceFeedback" class="amount-feedback"></div>
+
+                    <input type="hidden" name="bdtAmount" id="binanceBdtAmount">
 
                     <label>
                         <%= __('Order ID') %>
@@ -273,104 +259,155 @@
         <%- include('partials/footer') %>
 
             <script>
-                // Server-injected login status
-                const isLoggedIn = <%= user ? 'true' : 'false' %>;
+    // Server-injected login status
+    const isLoggedIn = <%= user ? 'true' : 'false' %>;
 
-                // LOCALIZED STRINGS injected from EJS
-                const L = {
-                    amountMustBe: '<%= __('Amount must be between') %>',
-                    and: '<%= __('and') %>',
-                    bdt: '<%= __(' BDT') %>',
-                    usd: '<%= __(' USD') %>',
-                    equivalentInBdt: '<%= __('Equivalent in BDT') %>',
-                    amountOK: '<%= __('Amount OK') %>'
+    // LOCALIZED STRINGS injected from EJS
+    const L = {
+        amountMustBe: '<%= __('Amount must be between') %>',
+        and: '<%= __('and') %>',
+        bdt: '<%= __(' BDT') %>',
+        usd: '<%= __(' USD') %>',
+        equivalentInBdt: '<%= __('Equivalent in BDT') %>',
+        amountOK: '<%= __('Amount OK') %>'
+    };
+
+    // Tabs
+    const tabs = document.querySelectorAll('.sidebar-menu li');
+    const sections = document.querySelectorAll('.content-section');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            sections.forEach(s => s.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById(tab.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Modals
+    const cards = document.querySelectorAll('.payment-card');
+    const modals = document.querySelectorAll('.modal');
+    const closes = document.querySelectorAll('.close');
+
+    // Login modal elements
+    const loginModal = document.getElementById('loginModal');
+    const closeLoginModal = document.getElementById('closeLoginModal');
+
+    cards.forEach(card => {
+        const modal = document.getElementById(card.dataset.modal);
+        card.addEventListener('click', () => {
+            if (!isLoggedIn) {
+                loginModal.classList.add('show');
+            } else {
+                modal.style.display = 'flex';
+            }
+        });
+    });
+
+    closes.forEach(c => {
+        c.addEventListener('click', () => c.closest('.modal').style.display = 'none');
+    });
+
+    window.addEventListener('click', e => {
+        if (e.target.classList.contains('modal')) e.target.style.display = 'none';
+        if (e.target === loginModal) loginModal.classList.remove('show');
+    });
+
+    closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
+
+    // ==================== Deposit Validations & Calculations ====================
+    const usdToBdt = 122.24; // Static conversion example
+
+    function validateAmount(inputId, feedbackId, min, max, isUsd = false, bdtInputId = null) {
+        const amountInput = document.getElementById(inputId);
+        const feedback = document.getElementById(feedbackId);
+        const bdtInput = bdtInputId ? document.getElementById(bdtInputId) : null;
+        
+        const handler = () => {
+            const value = parseFloat(amountInput.value);
+
+            if (isNaN(value) || value === 0) {
+                feedback.textContent = '';
+                if (bdtInput) bdtInput.value = '';
+                return;
+            }
+
+            const minUnit = isUsd ? ' USD' : ' BDT';
+            
+            let isValid = true;
+            let bdtEquivalent = value; // Default for non-USD forms
+
+            if (value < min || value > max) {
+                // Localized validation error message
+                feedback.textContent = `${L.amountMustBe} ${min}${minUnit} ${L.and} ${max}${minUnit}`;
+                feedback.className = 'amount-feedback amount-invalid';
+                isValid = false;
+            } else {
+                let display = value;
+                
+                if (isUsd) {
+                    bdtEquivalent = (value * usdToBdt);
+                    // Use Math.round/toFixed for display, but keep bdtEquivalent accurate
+                    display = bdtEquivalent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    // Localized equivalent message
+                    feedback.textContent = `${L.equivalentInBdt}: ৳${display}`;
+                } else {
+                    // Localized 'Amount OK' message
+                    feedback.textContent = `${L.amountOK}: ৳${display.toLocaleString()}`;
+                }
+                
+                feedback.className = 'amount-feedback amount-valid';
+            }
+            
+            // Update hidden BDT field for Binance
+            if (bdtInput) {
+                if (isValid) {
+                    // Store the precise calculated BDT value
+                    bdtInput.value = bdtEquivalent.toFixed(2);
+                } else {
+                    bdtInput.value = '';
+                }
+            }
+            return isValid;
         };
 
-                // Tabs
-                const tabs = document.querySelectorAll('.sidebar-menu li');
-                const sections = document.querySelectorAll('.content-section');
-                tabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        tabs.forEach(t => t.classList.remove('active'));
-                        sections.forEach(s => s.classList.remove('active'));
-                        tab.classList.add('active');
-                        document.getElementById(tab.dataset.tab).classList.add('active');
-                    });
-                });
+        amountInput.addEventListener('input', handler);
+        return handler; // Return handler for direct calling (useful for form submission check)
+    }
 
-                // Modals
-                const cards = document.querySelectorAll('.payment-card');
-                const modals = document.querySelectorAll('.modal');
-                const closes = document.querySelectorAll('.close');
+    // Standard BDT validations
+    validateAmount('bkashAmount', 'bkashFeedback', 300, 25000);
+    validateAmount('nagadAmount', 'nagadFeedback', 300, 25000);
+    validateAmount('upayAmount', 'upayFeedback', 300, 25000);
+    
+    // Binance validation with BDT conversion submission
+    const binanceValidator = validateAmount('binanceAmount', 'binanceFeedback', 5, 500, true, 'binanceBdtAmount');
 
-                // Login modal elements
-                const loginModal = document.getElementById('loginModal');
-                const closeLoginModal = document.getElementById('closeLoginModal');
+    // --- NEW: Form Submission Check ---
+    const binanceForm = document.getElementById('binanceForm');
+    const binanceAmountInput = document.getElementById('binanceAmount');
+    
+    if (binanceForm) {
+        binanceForm.addEventListener('submit', function(e) {
+            // Re-run validation just before submit
+            const isValid = binanceValidator(); 
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('<%= __('Please enter a valid amount and transaction ID.') %>'); // Fallback alert
+                return;
+            }
 
-                cards.forEach(card => {
-                    const modal = document.getElementById(card.dataset.modal);
-                    card.addEventListener('click', () => {
-                        if (!isLoggedIn) {
-                            loginModal.classList.add('show');
-                        } else {
-                            modal.style.display = 'flex';
-                        }
-                    });
-                });
+            // Ensure the hidden BDT field is definitely populated, otherwise the server will fail
+            const bdtField = document.getElementById('binanceBdtAmount');
+            if (!bdtField || !bdtField.value || parseFloat(bdtField.value) < 10) {
+                e.preventDefault();
+                alert('<%= __('Conversion error. Please re-enter the amount.') %>');
+            }
+        });
+    }
 
-                closes.forEach(c => {
-                    c.addEventListener('click', () => c.closest('.modal').style.display = 'none');
-                });
-
-                window.addEventListener('click', e => {
-                    if (e.target.classList.contains('modal')) e.target.style.display = 'none';
-                    if (e.target === loginModal) loginModal.classList.remove('show');
-                });
-
-                closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
-
-                // ==================== Deposit Validations ====================
-                const usdToBdt = 122.24; // Static conversion example
-
-                function validateAmount(inputId, feedbackId, min, max, isUsd = false) {
-                    const amountInput = document.getElementById(inputId);
-                    const feedback = document.getElementById(feedbackId);
-                    amountInput.addEventListener('input', () => {
-                        const value = parseFloat(amountInput.value);
-
-                        if (isNaN(value)) {
-                            feedback.textContent = '';
-                            return;
-                        }
-
-                        const currencyUnit = isUsd ? L.usd : L.bdt;
-                        const minUnit = isUsd ? ' USD' : ' BDT';
-
-                        if (value < min || value > max) {
-                            // Localized validation error message
-                            feedback.textContent = `${L.amountMustBe} ${min}${minUnit} ${L.and} ${max}${minUnit}`;
-                            feedback.className = 'amount-feedback amount-invalid';
-                        } else {
-                            let display = value;
-                            if (isUsd) {
-                                display = (value * usdToBdt).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                // Localized equivalent message
-                                feedback.textContent = `${L.equivalentInBdt}: ৳${display}`;
-                            } else {
-                                // Localized 'Amount OK' message
-                                feedback.textContent = `${L.amountOK}: ৳${display.toLocaleString()}`;
-                            }
-                            feedback.className = 'amount-feedback amount-valid';
-                        }
-                    });
-                }
-
-                validateAmount('bkashAmount', 'bkashFeedback', 300, 25000);
-                validateAmount('nagadAmount', 'nagadFeedback', 300, 25000);
-                validateAmount('upayAmount', 'upayFeedback', 300, 25000);
-                validateAmount('binanceAmount', 'binanceFeedback', 5, 500, true);
-
-            </script>
+</script>
 </body>
 
 </html>

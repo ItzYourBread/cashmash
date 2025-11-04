@@ -95,5 +95,11 @@
 	"Username already taken": "Username already taken",
 	"Error checking username": "Error checking username",
 	"Username must be at least 3 characters": "Username must be at least 3 characters",
-	"Password must be at least 6 characters long": "Password must be at least 6 characters long"
+	"Password must be at least 6 characters long": "Password must be at least 6 characters long",
+	"Please enter a valid amount and transaction ID.": "Please enter a valid amount and transaction ID.",
+	"Conversion error. Please re-enter the amount.": "Conversion error. Please re-enter the amount.",
+	"Insufficient Balance": "Insufficient Balance",
+	"Minimum amount is": "Minimum amount is",
+	"Balance is sufficient": "Balance is sufficient",
+	"Enter Amount": "Enter Amount"
 }
