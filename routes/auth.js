@@ -5,7 +5,7 @@ const { generateOTP, otpExpired } = require('../utils/otp');
 const transporter = require('../config/nodemailer');
 const router = express.Router();
 
-const otpEnable = true; // ⬅️ Set to true if you want OTP login enabled
+const otpEnable = false; // ⬅️ Set to true if you want OTP login enabled
 
 /* =====================================
    ✅ AUTHENTICATION CHECK MIDDLEWARE

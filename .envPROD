@@ -1,0 +1,6 @@
+MONGO_URI="mongodb+srv://cashmash:OWBpMMrRQZEcQIDH@cashmash.mqamnbr.mongodb.net/?appName=CashMash"
+SESSION_SECRET=supersecretcashmash34567543
+SMTP_EMAIL=noreply@watchnsfw.com
+SMTP_HOST=mail.privateemail.com
+SMTP_PASS=Q0YvBKycVljNuIbM
+SMTP_PORT=465
