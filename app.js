@@ -49,7 +49,9 @@ app.use(cors({
   origin: [
     'https://cashmash.onrender.com',   // your hosted frontend (change this if different)
     'https://www.cashmash.onrender.com',
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'http://127.0.0.1:5500', // <-- The origin of your HTML file (Live Server)
+    'http://localhost:5500'
   ],
   methods: ['GET', 'POST'],
   credentials: true
@@ -117,6 +119,8 @@ app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/user'));
 app.use('/', require('./routes/game'));
 app.use('/', require('./routes/payment'));
+app.use('/api/admin', require('./routes/admin'));
+
 
 // HTTP + Socket.IO
 const server = http.createServer(app);

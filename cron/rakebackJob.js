@@ -30,7 +30,7 @@ return { level: 5, percent: 18 };
 }
 
 // 🕛 Runs every minute for testing (change back to weekly later)
-cron.schedule('* * * * *', async () => {
+cron.schedule('0 0 * * 5', async () => {
 console.log('🕛 [WEEKLY] Rakeback Cron Started:', new Date().toLocaleString());
 
 try {

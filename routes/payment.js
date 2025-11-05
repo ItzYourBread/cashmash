@@ -60,7 +60,7 @@ router.get('/deposit', (req, res) => {
         ...depositData
       });
 
-      res.redirect('/dashboard');
+      res.redirect('/dashboard?section=deposit&page=1');
     } catch (err) {
       console.error(err);
       res.status(500).send('Deposit failed');
@@ -105,7 +105,7 @@ router.post('/deposit/binance', ensureAuth, async (req, res) => {
       ...depositData
     });
 
-    res.redirect('/dashboard');
+    res.redirect('/dashboard?section=deposit&page=1');
   } catch (err) {
     console.error('BinancePay deposit failed:', err);
     res.status(500).send('Deposit failed');
@@ -150,7 +150,7 @@ router.get('/withdraw', (req, res) => {
         ...withdrawData
       });
 
-      res.redirect('/dashboard');
+      res.redirect('/dashboard?section=withdraw&page=1');
     } catch (err) {
       console.error(err);
       res.status(500).send('Withdrawal failed');
@@ -192,7 +192,7 @@ router.post('/withdraw/binance', ensureAuth, async (req, res) => {
       ...withdrawData
     });
 
-    res.redirect('/dashboard');
+    res.redirect('/dashboard?section=withdraw&page=1');
   } catch (err) {
     console.error(err);
     res.status(500).send('Withdrawal failed');
