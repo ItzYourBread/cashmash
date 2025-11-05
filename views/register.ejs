@@ -37,9 +37,6 @@
         <!-- Email -->
         <input type="email" name="email" id="email" placeholder="<%= __('Email') %>" required />
 
-        <!-- Phone -->
-        <input type="tel" name="phone" id="phone" placeholder="<%= __('Phone Number (optional)') %>" />
-
         <!-- Password -->
         <input type="password" name="password" id="password" placeholder="<%= __('Password') %>" required />
 
@@ -114,7 +111,6 @@
 
           const username = usernameInput.value.trim();
           const email = document.getElementById('email').value.trim();
-          const phone = document.getElementById('phone').value.trim();
           const password = document.getElementById('password').value.trim();
 
           // Validation: username
@@ -127,13 +123,6 @@
           // Validation: password length
           if (password.length < 6) {
             responseMsg.textContent = '<%= __("Password must be at least 6 characters long") %>';
-            responseMsg.style.color = 'red';
-            return;
-          }
-
-          // Optional phone check (any country)
-          if (phone && !/^\+?[0-9]{6,15}$/.test(phone)) {
-            responseMsg.textContent = '<%= __("Phone validation error") %>';
             responseMsg.style.color = 'red';
             return;
           }

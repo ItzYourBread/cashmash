@@ -46,7 +46,7 @@ router.get('/check-username', async (req, res) => {
    ===================================== */
 router.post('/register', async (req, res) => {
   try {
-    let { username, email, phone, password } = req.body;
+    let { username, email, password } = req.body;
 
     // Clean input
     username = username.trim().toLowerCase();
@@ -70,7 +70,6 @@ router.post('/register', async (req, res) => {
     const newUser = new User({
       username,
       email,
-      phone: phone || null,
       password,
     });
 
