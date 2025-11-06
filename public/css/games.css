@@ -196,6 +196,45 @@ body {
   justify-content: center;
   gap: 15px;
 }
+/* BUTTONS STYLE */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    padding: 0 24px;
+    border-radius: 30px;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+/* GOLD BUTTON */
+.btn.gold {
+  background: var(--gold);
+    color: #000;
+    border: none;
+    box-shadow: 0 0 20px rgba(245, 197, 66, 0.4);
+}
+
+.btn.gold:hover {
+    box-shadow: 0 0 30px rgba(245, 197, 66, 0.7);
+}
+
+/* OUTLINE BUTTON */
+.btn.outline {
+    border: 2px solid var(--gold);
+    background: transparent;
+    color: var(--gold);
+}
+
+.btn.outline:hover {
+    background: var(--gold);
+    color: #000;
+    box-shadow: 0 0 20px rgba(245, 197, 66, 0.5);
+}
 
 /* ==========================================
    ANIMATIONS
