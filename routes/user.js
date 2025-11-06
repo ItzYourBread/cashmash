@@ -8,10 +8,14 @@ const router = express.Router();
 const PAGE_SIZE = 10; // Number of items per page
 
 function ensureAuth(req, res, next) {
-  if (req.isAuthenticated()) return next();
-  res.redirect('/login');
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    // User is authenticated, proceed to the next middleware/route handler
+    return next();
+  } else {
+    // User is NOT authenticated, redirect to the login page
+    return res.redirect('/login');
+  }
 }
-
 
 // Dashboard Route
 router.get('/dashboard', ensureAuth, async (req, res) => {

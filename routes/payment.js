@@ -7,10 +7,14 @@ const Withdraw = require('../models/Withdraw');
 const mongoose = require('mongoose'); // Mongoose is correctly imported
 
 function ensureAuth(req, res, next) {
-  if (req.isAuthenticated && req.isAuthenticated()) return next();
-  res.redirect('/login');
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    // User is authenticated, proceed to the next middleware/route handler
+    return next();
+  } else {
+    // User is NOT authenticated, redirect to the login page
+    return res.redirect('/login');
+  }
 }
-
 // Load agent payments JSON
 const agentPaymentsPath = path.join(__dirname, '../agent-payments.json');
 const agentPayments = JSON.parse(fs.readFileSync(agentPaymentsPath, 'utf-8'));

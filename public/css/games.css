@@ -210,7 +210,7 @@ body {
     transition: var(--transition);
     white-space: nowrap;
 }
-
+  
 /* GOLD BUTTON */
 .btn.gold {
   background: var(--gold);

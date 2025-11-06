@@ -9,8 +9,13 @@ const formatBalance = require('../utils/formatBalance'); // <--- Ensure this pat
 
 // ensureAuth middleware
 function ensureAuth(req, res, next) {
-  if (req.isAuthenticated && req.isAuthenticated()) return next();
-  res.status(401).json({ error: 'Unauthorized' });
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    // User is authenticated, proceed to the next middleware/route handler
+    return next();
+  } else {
+    // User is NOT authenticated, redirect to the login page
+    return res.redirect('/login');
+  }
 }
 
 // --- COMMON RENDER OBJECT ---
