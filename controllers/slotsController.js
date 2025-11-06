@@ -11,8 +11,8 @@ const setSlotType = (req) => {
 // --- CONFIG ---
 const TARGET_RTP = 0.92; 
 const HOUSE_EDGE = 1 - TARGET_RTP;
-const MIN_WIN_RATE = 0.11;
-const MAX_WIN_RATE = 0.34;
+const MIN_WIN_RATE = 0.16;
+const MAX_WIN_RATE = 0.38;
 const PAYOUT_FACTORS = { 3: 1.0, 4: 3.0, 5: 5.0 };
 
 // --- DYNAMIC CONFIGURATION ---
@@ -111,11 +111,11 @@ exports.spin = async (req, res) => {
     let winThreshold = MIN_WIN_RATE + Math.random() * (MAX_WIN_RATE - MIN_WIN_RATE);
 
     // 💸 Low Balance Boost
-    if (user.chips < 200) {
+    if (user.chips < 400) {
       const boost = 0.1 + Math.random() * 0.1;
       winThreshold += boost;
       console.log(`[SLOTS] Low-balance boost +${(boost * 100).toFixed(1)}% (<200)`);
-    } else if (user.chips < 300) {
+    } else if (user.chips < 600) {
       const boost = 0.05 + Math.random() * 0.07;
       winThreshold += boost;
       console.log(`[SLOTS] Low-balance boost +${(boost * 100).toFixed(1)}% (<300)`);
