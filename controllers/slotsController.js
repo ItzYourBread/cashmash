@@ -23,11 +23,9 @@ const getDynamicConfig = () => {
 
   if (dayOfWeek === 0 || dayOfWeek === 1) payoutBoostFactor = 1.1; // Lucky Day
 
-  // Include House Edge adjustment factor
   const houseAdjustment = 1 - (HOUSE_EDGE / 2);
   const dynamicSymbols = baseConfig.symbols.map(sym => ({
     ...sym,
-    // Apply both the boost and the house edge adjustment
     multiplier: sym.multiplier * payoutBoostFactor * houseAdjustment
   }));
 
@@ -43,61 +41,73 @@ const getRandomSymbol = (config) => {
   return weighted[Math.floor(Math.random() * weighted.length)];
 };
 
-// 🌟 FINAL FIX: Payline validation and clean symbol matching
+// --- Winnings Calculation ---
 const calculateWinnings = (symbolsMatrix, bet, config) => {
   let totalWin = 0;
-  // Initialize finalSymbols (output) with a copy of the matrix data, ready for win flagging
   const finalSymbols = symbolsMatrix.map(reel => reel.map(sym => ({ ...sym, win: false })));
 
-  // 🛑 CRITICAL PAYLINE VALIDATION: Filter out any payline that uses an invalid row index.
-  const validPaylines = config.paylines.filter(line => {
-    // Check if every index is less than the number of available rows (e.g., 0-3 if rows=4)
-    return line.every(rowIndex => rowIndex < config.rows);
-  });
+  const validPaylines = (config.paylines || []).filter(line => 
+    Array.isArray(line) &&
+    line.length === config.reels &&
+    line.every(rowIndex => Number.isInteger(rowIndex) && rowIndex >= 0 && rowIndex < config.rows)
+  );
 
   validPaylines.forEach(line => {
-    let winLength = 0, currentSymbolName = null;
-    let winningSymbol = null; // Store the actual object from the first reel
+    let winLength = 0;
+    let currentSymbolName = null;
+    let winningSymbol = null;
 
-    for (let r = 0; r < config.reels; r++) {
-      const row = line[r];
-      // Get the full symbol object from the raw matrix
-      const symbol = symbolsMatrix[r][row];
+    for (let reelIndex = 0; reelIndex < config.reels; reelIndex++) {
+      const rowIndex = line[reelIndex];
+      if (!symbolsMatrix[reelIndex] || !symbolsMatrix[reelIndex][rowIndex]) {
+        winLength = 0;
+        break;
+      }
 
-      if (r === 0) {
-        currentSymbolName = symbol.name; // Track name for comparison
-        winningSymbol = symbol;          // Track object for multiplier
+      const symbol = symbolsMatrix[reelIndex][rowIndex];
+
+      if (reelIndex === 0) {
+        currentSymbolName = symbol.name;
+        winningSymbol = symbol;
         winLength = 1;
-      }
-      // Compare the name of the current symbol against the starting symbol's name
-      else if (symbol.name === currentSymbolName) {
+      } else if (symbol.name === currentSymbolName) {
         winLength++;
-      } else {
-        break; // Stop checking this line
-      }
+      } else break;
     }
 
     if (winLength >= 3) {
       const factor = PAYOUT_FACTORS[winLength] || 0;
-      // Use the stored winningSymbol object for the correct multiplier
-      const lineWin = bet * winningSymbol.multiplier * factor;
+      const lineWin = bet * (winningSymbol?.multiplier || 0) * factor;
       totalWin += lineWin;
 
-      // Mark symbols as winning in the finalSymbols array
-      for (let r = 0; r < winLength; r++) {
-        finalSymbols[r][line[r]].win = true;
+      for (let reelIndex = 0; reelIndex < winLength; reelIndex++) {
+        const rowIndex = line[reelIndex];
+        if (finalSymbols[reelIndex] && finalSymbols[reelIndex][rowIndex]) {
+          finalSymbols[reelIndex][rowIndex].win = true;
+        }
       }
     }
   });
 
   return { totalWin, finalSymbols };
 };
-// --- END calculateWinnings ---
 
-// ----------------- MAIN SPIN -----------------
+// --- Generate Losing Matrix ---
+const generateLosingMatrix = (config) => {
+  const matrix = Array(config.reels).fill(0).map(() => Array(config.rows).fill(0).map(() => {
+    const sym = getRandomSymbol(config);
+    return { name: sym.name, file: sym.file, multiplier: sym.multiplier };
+  }));
+
+  const { totalWin, finalSymbols } = calculateWinnings(matrix, 1, config);
+  if (totalWin > 0) return generateLosingMatrix(config);
+  return { matrix, finalSymbols, totalWin: 0 };
+};
+
+// --- MAIN SPIN ---
 exports.spin = async (req, res) => {
-  let user; // Declare user outside try-catch for error refund logic
-  const bet = parseInt(req.body.bet, 10); // Declare bet outside for error refund logic
+  let user;
+  const bet = parseInt(req.body.bet, 10);
 
   try {
     setSlotType(req);
@@ -110,99 +120,74 @@ exports.spin = async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
     if (bet > user.chips) return res.status(400).json({ error: 'Insufficient balance' });
 
-    // Deduct bet
     user.chips -= bet;
 
-    // --- Streak/Counter Setup ---
     user.losingStreak = user.losingStreak || 0;
     user.comebackSpinsLeft = user.comebackSpinsLeft || 0;
     user.spinsSinceLastSmallWin = user.spinsSinceLastSmallWin || 0;
     user.spinsSinceLastSmallWin++;
     user.totalWagered = (user.totalWagered || 0) + bet;
 
+    // --- Generate initial symbols ---
+    const symbolsMatrix = Array(config.reels).fill(0).map(() => Array(config.rows).fill(0).map(() => {
+      const sym = getRandomSymbol(config);
+      return { name: sym.name, file: sym.file, multiplier: sym.multiplier };
+    }));
 
-    // --- Generate slot symbols ---
-    const symbolsMatrix = [];
-    for (let c = 0; c < config.reels; c++) {
-      const col = [];
-      for (let r = 0; r < config.rows; r++) {
-        const sym = getRandomSymbol(config);
-        col.push({ name: sym.name, file: sym.file, multiplier: sym.multiplier });
-      }
-      symbolsMatrix.push(col);
-    }
-
-    // Initial calculation based on random symbols
     let { totalWin, finalSymbols } = calculateWinnings(symbolsMatrix, bet, config);
 
-    // 🎯 --- WIN CONTROL LOGIC ---
-    const MIN_RATE = config.baseWinRate.MIN; // Fetched per slot type
-    const MAX_RATE = config.baseWinRate.MAX; // Fetched per slot type
+    // --- RNG & Win Logic ---
+    const minRate = Math.min(config.baseWinRate.MIN, config.baseWinRate.MAX);
+    const maxRate = Math.max(config.baseWinRate.MIN, config.baseWinRate.MAX);
+    let winThreshold = minRate + Math.random() * ((maxRate - minRate) || 0.0001);
 
-    let winThreshold = MIN_RATE + Math.random() * (MAX_RATE - MIN_RATE);
-    // Apply Low/High Balance Adjustments (Omitting for brevity, but use your logic)
-
-    // 🔥 Comeback Mode (Boost)
     if (user.comebackSpinsLeft > 0) {
-      winThreshold += (0.15 + Math.random() * 0.15);
-      user.comebackSpinsLeft -= 1;
+      winThreshold += 0.15 + Math.random() * 0.15;
+      user.comebackSpinsLeft--;
     }
-
-    winThreshold = Math.min(Math.max(winThreshold, 0.05), 0.6);
+    winThreshold = Math.min(Math.max(winThreshold, 0.01), 0.99);
 
     const winRoll = Math.random();
     let isForcedWin = false;
 
-    // 🎁 --- FORCED SMALL WIN ---
-    if (user.spinsSinceLastSmallWin === 5) {
-      if (totalWin === 0) {
-        const smallSymbols = config.symbols.filter(s => s.multiplier <= 1.5);
-        if (smallSymbols.length > 0) {
-          const winningSymbol = smallSymbols[Math.floor(Math.random() * smallSymbols.length)];
-          const lineIndex = Math.floor(Math.random() * config.paylines.length);
-          const line = config.paylines[lineIndex];
+    // --- Forced small win every 10 spins ---
+    if (user.spinsSinceLastSmallWin >= 10 && totalWin === 0) {
+      const smallSymbols = config.symbols.filter(s => s.multiplier <= 1.5);
+      if (smallSymbols.length > 0) {
+        const winningSymbol = smallSymbols[Math.floor(Math.random() * smallSymbols.length)];
+        const line = config.paylines[Math.floor(Math.random() * config.paylines.length)];
 
-          // Ensure the line is valid before attempting to modify matrix
-          if (line.every(rowIndex => rowIndex < config.rows)) {
-            for (let r = 0; r < 3; r++) {
-              symbolsMatrix[r][line[r]] = { // Mutate the matrix
-                name: winningSymbol.name,
-                file: winningSymbol.file,
-                multiplier: winningSymbol.multiplier
-              };
-            }
-            // Recalculate based on modified matrix
-            const recalculated = calculateWinnings(symbolsMatrix, bet, config);
-            totalWin = recalculated.totalWin;
-            finalSymbols = recalculated.finalSymbols;
-            isForcedWin = true;
+        if (line.every(rowIndex => rowIndex < config.rows)) {
+          for (let r = 0; r < 3; r++) {
+            symbolsMatrix[r][line[r]] = {
+              name: winningSymbol.name,
+              file: winningSymbol.file,
+              multiplier: winningSymbol.multiplier
+            };
           }
+          const recalculated = calculateWinnings(symbolsMatrix, bet, config);
+          totalWin = recalculated.totalWin;
+          finalSymbols = recalculated.finalSymbols;
+          isForcedWin = true;
         }
       }
-      user.spinsSinceLastSmallWin = 0; // Reset counter
+      user.spinsSinceLastSmallWin = 0;
     }
 
-    // Standard Loss Check
-    else if (totalWin > 0 && winRoll > winThreshold && !isForcedWin) {
-      // If the random spin won, but the RNG control dictates a loss (rare/big win control)
+    // --- RNG override ---
+    if (!isForcedWin && totalWin > 0 && winRoll > winThreshold) {
       totalWin = 0;
       finalSymbols = symbolsMatrix.map(reel => reel.map(sym => ({ ...sym, win: false })));
-    } else if (totalWin === 0 && winRoll < winThreshold && !isForcedWin) {
-      // If the random spin lost, but the RNG control dictates a win (small win boost)
-      // We skip forcing a win here, letting the 'Forced Small Win' cover this, or allowing a loss.
+      console.log('❌ RNG Override: Win cancelled');
+    } else if (totalWin > 0) {
+      console.log('✅ Win accepted:', totalWin);
+    } else {
+      if (winRoll < winThreshold) console.log('🎯 RNG would allow a win, but matrix lost.');
     }
 
-
-    // --- RTP Adjustment (Final reduction on big wins) ---
-    if (totalWin > 0 && !isForcedWin && Math.random() > TARGET_RTP) {
-      const reduced = Math.floor(totalWin * (0.4 + Math.random() * 0.3));
-      totalWin = reduced;
-    }
-
-    // --- Final Update and Response ---
     user.chips += totalWin;
 
-    // Track streaks
+    // Track losing streak & comeback
     if (totalWin > 0) {
       user.losingStreak = 0;
     } else {
@@ -237,7 +222,6 @@ exports.spin = async (req, res) => {
 
   } catch (err) {
     console.error('Spin error', err);
-    // 🛡️ CRITICAL ERROR HANDLING: Refund the bet if the server crashes after deduction
     if (user && bet) {
       user.chips += bet;
       await user.save().catch(e => console.error("Refund failed:", e));
@@ -245,3 +229,4 @@ exports.spin = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+

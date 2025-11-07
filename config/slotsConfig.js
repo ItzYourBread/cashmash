@@ -2,26 +2,26 @@ const slotsConfig = {
   ClassicSlot: {
     // 💥 HIGH VOLATILITY SETTINGS (Fewer, bigger wins)
     baseWinRate: {
-        MIN: 0.4, // Low minimum chance
-        MAX: 0.12  // Wide range for control logic
+      MIN: 0.2, // Low minimum chance
+      MAX: 0.4  // Wide range for control logic
     },
     symbols: [
-      { name: 'cherry', file: '/images/ClassicSlot/cherry.png', multiplier: 0.8 },
-      { name: 'lemon', file: '/images/ClassicSlot/lemon.png', multiplier: 1 },
-      { name: 'orange', file: '/images/ClassicSlot/orange.png', multiplier: 1.2 },
-      { name: 'watermelon', file: '/images/ClassicSlot/watermelon.png', multiplier: 1.8 },
-      { name: 'grapes', file: '/images/ClassicSlot/grapes.png', multiplier: 3 },
-      { name: 'star', file: '/images/ClassicSlot/star.png', multiplier: 4 },
-      { name: 'red7', file: '/images/ClassicSlot/red7.png', multiplier: 10 },
-      { name: 'diamond', file: '/images/ClassicSlot/diamond.png', multiplier: 8 },
-      { name: 'bar', file: '/images/ClassicSlot/bar.png', multiplier: 20 },
-      { name: 'jackpot', file: '/images/ClassicSlot/jackpot.png', multiplier: 100 },
+      { name: 'cherry', file: '/images/ClassicSlot/cherry.png', multiplier: 0.5 },
+      { name: 'lemon', file: '/images/ClassicSlot/lemon.png', multiplier: 0.7 },
+      { name: 'orange', file: '/images/ClassicSlot/orange.png', multiplier: 0.8 },
+      { name: 'watermelon', file: '/images/ClassicSlot/watermelon.png', multiplier: 1.2 },
+      { name: 'grapes', file: '/images/ClassicSlot/grapes.png', multiplier: 2.0 },
+      { name: 'star', file: '/images/ClassicSlot/star.png', multiplier: 2.5 },
+      { name: 'diamond', file: '/images/ClassicSlot/diamond.png', multiplier: 4.0 },
+      { name: 'red7', file: '/images/ClassicSlot/red7.png', multiplier: 5.0 },
+      { name: 'bar', file: '/images/ClassicSlot/bar.png', multiplier: 10.0 },
+      { name: 'jackpot', file: '/images/ClassicSlot/jackpot.png', multiplier: 40.0 }
     ],
     reels: 5,
     rows: 4,
     symbolChances: {
       cherry: 50, lemon: 35, orange: 25, watermelon: 15, grapes: 10,
-      star: 8, red7: 3, diamond: 3, bar: 2, jackpot: 1
+      star: 8, red7: 3, diamond: 3, bar: 3, jackpot: 3
     },
     paylines: [
       // 1-4: Essential Horizontal Lines (4 lines)
@@ -65,28 +65,19 @@ const slotsConfig = {
   PharaohsRiches: {
     // ✨ LOW VOLATILITY SETTINGS (More, smaller wins)
     baseWinRate: {
-        MIN: 0.6, // Higher minimum chance for frequent small wins
-        MAX: 0.16  // Tighter range for control logic
+      MIN: 0.4, // Higher minimum chance for frequent small wins
+      MAX: 0.6  // Tighter range for control logic
     },
     symbols: [
-      // 9 -> 6
-      { name: 'pharaoh', file: '/images/PharaohsRichesSlots/pharaoh.png', multiplier: 6 },
-      // 7 -> 5
-      { name: 'sphinx', file: '/images/PharaohsRichesSlots/sphinx.png', multiplier: 5 },
-      // 3 -> 2
-      { name: 'ankh', file: '/images/PharaohsRichesSlots/ankh.png', multiplier: 2 },
-      // 2.5 -> 1.8
-      { name: 'scarab', file: '/images/PharaohsRichesSlots/scarab.png', multiplier: 1.8 },
-      // 4 -> 3
-      { name: 'pyramid', file: '/images/PharaohsRichesSlots/pyramid.png', multiplier: 3 },
-      // 1.5 -> 1.0 (Lowest possible multiplier)
-      { name: 'goldCoin', file: '/images/PharaohsRichesSlots/goldCoin.png', multiplier: 1.0 },
-      // 6 -> 4
-      { name: 'treasureChest', file: '/images/PharaohsRichesSlots/treasureChest.png', multiplier: 4 },
-      // 2 -> 1.5
-      { name: 'hieroglyphScroll', file: '/images/PharaohsRichesSlots/hieroglyphScroll.png', multiplier: 1.5 },
-      // 100 -> 100
-      { name: 'ra', file: '/images/PharaohsRichesSlots/ra.png', multiplier: 100 } 
+      { name: 'goldCoin', file: '/images/PharaohsRichesSlots/goldCoin.png', multiplier: 0.6 },
+      { name: 'scarab', file: '/images/PharaohsRichesSlots/scarab.png', multiplier: 1.1 },
+      { name: 'hieroglyphScroll', file: '/images/PharaohsRichesSlots/hieroglyphScroll.png', multiplier: 0.9 },
+      { name: 'ankh', file: '/images/PharaohsRichesSlots/ankh.png', multiplier: 1.3 },
+      { name: 'pyramid', file: '/images/PharaohsRichesSlots/pyramid.png', multiplier: 1.8 },
+      { name: 'treasureChest', file: '/images/PharaohsRichesSlots/treasureChest.png', multiplier: 2.5 },
+      { name: 'sphinx', file: '/images/PharaohsRichesSlots/sphinx.png', multiplier: 3.0 },
+      { name: 'pharaoh', file: '/images/PharaohsRichesSlots/pharaoh.png', multiplier: 3.5 },
+      { name: 'ra', file: '/images/PharaohsRichesSlots/ra.png', multiplier: 100.0 }
     ],
 
     reels: 5,
@@ -94,15 +85,15 @@ const slotsConfig = {
 
     // 💰 ADJUSTED CHANCES FOR MAXIMUM PROFITABILITY (Total = 100)
     symbolChances: {
-      goldCoin: 52.9,         // Increased chance for the now-1x payout
-      scarab: 18,
-      hieroglyphScroll: 25,   
+      goldCoin: 30,         // Increased chance for the now-1x payout
+      scarab: 25,
+      hieroglyphScroll: 18,
       ankh: 12,
-      pyramid: 8,
-      sphinx: 2,              // Further reduced chance
-      pharaoh: 1,             // Further reduced chance
-      treasureChest: 1,       // Further reduced chance
-      ra: 0.1                 // Drastically reduced chance for jackpot
+      pyramid: 6,
+      sphinx: 4,              // Further reduced chance
+      pharaoh: 3,             // Further reduced chance
+      treasureChest: 3,       // Further reduced chance
+      ra: 2                 // Drastically reduced chance for jackpot
     },
 
     paylines: [
