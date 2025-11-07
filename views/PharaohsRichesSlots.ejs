@@ -25,12 +25,12 @@
         <div class="controls">
           <div class="balance-container">
             Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
-            <%= formatBalance(user.chips) %>
+              <%= formatBalance(user.chips) %>
             </strong>
           </div>
 
           <div class="bet-section">
-            <input type="number" id="betAmount" placeholder="50-2000" min="50" max="2000" value="50" />
+            <input type="number" id="betAmount" placeholder="200-10000" min="200" max="10000" value="200" />
             <button id="spinBtn" class="btn gold big">SPIN</button>
           </div>
 
@@ -41,28 +41,52 @@
       </div>
     </section>
 
-    <!-- Info Modal -->
     <div id="infoModal" class="modal">
       <div class="modal-content">
         <span class="close-btn">&times;</span>
-        <h2>Winning Info</h2>
-        <p>Payouts require 5-of-a-kind on any of the 40 active paylines.</p>
+        <h2>Winning Info - Pharaohs Riches</h2>
+        <p>Payouts require 5-of-a-kind on any of the 25 active paylines.</p>
 
         <h3>Multipliers (5-of-a-Kind)</h3>
         <ul>
-          <li><img src="/images/PharaohsRichesSlots/pharaoh.png" alt="Pharaoh" class="mini-symbol" /> Pharaoh: x5</li>
-          <li><img src="/images/PharaohsRichesSlots/sphinx.png" alt="Sphinx" class="mini-symbol" /> Sphinx: x4</li>
-          <li><img src="/images/PharaohsRichesSlots/ankh.png" alt="Ankh" class="mini-symbol" /> Ankh: x3.5</li>
-          <li><img src="/images/PharaohsRichesSlots/scarab.png" alt="Scarab" class="mini-symbol" /> Scarab: x2.5</li>
-          <li><img src="/images/PharaohsRichesSlots/pyramid.png" alt="Pyramid" class="mini-symbol" /> Pyramid: x2</li>
-          <li><img src="/images/PharaohsRichesSlots/goldCoin.png" alt="Gold Coin" class="mini-symbol" /> Gold Coin: x1.5
+          <li>
+            <img src="/images/PharaohsRichesSlots/ra.png" alt="Ra" class="mini-symbol" />
+            Ra (Jackpot): x100
           </li>
-          <li><img src="/images/PharaohsRichesSlots/treasureChest.png" alt="Treasure Chest" class="mini-symbol" />
-            Treasure Chest: x1.2</li>
-          <li><img src="/images/PharaohsRichesSlots/hieroglyphScroll.png" alt="Hieroglyph Scroll" class="mini-symbol" />
-            Hieroglyph Scroll: x1</li>
-          <li><img src="/images/PharaohsRichesSlots/ra.png" alt="Ra" class="mini-symbol" /> Ra: x10</li>
+          <li>
+            <img src="/images/PharaohsRichesSlots/pharaoh.png" alt="Pharaoh" class="mini-symbol" />
+            Pharaoh: x5
+          </li>
+          <li>
+            <img src="/images/PharaohsRichesSlots/sphinx.png" alt="Sphinx" class="mini-symbol" />
+            Sphinx: x4
+          </li>
+          <li>
+            <img src="/images/PharaohsRichesSlots/treasureChest.png" alt="Treasure Chest" class="mini-symbol" />
+            Treasure Chest: x3
+          </li>
+          <li>
+            <img src="/images/PharaohsRichesSlots/pyramid.png" alt="Pyramid" class="mini-symbol" />
+            Pyramid: x2.5
+          </li>
+          <li>
+            <img src="/images/PharaohsRichesSlots/ankh.png" alt="Ankh" class="mini-symbol" />
+            Ankh: x1.5
+          </li>
+          <li>
+            <img src="/images/PharaohsRichesSlots/scarab.png" alt="Scarab" class="mini-symbol" />
+            Scarab: x1.2
+          </li>
+          <li>
+            <img src="/images/PharaohsRichesSlots/hieroglyphScroll.png" alt="Hieroglyph Scroll" class="mini-symbol" />
+            Hieroglyph Scroll: x1.0
+          </li>
+          <li>
+            <img src="/images/PharaohsRichesSlots/goldCoin.png" alt="Gold Coin" class="mini-symbol" />
+            Gold Coin: x1x
+          </li>
         </ul>
+
       </div>
     </div>
 

@@ -1,5 +1,10 @@
 const slotsConfig = {
   ClassicSlot: {
+    // 💥 HIGH VOLATILITY SETTINGS (Fewer, bigger wins)
+    baseWinRate: {
+        MIN: 0.4, // Low minimum chance
+        MAX: 0.12  // Wide range for control logic
+    },
     symbols: [
       { name: 'cherry', file: '/images/ClassicSlot/cherry.png', multiplier: 0.8 },
       { name: 'lemon', file: '/images/ClassicSlot/lemon.png', multiplier: 1 },
@@ -19,142 +24,122 @@ const slotsConfig = {
       star: 8, red7: 3, diamond: 3, bar: 2, jackpot: 1
     },
     paylines: [
-      // 1-4: horizontal lines
-      [0, 0, 0, 0, 0],
-      [1, 1, 1, 1, 1],
-      [2, 2, 2, 2, 2],
-      [3, 3, 3, 3, 3],
+      // 1-4: Essential Horizontal Lines (4 lines)
+      [0, 0, 0, 0, 0], // Top
+      [1, 1, 1, 1, 1], // Upper Middle
+      [2, 2, 2, 2, 2], // Lower Middle
+      [3, 3, 3, 3, 3], // Bottom
 
-      // 5-12: simple V / inverted V / zigzags
-      [0, 1, 2, 1, 0],
-      [3, 2, 1, 2, 3],
-      [1, 0, 0, 0, 1],
-      [2, 3, 3, 3, 2],
-      [0, 0, 1, 0, 0],
-      [3, 3, 2, 3, 3],
-      [0, 1, 1, 1, 0],
-      [3, 2, 2, 2, 3],
+      // 5-10: Simple Zig-Zag (V/Inverted V/Dips) (6 lines)
+      [0, 1, 2, 1, 0], // V-Shape
+      [3, 2, 1, 2, 3], // Inverted V-Shape
+      [1, 0, 0, 0, 1], // Upper Dip
+      [2, 3, 3, 3, 2], // Lower Dip
+      [0, 0, 1, 0, 0], // Top Squiggle
+      [3, 3, 2, 3, 3], // Bottom Squiggle
 
-      // 13-20: diagonals across
-      [0, 1, 2, 3, 3],
-      [3, 2, 1, 0, 0],
-      [0, 1, 2, 3, 2],
-      [3, 2, 1, 0, 1],
-      [1, 2, 3, 3, 3],
-      [2, 1, 0, 0, 0],
-      [1, 1, 2, 1, 1],
-      [2, 2, 1, 2, 2],
+      // 11-14: Core Diagonals (4 lines)
+      [0, 1, 2, 3, 2], // Diag Down, Back Up
+      [3, 2, 1, 0, 1], // Diag Up, Back Down
+      [0, 1, 2, 3, 3], // Corner-to-Corner (Ends Low)
+      [3, 2, 1, 0, 0], // Corner-to-Corner (Ends High)
 
-      // 21-28: extended zigzags / double dips
+      // 15-20: Extended Zig-Zag (W/M Patterns) (6 lines)
       [0, 1, 0, 1, 0],
       [3, 2, 3, 2, 3],
-      [0, 2, 0, 2, 0],
-      [3, 1, 3, 1, 3],
-      [1, 0, 1, 0, 1],
-      [2, 3, 2, 3, 2],
       [1, 2, 1, 2, 1],
       [2, 1, 2, 1, 2],
+      [1, 0, 1, 0, 1],
+      [2, 3, 2, 3, 2],
 
-      // 29-36: ladder / step patterns
-      [0, 0, 1, 2, 3],
-      [3, 3, 2, 1, 0],
-      [1, 1, 0, 1, 2],
-      [2, 2, 3, 2, 1],
-      [0, 1, 1, 2, 2],
-      [3, 2, 2, 1, 1],
-      [1, 2, 2, 3, 3],
-      [2, 1, 1, 0, 0],
-
-      // 37-40: mixed S / small diagonals
-      [0, 1, 1, 0, 1],
-      [3, 2, 2, 3, 2],
-      [0, 1, 2, 1, 2],
-      [3, 2, 1, 2, 1]
+      // 21-25: Ladder/Step Patterns (5 lines)
+      [0, 0, 1, 2, 3], // Left-to-Right Stair Step
+      [3, 3, 2, 1, 0], // Reverse Stair Step
+      [0, 1, 1, 2, 2], // Slow Climb
+      [3, 2, 2, 1, 1], // Slow Descent
+      [1, 2, 2, 3, 3]  // Mid-to-Bottom Climb
     ],
     spinDuration: 1500
   },
 
   PharaohsRiches: {
+    // ✨ LOW VOLATILITY SETTINGS (More, smaller wins)
+    baseWinRate: {
+        MIN: 0.6, // Higher minimum chance for frequent small wins
+        MAX: 0.16  // Tighter range for control logic
+    },
     symbols: [
-      { name: 'pharaoh', file: '/images/PharaohsRichesSlots/pharaoh.png', multiplier: 10 },
-      { name: 'sphinx', file: '/images/PharaohsRichesSlots/sphinx.png', multiplier: 8 },
-      { name: 'ankh', file: '/images/PharaohsRichesSlots/ankh.png', multiplier: 4 },
-      { name: 'scarab', file: '/images/PharaohsRichesSlots/scarab.png', multiplier: 3 },
-      { name: 'pyramid', file: '/images/PharaohsRichesSlots/pyramid.png', multiplier: 5 },
-      { name: 'goldCoin', file: '/images/PharaohsRichesSlots/goldCoin.png', multiplier: 2 },
-      { name: 'treasureChest', file: '/images/PharaohsRichesSlots/treasureChest.png', multiplier: 7 },
-      { name: 'hieroglyphScroll', file: '/images/PharaohsRichesSlots/hieroglyphScroll.png', multiplier: 3 },
-      { name: 'ra', file: '/images/PharaohsRichesSlots/ra.png', multiplier: 100 }
+      // 9 -> 6
+      { name: 'pharaoh', file: '/images/PharaohsRichesSlots/pharaoh.png', multiplier: 6 },
+      // 7 -> 5
+      { name: 'sphinx', file: '/images/PharaohsRichesSlots/sphinx.png', multiplier: 5 },
+      // 3 -> 2
+      { name: 'ankh', file: '/images/PharaohsRichesSlots/ankh.png', multiplier: 2 },
+      // 2.5 -> 1.8
+      { name: 'scarab', file: '/images/PharaohsRichesSlots/scarab.png', multiplier: 1.8 },
+      // 4 -> 3
+      { name: 'pyramid', file: '/images/PharaohsRichesSlots/pyramid.png', multiplier: 3 },
+      // 1.5 -> 1.0 (Lowest possible multiplier)
+      { name: 'goldCoin', file: '/images/PharaohsRichesSlots/goldCoin.png', multiplier: 1.0 },
+      // 6 -> 4
+      { name: 'treasureChest', file: '/images/PharaohsRichesSlots/treasureChest.png', multiplier: 4 },
+      // 2 -> 1.5
+      { name: 'hieroglyphScroll', file: '/images/PharaohsRichesSlots/hieroglyphScroll.png', multiplier: 1.5 },
+      // 100 -> 100
+      { name: 'ra', file: '/images/PharaohsRichesSlots/ra.png', multiplier: 100 } 
     ],
 
     reels: 5,
     rows: 4,
 
-    // 🧩 FIXED CHANCES — same multipliers, just better balancing
+    // 💰 ADJUSTED CHANCES FOR MAXIMUM PROFITABILITY (Total = 100)
     symbolChances: {
-      goldCoin: 28,          // more frequent small win
-      scarab: 18,            // moderate win
-      hieroglyphScroll: 15,  // balanced mid symbol
-      ankh: 12,              // less common
-      pyramid: 8,            // moderate
-      sphinx: 5,             // rarer
-      pharaoh: 3,            // big win symbol
-      treasureChest: 3,      // rare high symbol
-      ra: 0.5                // ultra-rare jackpot (1 in 200)
+      goldCoin: 52.9,         // Increased chance for the now-1x payout
+      scarab: 18,
+      hieroglyphScroll: 25,   
+      ankh: 12,
+      pyramid: 8,
+      sphinx: 2,              // Further reduced chance
+      pharaoh: 1,             // Further reduced chance
+      treasureChest: 1,       // Further reduced chance
+      ra: 0.1                 // Drastically reduced chance for jackpot
     },
 
     paylines: [
-      // 1-4: horizontal lines
-      [0, 0, 0, 0, 0],
-      [1, 1, 1, 1, 1],
-      [2, 2, 2, 2, 2],
-      [3, 3, 3, 3, 3],
+      // 1-4: Essential Horizontal Lines (4 lines)
+      [0, 0, 0, 0, 0], // Top
+      [1, 1, 1, 1, 1], // Upper Middle
+      [2, 2, 2, 2, 2], // Lower Middle
+      [3, 3, 3, 3, 3], // Bottom
 
-      // 5-12: simple V / inverted V / zigzags
-      [0, 1, 2, 1, 0],
-      [3, 2, 1, 2, 3],
-      [1, 0, 0, 0, 1],
-      [2, 3, 3, 3, 2],
-      [0, 0, 1, 0, 0],
-      [3, 3, 2, 3, 3],
-      [0, 1, 1, 1, 0],
-      [3, 2, 2, 2, 3],
+      // 5-10: Simple Zig-Zag (V/Inverted V/Dips) (6 lines)
+      [0, 1, 2, 1, 0], // V-Shape
+      [3, 2, 1, 2, 3], // Inverted V-Shape
+      [1, 0, 0, 0, 1], // Upper Dip
+      [2, 3, 3, 3, 2], // Lower Dip
+      [0, 0, 1, 0, 0], // Top Squiggle
+      [3, 3, 2, 3, 3], // Bottom Squiggle
 
-      // 13-20: diagonals across
-      [0, 1, 2, 3, 3],
-      [3, 2, 1, 0, 0],
-      [0, 1, 2, 3, 2],
-      [3, 2, 1, 0, 1],
-      [1, 2, 3, 3, 3],
-      [2, 1, 0, 0, 0],
-      [1, 1, 2, 1, 1],
-      [2, 2, 1, 2, 2],
+      // 11-14: Core Diagonals (4 lines)
+      [0, 1, 2, 3, 2], // Diag Down, Back Up
+      [3, 2, 1, 0, 1], // Diag Up, Back Down
+      [0, 1, 2, 3, 3], // Corner-to-Corner (Ends Low)
+      [3, 2, 1, 0, 0], // Corner-to-Corner (Ends High)
 
-      // 21-28: extended zigzags / double dips
+      // 15-20: Extended Zig-Zag (W/M Patterns) (6 lines)
       [0, 1, 0, 1, 0],
       [3, 2, 3, 2, 3],
-      [0, 2, 0, 2, 0],
-      [3, 1, 3, 1, 3],
-      [1, 0, 1, 0, 1],
-      [2, 3, 2, 3, 2],
       [1, 2, 1, 2, 1],
       [2, 1, 2, 1, 2],
+      [1, 0, 1, 0, 1],
+      [2, 3, 2, 3, 2],
 
-      // 29-36: ladder / step patterns
-      [0, 0, 1, 2, 3],
-      [3, 3, 2, 1, 0],
-      [1, 1, 0, 1, 2],
-      [2, 2, 3, 2, 1],
-      [0, 1, 1, 2, 2],
-      [3, 2, 2, 1, 1],
-      [1, 2, 2, 3, 3],
-      [2, 1, 1, 0, 0],
-
-      // 37-40: mixed S / small diagonals
-      [0, 1, 1, 0, 1],
-      [3, 2, 2, 3, 2],
-      [0, 1, 2, 1, 2],
-      [3, 2, 1, 2, 1]
+      // 21-25: Ladder/Step Patterns (5 lines)
+      [0, 0, 1, 2, 3], // Left-to-Right Stair Step
+      [3, 3, 2, 1, 0], // Reverse Stair Step
+      [0, 1, 1, 2, 2], // Slow Climb
+      [3, 2, 2, 1, 1], // Slow Descent
+      [1, 2, 2, 3, 3]  // Mid-to-Bottom Climb
     ],
     spinDuration: 1500
   }

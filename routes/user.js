@@ -22,9 +22,27 @@ router.get('/dashboard', ensureAuth, async (req, res) => {
   try {
     const PAGE_SIZE = 10;
     const user = await User.findById(req.user._id)
-      .populate('deposits')
-      .populate('withdrawals')
-      .populate('gameHistory');
+      .populate({
+        path: 'deposits',
+        options: {
+          // Sort by 'createdAt' field in descending order (-1)
+          sort: { 'createdAt': -1 }
+        }
+      })
+      .populate({
+        path: 'withdrawals',
+        options: {
+          // Sort by 'createdAt' field in descending order (-1)
+          sort: { 'createdAt': -1 }
+        }
+      })
+      .populate({
+        path: 'gameHistory',
+        options: {
+          // Sort by 'createdAt' field in descending order (-1)
+          sort: { 'createdAt': -1 }
+        }
+      });
 
     const activeSection = req.query.section || 'statistics';
     const currentPage = parseInt(req.query.page) || 1;
@@ -122,8 +140,8 @@ router.post('/change-password', ensureAuth, async (req, res) => {
     if (!isMatch) return res.status(400).send('Current password is incorrect');
 
     // Note: Mongoose pre('save') middleware should handle hashing the password
-    user.password = newPassword; 
-    await user.save(); 
+    user.password = newPassword;
+    await user.save();
     res.redirect('/dashboard?message=Password+changed+successfully');
   } catch (err) {
     console.error(err);

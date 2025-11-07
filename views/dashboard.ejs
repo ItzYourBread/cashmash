@@ -94,7 +94,8 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <% for(let i=deposits.length - 1; i>= 0; i--) { %>
+                          <% // ✅ CORRECTED: Loop forward to show newest first %>
+                          <% for(let i=0; i < deposits.length; i++) { %>
                             <% const dep=deposits[i]; %>
                               <tr>
                                 <td>
@@ -134,7 +135,8 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <% for(let i=withdrawals.length - 1; i>= 0; i--) { %>
+                          <% // ✅ CORRECTED: Loop forward to show newest first %>
+                          <% for(let i=0; i < withdrawals.length; i++) { %>
                             <% const w=withdrawals[i]; %>
                               <tr>
                                 <td>
@@ -185,7 +187,8 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <% for(let i=gameHistory.length - 1; i>= 0; i--) { %>
+                          <% // ✅ CORRECTED: Loop forward to show newest first %>
+                          <% for(let i=0; i < gameHistory.length; i++) { %>
                             <% const g=gameHistory[i]; %>
                               <tr>
                                 <td>

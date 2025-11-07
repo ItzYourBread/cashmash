@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     betInput.addEventListener("blur", () => {
         let val = parseInt(betInput.value);
-        if (isNaN(val) || val < 10) betInput.value = 10;
-        if (val > 1000) betInput.value = 1000;
+        if (isNaN(val) || val < 75) betInput.value = 75;
+        if (val > 5000) betInput.value = 5000;
     });
 
     // ====================== CONFIG ======================
