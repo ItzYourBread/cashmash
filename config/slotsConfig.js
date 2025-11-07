@@ -3,7 +3,7 @@ const slotsConfig = {
     // 💥 HIGH VOLATILITY SETTINGS (Fewer, bigger wins)
     baseWinRate: {
         MIN: 0.4, // Low minimum chance
-        MAX: 0.99  // Wide range for control logic
+        MAX: 0.12  // Wide range for control logic
     },
     symbols: [
       { name: 'cherry', file: '/images/ClassicSlot/cherry.png', multiplier: 0.8 },
@@ -20,7 +20,7 @@ const slotsConfig = {
     reels: 5,
     rows: 4,
     symbolChances: {
-      cherry: 100000, lemon: 35, orange: 25, watermelon: 15, grapes: 10,
+      cherry: 50, lemon: 35, orange: 25, watermelon: 15, grapes: 10,
       star: 8, red7: 3, diamond: 3, bar: 2, jackpot: 1
     },
     paylines: [
