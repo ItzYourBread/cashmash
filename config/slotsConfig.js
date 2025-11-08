@@ -2,8 +2,8 @@ const slotsConfig = {
   ClassicSlot: {
     // 💥 HIGH VOLATILITY SETTINGS (Fewer, bigger wins)
     baseWinRate: {
-      MIN: 0.2, // Low minimum chance
-      MAX: 0.4  // Wide range for control logic
+      MIN: 0.6, // Low minimum chance
+      MAX: 0.30  // Wide range for control logic
     },
     symbols: [
       { name: 'cherry', file: '/images/ClassicSlot/cherry.png', multiplier: 0.5 },
@@ -65,8 +65,8 @@ const slotsConfig = {
   PharaohsRiches: {
     // ✨ LOW VOLATILITY SETTINGS (More, smaller wins)
     baseWinRate: {
-      MIN: 0.4, // Higher minimum chance for frequent small wins
-      MAX: 0.6  // Tighter range for control logic
+      MIN: 0.4, // Low minimum chance
+      MAX: 0.28  // Wide range for control logic
     },
     symbols: [
       { name: 'goldCoin', file: '/images/PharaohsRichesSlots/goldCoin.png', multiplier: 0.6 },

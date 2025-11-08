@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { spin } = require('../controllers/slotsController');
+const { spin, simulate } = require('../controllers/slotsController');
 const minesController = require('../controllers/minesController');
 const baccaratController = require("../controllers/baccaratController");
 const blackjackController = require('../controllers/blackjackController');
@@ -35,6 +35,9 @@ function getCommonRenderData(req) {
 router.get('/slots', ensureAuth, (req, res) => res.render('slots', getCommonRenderData(req)));
 router.get('/slots-pharaohsriches', ensureAuth, (req, res) => res.render('PharaohsRichesSlots', getCommonRenderData(req)));
 router.post('/slots/spin', ensureAuth, spin);
+
+router.get('/slots/simulate', simulate);
+
 
 // --- MINES ROUTES ---
 router.get('/mines', ensureAuth, (req, res) => res.render('mines', getCommonRenderData(req)));

@@ -230,3 +230,98 @@ exports.spin = async (req, res) => {
   }
 };
 
+// --- SIMULATION MODE ---
+exports.simulate = async (req, res) => {
+  try {
+    setSlotType(req);
+    const config = getDynamicConfig();
+
+    let balance = 50000; // Starting test balance (BDT)
+    const bet = 75; // Default bet per spin
+    let spinCount = 0;
+    let totalWins = 0;
+    let totalLosses = 0;
+    let totalWagered = 0;
+    let highestBalance = balance;
+    let biggestWin = 0;
+
+    console.log(`🎮 Simulation starting for ${slotType}`);
+    console.log(`💰 Starting balance: ${balance} BDT`);
+
+    // Keep running until balance below 10,000
+    while (balance >= 10000) {
+      spinCount++;
+      totalWagered += bet;
+
+      // --- Generate reels
+      const symbolsMatrix = Array(config.reels).fill(0).map(() =>
+        Array(config.rows).fill(0).map(() => {
+          const sym = getRandomSymbol(config);
+          return { name: sym.name, file: sym.file, multiplier: sym.multiplier };
+        })
+      );
+
+      let { totalWin } = calculateWinnings(symbolsMatrix, bet, config);
+
+      // --- Win RNG control
+      const minRate = Math.min(config.baseWinRate.MIN, config.baseWinRate.MAX);
+      const maxRate = Math.max(config.baseWinRate.MIN, config.baseWinRate.MAX);
+      const winThreshold = minRate + Math.random() * ((maxRate - minRate) || 0.0001);
+      const winRoll = Math.random();
+
+      // RNG enforcement
+      if (totalWin > 0 && winRoll > winThreshold) {
+        totalWin = 0; // House advantage
+      }
+
+      // Apply result
+      balance -= bet;
+      balance += totalWin;
+      if (totalWin > 0) {
+        totalWins++;
+        if (totalWin > biggestWin) biggestWin = totalWin;
+      } else {
+        totalLosses++;
+      }
+
+      if (balance > highestBalance) highestBalance = balance;
+
+      // Optional logging every 100 spins
+      if (spinCount % 100 === 0) {
+        console.log(`🌀 Spins: ${spinCount}, Balance: ${balance.toFixed(2)}, RTP: ${(balance / 50000).toFixed(3)}`);
+      }
+    }
+
+    const netResult = balance - 50000;
+    const rtp = (balance / totalWagered).toFixed(3);
+
+    console.log('--- Simulation Complete ---');
+    console.log(`🧾 Spins: ${spinCount}`);
+    console.log(`🏆 Total Wins: ${totalWins}`);
+    console.log(`💀 Total Losses: ${totalLosses}`);
+    console.log(`📈 Highest Balance: ${highestBalance}`);
+    console.log(`💸 Biggest Win: ${biggestWin}`);
+    console.log(`💰 Final Balance: ${balance}`);
+    console.log(`📉 Net Result: ${netResult}`);
+    console.log(`🎯 Effective RTP: ${rtp}`);
+
+    res.json({
+      ok: true,
+      summary: {
+        slotType,
+        spins: spinCount,
+        totalWins,
+        totalLosses,
+        highestBalance,
+        biggestWin,
+        finalBalance: balance,
+        netResult,
+        effectiveRTP: rtp
+      }
+    });
+
+  } catch (err) {
+    console.error('Simulation error:', err);
+    res.status(500).json({ error: 'Simulation failed' });
+  }
+};
