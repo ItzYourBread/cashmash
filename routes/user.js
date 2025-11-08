@@ -22,30 +22,21 @@ router.get('/dashboard', ensureAuth, async (req, res) => {
   try {
     const PAGE_SIZE = 10;
     const user = await User.findById(req.user._id)
-      .populate({
-        path: 'deposits',
-        options: {
-          // Sort by 'createdAt' field in descending order (-1)
-          sort: { 'createdAt': -1 }
-        }
-      })
-      .populate({
-        path: 'withdrawals',
-        options: {
-          // Sort by 'createdAt' field in descending order (-1)
-          sort: { 'createdAt': -1 }
-        }
-      })
-      .populate({
-        path: 'gameHistory',
-        options: {
-          // Sort by 'createdAt' field in descending order (-1)
-          sort: { 'createdAt': -1 }
-        }
-      });
+      .populate('deposits')
+      .populate('withdrawals')
+      .populate('gameHistory');
 
     const activeSection = req.query.section || 'statistics';
     const currentPage = parseInt(req.query.page) || 1;
+
+    // --- Force consistent sorting (newest first) ---
+    const sortByDateDesc = (arr, field = 'createdAt') =>
+      [...(arr || [])].sort((a, b) => new Date(b[field]) - new Date(a[field]));
+
+    const sortedDeposits = sortByDateDesc(user.deposits, 'createdAt');
+    const sortedWithdrawals = sortByDateDesc(user.withdrawals, 'createdAt');
+    const sortedHistory = sortByDateDesc(user.gameHistory, 'playedAt');
+    const sortedRakeback = sortByDateDesc(user.rakebackHistory || [], 'creditedAt');
 
     // --- Pagination Helper ---
     const paginate = (arr) => {
@@ -55,13 +46,12 @@ router.get('/dashboard', ensureAuth, async (req, res) => {
       return { paginated: arr.slice(start, start + PAGE_SIZE), total, pages };
     };
 
-    const { paginated: paginatedDeposits, pages: depositPages } = paginate(user.deposits);
-    const { paginated: paginatedWithdrawals, pages: withdrawalPages } = paginate(user.withdrawals);
-    const { paginated: paginatedGameHistory, pages: historyPages } = paginate(user.gameHistory);
-    const { paginated: paginatedRakeback, pages: rakePages } =
-      paginate((user.rakebackHistory || []).sort((a, b) => new Date(b.creditedAt) - new Date(a.creditedAt)));
+    const { paginated: paginatedDeposits, pages: depositPages } = paginate(sortedDeposits);
+    const { paginated: paginatedWithdrawals, pages: withdrawalPages } = paginate(sortedWithdrawals);
+    const { paginated: paginatedGameHistory, pages: historyPages } = paginate(sortedHistory);
+    const { paginated: paginatedRakeback, pages: rakePages } = paginate(sortedRakeback);
 
-    // --- Process Rakeback for Display ---
+    // --- Process rakeback for display ---
     const rakebackDisplay = paginatedRakeback.map(rb => ({
       date: rb.creditedAt ? new Date(rb.creditedAt) : new Date(),
       weeklyWagered: rb.wagered || 0,
@@ -69,39 +59,33 @@ router.get('/dashboard', ensureAuth, async (req, res) => {
       rakeback: rb.amount || 0
     }));
 
-    // --- Render Dashboard ---
     res.render('dashboard', {
       user,
       activeSection,
       currentPage,
 
-      // Deposits
       deposits: paginatedDeposits,
       depositPages,
       depositPage: currentPage,
 
-      // Withdrawals
       withdrawals: paginatedWithdrawals,
       withdrawalPages,
       withdrawalPage: currentPage,
 
-      // Game History
       gameHistory: paginatedGameHistory,
       historyPages,
       historyPage: currentPage,
 
-      // Rakeback
       rakebackHistory: rakebackDisplay,
       rakePages,
       rakePage: currentPage
     });
 
   } catch (err) {
-    console.error(err);
+    console.error('Dashboard error:', err);
     res.redirect('/login');
   }
 });
-
 
 // Update phone
 router.post('/account/update', ensureAuth, async (req, res) => {
