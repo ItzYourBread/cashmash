@@ -133,7 +133,76 @@ const slotsConfig = {
       [1, 2, 2, 3, 3]  // Mid-to-Bottom Climb
     ],
     spinDuration: 1500
+  },
+
+  DragonBlaze: {
+    // 🔥 MEDIUM-HIGH VOLATILITY SETTINGS (Epic fire theme)
+    baseWinRate: {
+      MIN: 0.7, // Moderate minimum chance
+      MAX: 0.26  // Wider spread for dramatic wins
+    },
+
+    // 🐲 SYMBOLS — matches your existing image assets
+    symbols: [
+      { name: 'emberCoin', file: '/images/DragonBlazeSlots/emberCoin.png', multiplier: 0.6 },
+      { name: 'fireRune', file: '/images/DragonBlazeSlots/fireRune.png', multiplier: 1.0 },
+      { name: 'flameSword', file: '/images/DragonBlazeSlots/flameSword.png', multiplier: 1.8 },
+      { name: 'lavaShield', file: '/images/DragonBlazeSlots/lavaShield.png', multiplier: 2.5 },
+      { name: 'dragonEye', file: '/images/DragonBlazeSlots/dragonEye.png', multiplier: 3.5 },
+      { name: 'phoenixFeather', file: '/images/DragonBlazeSlots/phoenixFeather.png', multiplier: 5.0 },
+      { name: 'blazeCrown', file: '/images/DragonBlazeSlots/blazeCrown.png', multiplier: 8.0 },
+      { name: 'goldenDragon', file: '/images/DragonBlazeSlots/goldenDragon.png', multiplier: 15.0 },
+      { name: 'dragonBlaze', file: '/images/DragonBlazeSlots/dragonBlaze.png', multiplier: 40.0 } // 🔥 jackpot
+    ],
+
+    reels: 5,
+    rows: 4,
+
+    // 🎯 SYMBOL CHANCES (Total = 100)
+    symbolChances: {
+      emberCoin: 25,
+      fireRune: 20,
+      flameSword: 15,
+      lavaShield: 12,
+      dragonEye: 10,
+      phoenixFeather: 8,
+      blazeCrown: 5,
+      goldenDragon: 3,
+      dragonBlaze: 2
+    },
+
+    // 🕹️ 25 Paylines (balanced mix of horizontals, diagonals, zigs)
+    paylines: [
+      [0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 1],
+      [2, 2, 2, 2, 2],
+      [3, 3, 3, 3, 3],
+      [0, 1, 2, 1, 0],
+      [3, 2, 1, 2, 3],
+      [1, 0, 0, 0, 1],
+      [2, 3, 3, 3, 2],
+      [0, 0, 1, 0, 0],
+      [3, 3, 2, 3, 3],
+      [0, 1, 2, 3, 2],
+      [3, 2, 1, 0, 1],
+      [0, 1, 2, 3, 3],
+      [3, 2, 1, 0, 0],
+      [0, 1, 0, 1, 0],
+      [3, 2, 3, 2, 3],
+      [1, 2, 1, 2, 1],
+      [2, 1, 2, 1, 2],
+      [1, 0, 1, 0, 1],
+      [2, 3, 2, 3, 2],
+      [0, 0, 1, 2, 3],
+      [3, 3, 2, 1, 0],
+      [0, 1, 1, 2, 2],
+      [3, 2, 2, 1, 1],
+      [1, 2, 2, 3, 3]
+    ],
+
+    spinDuration: 1500
   }
+
 };
 
 module.exports = slotsConfig;

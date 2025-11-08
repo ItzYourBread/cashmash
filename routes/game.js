@@ -34,6 +34,7 @@ function getCommonRenderData(req) {
 // --- SLOTS ROUTES ---
 router.get('/slots', ensureAuth, (req, res) => res.render('slots', getCommonRenderData(req)));
 router.get('/slots-pharaohsriches', ensureAuth, (req, res) => res.render('PharaohsRichesSlots', getCommonRenderData(req)));
+router.get('/slots-dragonblaze', ensureAuth, (req, res) => res.render('DragonBlazeSlots', getCommonRenderData(req)));
 router.post('/slots/spin', ensureAuth, spin);
 
 router.get('/slots/simulate', simulate);

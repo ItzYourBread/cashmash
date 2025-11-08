@@ -46,7 +46,7 @@ const calculateWinnings = (symbolsMatrix, bet, config) => {
   let totalWin = 0;
   const finalSymbols = symbolsMatrix.map(reel => reel.map(sym => ({ ...sym, win: false })));
 
-  const validPaylines = (config.paylines || []).filter(line => 
+  const validPaylines = (config.paylines || []).filter(line =>
     Array.isArray(line) &&
     line.length === config.reels &&
     line.every(rowIndex => Number.isInteger(rowIndex) && rowIndex >= 0 && rowIndex < config.rows)
@@ -136,6 +136,17 @@ exports.spin = async (req, res) => {
 
     let { totalWin, finalSymbols } = calculateWinnings(symbolsMatrix, bet, config);
 
+    // --- Dragon Eye Bonus ---
+    let dragonEyeBonus = 0;
+    finalSymbols.forEach(reelSymbols => {
+      reelSymbols.forEach(symbol => {
+        if (symbol.name === 'dragonEye') {
+          dragonEyeBonus += bet * 0.10; // 10% of bet per dragonEye
+        }
+      });
+    });
+    totalWin += dragonEyeBonus; // add to total win
+
     // --- RNG & Win Logic ---
     const minRate = Math.min(config.baseWinRate.MIN, config.baseWinRate.MAX);
     const maxRate = Math.max(config.baseWinRate.MIN, config.baseWinRate.MAX);
@@ -166,7 +177,16 @@ exports.spin = async (req, res) => {
             };
           }
           const recalculated = calculateWinnings(symbolsMatrix, bet, config);
-          totalWin = recalculated.totalWin;
+
+          // Apply dragonEye bonus to forced win too
+          let forcedDragonEyeBonus = 0;
+          recalculated.finalSymbols.forEach(reelSymbols => {
+            reelSymbols.forEach(symbol => {
+              if (symbol.name === 'dragonEye') forcedDragonEyeBonus += bet * 0.10;
+            });
+          });
+
+          totalWin = recalculated.totalWin + forcedDragonEyeBonus;
           finalSymbols = recalculated.finalSymbols;
           isForcedWin = true;
         }
@@ -178,6 +198,7 @@ exports.spin = async (req, res) => {
     if (!isForcedWin && totalWin > 0 && winRoll > winThreshold) {
       totalWin = 0;
       finalSymbols = symbolsMatrix.map(reel => reel.map(sym => ({ ...sym, win: false })));
+      dragonEyeBonus = 0;
       console.log('❌ RNG Override: Win cancelled');
     } else if (totalWin > 0) {
       console.log('✅ Win accepted:', totalWin);
@@ -198,11 +219,20 @@ exports.spin = async (req, res) => {
       }
     }
 
+    const GAME_TYPE_NAMES = {
+      ClassicSlot: "Classic Slot",
+      PharaohsRiches: "Pharaoh’s Riches Slot",
+      DragonBlaze: "Dragon Blaze Slot",
+      Lucky777: "Lucky 777 Slot",
+      CashCrash: "Cash Crash Slot",
+    };
+
     user.gameHistory.push({
-      gameType: slotType,
+      gameType: GAME_TYPE_NAMES[slotType] || slotType,
       betAmount: bet,
       multiplier: totalWin > 0 ? totalWin / bet : 0,
       winAmount: totalWin,
+      dragonEyeBonus,        // send Dragon Eye bonus to frontend
       result: totalWin > 0 ? 'Win' : 'Loss',
       playedAt: new Date()
     });
@@ -213,6 +243,7 @@ exports.spin = async (req, res) => {
       ok: true,
       finalSymbols,
       winnings: totalWin,
+      dragonEyeBonus,         // include in response for animation
       balance: user.chips,
       isLuckyDay: config.isLuckyDay,
       losingStreak: user.losingStreak,

@@ -35,11 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ======= Symbols =======
     const symbols = [
-        'pharaoh', 'sphinx', 'ankh', 'scarab', 'pyramid',
-        'goldCoin', 'treasureChest', 'hieroglyphScroll', 'ra'
+        'blazeCrown', 'dragonBlaze', 'dragonEye', 'emberCoin', 'fireRune',
+        'flameSword', 'goldenDragon', 'lavaShield', 'phoenixFeather'
     ].map(name => ({
         name,
-        file: `/images/PharaohsRichesSlots/${name}.png`
+        file: `/images/DragonBlazeSlots/${name}.png`
     }));
 
     const loadedSymbols = [];
@@ -56,10 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ======= Server Call =======
     const actualServerSpin = async (bet) => {
-        const response = await fetch('/slots/spin?type=PharaohsRiches', {
+        const response = await fetch('/slots/spin?type=DragonBlaze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ bet, slotType: 'PharaohsRiches' })
+            body: JSON.stringify({ bet, slotType: 'DragonBlaze' })
         });
         const data = await response.json();
         if (!response.ok || data.error) throw new Error(data.error || 'Server request failed');
@@ -88,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!spinning) return;
             this.position += this.speed;
             if (this.position >= SYMBOL_SIZE + GAP) this.position -= SYMBOL_SIZE + GAP;
+
             if (this.stopping && !this.settled) {
                 this.speed *= 0.95;
                 if (this.speed < 1) {
@@ -120,12 +121,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.drawImage(imgData, this.x, y, SYMBOL_SIZE, SYMBOL_SIZE);
                 ctx.restore();
 
-                // Golden glow border for winners
+                // Glow border if winning
                 if (isWinningSymbol && glowing) {
-                    const glowAlpha = 0.6 + 0.4 * Math.sin(Date.now() / 100);
+                    const glowAlpha = 0.7 + 0.3 * Math.sin(Date.now() / 100);
                     const gradient = ctx.createLinearGradient(this.x, y, this.x + SYMBOL_SIZE, y + SYMBOL_SIZE);
-                    gradient.addColorStop(0, `rgba(255, 215, 100, ${glowAlpha})`);
-                    gradient.addColorStop(1, `rgba(255, 230, 150, ${glowAlpha})`);
+                    gradient.addColorStop(0, `rgba(255, 200, 50, ${glowAlpha})`);
+                    gradient.addColorStop(1, `rgba(255, 100, 0, ${glowAlpha})`);
                     ctx.strokeStyle = gradient;
                     ctx.lineWidth = 4;
                     ctx.strokeRect(this.x + 2, y + 2, SYMBOL_SIZE - 4, SYMBOL_SIZE - 4);
@@ -139,22 +140,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let spinning = false, glowing = false, particles = [];
 
     const createParticles = () => {
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < 30; i++) {
             particles.push({
                 x: Math.random() * CANVAS_WIDTH,
                 y: CANVAS_HEIGHT,
                 size: Math.random() * 3 + 1,
-                speedY: 1.5 + Math.random() * 2.5,
-                alpha: 1,
-                color: Math.random() > 0.5 ? 'gold' : 'deepskyblue'
+                speedY: 2 + Math.random() * 3,
+                alpha: 1
             });
         }
     };
 
     const drawParticles = () => {
         particles.forEach(p => {
-            const [r, g, b] = p.color === 'gold' ? [255, 215, 0] : [0, 180, 255];
-            ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${p.alpha})`;
+            ctx.fillStyle = `rgba(255, ${120 + Math.random() * 50}, 0, ${p.alpha})`;
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
             ctx.fill();
@@ -164,12 +163,11 @@ document.addEventListener('DOMContentLoaded', () => {
         particles = particles.filter(p => p.alpha > 0);
     };
 
-    const drawDesertBackground = () => {
-        const flicker = 0.05 + Math.sin(Date.now() / 180) * 0.05;
+    const drawFlameBackground = () => {
+        const flicker = 0.05 + Math.sin(Date.now() / 150) * 0.05;
         const grd = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
-        grd.addColorStop(0, `rgba(255, 230, 120, 0.3)`);
-        grd.addColorStop(0.5, `rgba(255, 220, 80, ${0.25 + flicker})`);
-        grd.addColorStop(1, `rgba(100, 60, 0, 1)`);
+        grd.addColorStop(0, `rgba(20, 0, 0, 1)`);
+        grd.addColorStop(1, `rgba(255, 50, 0, ${0.3 + flicker})`);
         ctx.fillStyle = grd;
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     };
@@ -182,21 +180,45 @@ document.addEventListener('DOMContentLoaded', () => {
         draw();
     };
 
+    let glowingDragonEyes = [];
+    let dragonEyeGlowTime = 0;
+
     const draw = () => {
-        drawDesertBackground();
+        drawFlameBackground();
         reels.forEach(r => { r.update(); r.draw(); });
+
+        // Dragon Eye +10% fade animation
+        if (glowingDragonEyes.length && dragonEyeGlowTime > 0) {
+            const alpha = Math.sin(Date.now() / 200) * 0.5 + 0.5;
+            const goldAlpha = alpha * 0.9 + 0.1;
+            ctx.fillStyle = `rgba(255, 215, 0, ${goldAlpha})`; // golden
+            ctx.font = '28px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            glowingDragonEyes.forEach(pos => {
+                const x = pos.x * (SYMBOL_SIZE + GAP) + SYMBOL_SIZE / 2;
+                const y = pos.y * (SYMBOL_SIZE + GAP) + SYMBOL_SIZE / 2;
+                ctx.fillText('+10%', x, y);
+            });
+            dragonEyeGlowTime -= 16;
+            if (dragonEyeGlowTime <= 0) glowingDragonEyes = [];
+        }
+
         if (glowing && particles.length) drawParticles();
-        if (spinning || glowing) requestAnimationFrame(draw);
+        if (spinning || glowing || glowingDragonEyes.length) requestAnimationFrame(draw);
     };
 
     const startSpin = async () => {
-        if (spinning || glowing) return;
+        if (spinning || glowing || glowingDragonEyes.length) return;
+
         const bet = parseInt(betInput.value, 10) || 50;
         if (bet <= 0) return alert('Enter a valid bet!');
         if (bet > currentBalance) return alert('Not enough balance!');
 
         resultDisplay.textContent = '';
         spinBtn.disabled = true;
+
+        // Optimistic balance deduction
         currentBalance -= bet;
         balanceDisplay.textContent = formatChips(currentBalance);
 
@@ -204,22 +226,56 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await actualServerSpin(bet);
             const finalSymbolsFromServer = data.finalSymbols;
 
+            // Start reel spinning animation
             spinning = true;
             reels.forEach(r => r.start());
             draw();
-            reels.forEach((r, i) => setTimeout(() => r.stop(finalSymbolsFromServer[i]), i * 800 + 1000));
+
+            // Stop reels with stagger
+            reels.forEach((r, i) =>
+                setTimeout(() => r.stop(finalSymbolsFromServer[i]), i * 800 + 1000)
+            );
 
             const stopTime = 1000 + REELS * 800 + 2000;
             setTimeout(() => {
                 spinning = false;
+
+                // Update balance from server
                 currentBalance = data.balance;
                 balanceDisplay.textContent = formatChips(currentBalance);
 
+                // Check for Dragon Eye bonus
+                let dragonEyeBonus = 0;
+                finalSymbolsFromServer.forEach(reelSymbols => {
+                    reelSymbols.forEach(symbol => {
+                        if (symbol.name === 'dragonEye') {
+                            dragonEyeBonus += bet * 0.10; // 10% of bet per dragonEye
+                        }
+                    });
+                });
+
+                if (dragonEyeBonus > 0) {
+                    currentBalance += dragonEyeBonus;
+                    balanceDisplay.textContent = formatChips(currentBalance);
+
+                    // Prepare animation positions
+                    glowingDragonEyes = finalSymbolsFromServer.map((reelSymbols, reelIndex) =>
+                        reelSymbols.map((symbol, rowIndex) =>
+                            symbol.name === 'dragonEye' ? { x: reelIndex, y: rowIndex } : null
+                        )
+                    ).flat().filter(Boolean);
+
+                    dragonEyeGlowTime = 2000; // 2 seconds fade-in/out
+                }
+
+                // Normal winnings animation
                 if (data.winnings > 0) {
                     resultDisplay.textContent = `You won ৳${formatChips(data.winnings)}!`;
+
                     glowing = true;
-                    createParticles();
+                    createParticles(); // sparks!
                     draw();
+
                     setTimeout(() => {
                         glowing = false;
                         spinBtn.disabled = false;
@@ -227,15 +283,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     spinBtn.disabled = false;
                 }
+
             }, stopTime);
+
         } catch (err) {
             console.error(err);
             alert(err.message || 'Spin error');
+
+            // Refund bet if error
             currentBalance += bet;
             balanceDisplay.textContent = formatChips(currentBalance);
             spinBtn.disabled = false;
         }
     };
+
 
     spinBtn.addEventListener('click', startSpin);
 });
