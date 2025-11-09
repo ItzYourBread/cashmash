@@ -65,7 +65,7 @@ const slotsConfig = {
   PharaohsRiches: {
     // ✨ LOW VOLATILITY SETTINGS (More, smaller wins)
     baseWinRate: {
-      MIN: 0.4, // Low minimum chance
+      MIN: 0.8, // Low minimum chance
       MAX: 0.28  // Wide range for control logic
     },
     symbols: [
@@ -138,8 +138,8 @@ const slotsConfig = {
   DragonBlaze: {
     // 🔥 MEDIUM-HIGH VOLATILITY SETTINGS (Epic fire theme)
     baseWinRate: {
-      MIN: 0.7, // Moderate minimum chance
-      MAX: 0.26  // Wider spread for dramatic wins
+      MIN: 0.8, // Low minimum chance
+      MAX: 0.33  // Wide range for control logic
     },
 
     // 🐲 SYMBOLS — matches your existing image assets
