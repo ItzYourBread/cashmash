@@ -9,6 +9,89 @@
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/slots.css" />
+  <style>
+    /* ===================== DRAGONBLAZE THEME (BLACK + FIRE + GOLD) ===================== */
+    /* ===== GLOBAL ===== */
+    body {
+      margin: 0;
+      background: radial-gradient(circle at center, #1a0000 10%, #0a0000 100%);
+      color: #f9e8c3;
+      overflow-x: hidden;
+    }
+
+    /* ===== MODAL CONTENT ===== */
+    .modal-content {
+      background: linear-gradient(145deg, rgba(30, 0, 0, 0.98), rgba(10, 0, 0, 0.96));
+      border: 2px solid rgba(255, 140, 0, 0.6);
+      box-shadow:
+        0 0 40px rgba(255, 100, 0, 0.4),
+        inset 0 0 25px rgba(255, 215, 90, 0.1);
+      border-radius: 20px;
+      padding: 40px 48px;
+      width: 480px;
+      max-width: 90%;
+      text-align: left;
+      position: relative;
+      overflow-y: auto;
+      max-height: 85vh;
+      scrollbar-width: thin;
+      scrollbar-color: #ffcc66 rgba(50, 0, 0, 0.4);
+    }
+
+    .modal-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #ff9933, #ffcc66);
+      border-radius: 4px;
+    }
+
+    /* ===== CLOSE BUTTON ===== */
+    .close-btn {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      font-size: 1.8em;
+      color: #ffbb55;
+      cursor: pointer;
+      text-shadow: 0 0 15px rgba(255, 100, 0, 0.9);
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      color: #fff;
+      transform: rotate(12deg) scale(1.1);
+      text-shadow: 0 0 25px rgba(255, 180, 0, 1);
+    }
+
+    /* ===== TITLES & LIST ===== */
+    .modal-content h2 {
+      text-align: center;
+      color: #ffd85f;
+      font-size: 1.8em;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-shadow:
+        0 0 15px rgba(255, 180, 50, 0.8),
+        0 0 35px rgba(255, 90, 0, 0.7);
+    }
+
+    .modal-content li {
+      color: #f9d99a;
+      font-size: 1.05em;
+      margin-bottom: 10px;
+      border-left: 3px solid rgba(255, 140, 0, 0.5);
+      padding-left: 12px;
+      transition: all 0.25s ease;
+    }
+
+    .modal-content li:hover {
+      color: #ffb94c;
+      border-color: #ff9900;
+      transform: translateX(3px);
+    }
+  </style>
 </head>
 
 <body>
@@ -45,22 +128,50 @@
     <div id="infoModal" class="modal">
       <div class="modal-content">
         <span class="close-btn">&times;</span>
-        <h2>Winning Info - Dragon Blaze</h2>
-        <p>5-of-a-kind wins across 25 blazing paylines will ignite your fortune!</p>
+        <h2>Dragon Blaze — Game Info</h2>
+        <p>
+          Match <strong>5-of-a-kind</strong> symbols across <strong>25 active paylines</strong>
+          to unleash blazing wins! Each spin burns with the potential for bonus fire and fortune.
+        </p>
 
-        <h3>Multipliers (5-of-a-Kind)</h3>
-        <ul>
-          <li><img src="/images/DragonBlazeSlots/dragonBlaze.png" class="mini-symbol" /> Dragon Blaze: x40</li>
-          <li><img src="/images/DragonBlazeSlots/goldenDragon.png" class="mini-symbol" /> Golden Dragon: x15</li>
-          <li><img src="/images/DragonBlazeSlots/blazeCrown.png" class="mini-symbol" /> Blaze Crown: x8</li>
-          <li><img src="/images/DragonBlazeSlots/phoenixFeather.png" class="mini-symbol" /> Phoenix Feather: x5</li>
-          <li><img src="/images/DragonBlazeSlots/dragonEye.png" class="mini-symbol" /> Dragon Eye: x3.5</li>
-          <li><img src="/images/DragonBlazeSlots/lavaShield.png" class="mini-symbol" /> Lava Shield: x2.5</li>
-          <li><img src="/images/DragonBlazeSlots/flameSword.png" class="mini-symbol" /> Flame Sword: x1.8</li>
-          <li><img src="/images/DragonBlazeSlots/fireRune.png" class="mini-symbol" /> Fire Rune: x1.0</li>
-          <li><img src="/images/DragonBlazeSlots/emberCoin.png" class="mini-symbol" /> Ember Coin: x0.6</li>
+        <h3>Symbol Multipliers (5-of-a-Kind)</h3>
+        <ul class="symbol-list">
+          <li><img src="/images/DragonBlazeSlots/dragonBlaze.png" class="mini-symbol" /> <strong>Dragon Blaze:</strong>
+            x100</li>
+          <li><img src="/images/DragonBlazeSlots/goldenDragon.png" class="mini-symbol" /> <strong>Golden
+              Dragon:</strong> x15</li>
+          <li><img src="/images/DragonBlazeSlots/blazeCrown.png" class="mini-symbol" /> <strong>Blaze Crown:</strong> x8
+          </li>
+          <li><img src="/images/DragonBlazeSlots/phoenixFeather.png" class="mini-symbol" /> <strong>Phoenix
+              Feather:</strong> x5</li>
+          <li><img src="/images/DragonBlazeSlots/dragonEye.png" class="mini-symbol" /> <strong>Dragon Eye:</strong>
+            x3.5
+          </li>
+          <li><img src="/images/DragonBlazeSlots/lavaShield.png" class="mini-symbol" /> <strong>Lava Shield:</strong>
+            x2.5</li>
+          <li><img src="/images/DragonBlazeSlots/flameSword.png" class="mini-symbol" /> <strong>Flame Sword:</strong>
+            x1.8</li>
+          <li><img src="/images/DragonBlazeSlots/fireRune.png" class="mini-symbol" /> <strong>Fire Rune:</strong> x1.0
+          </li>
+          <li><img src="/images/DragonBlazeSlots/emberCoin.png" class="mini-symbol" /> <strong>Ember Coin:</strong> x0.6
+          </li>
         </ul>
 
+        <h3>Dragon Eye Bonus</h3>
+        <p>
+          Every <strong>Dragon Eye</strong> that appears during your spin grants an instant
+          <strong>+10% of your bet</strong> as bonus gold — whether you win the round or not.
+        </p>
+
+        <h3>Lucky Day Boost</h3>
+        <p>
+          On <strong>Sunday</strong> and <strong>Monday</strong>, chances are boosted by <strong>+10%</strong>
+          as part of the weekly <em>“Blaze Blessing”</em> event!
+        </p>
+
+        <p class="footer-note">
+          <em>Feel the flames. Embrace the risk. The Dragon rewards the brave.</em>
+        </p>
       </div>
     </div>
 

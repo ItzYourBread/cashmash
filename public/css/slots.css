@@ -53,15 +53,12 @@ body {
 /* ===================== CANVAS ===================== */
 .slot-canvas-wrapper {
   background: linear-gradient(180deg, #000000 0%, #000000 100%);
-  border-radius: 15px;
-  border: 3px solid #f5c542;
+  border: 5px solid #f5c542;
   box-shadow: 0 0 30px rgba(245, 197, 66, 0.3), inset 0 0 20px rgba(245, 197, 66, 0.2);
-  padding: 5px;
 }
 
 #slotCanvas {
   display: block;
-  border-radius: 10px;
   width: 100%;
   max-width: 600px;
 }
@@ -158,86 +155,120 @@ body {
   margin-top: 20px;
   text-shadow: 0 0 8px rgba(245, 197, 66, 0.4);
 }
-
-/* ===================== MODAL (BLACK & GOLD THEME) ===================== */
+/* ===================== MODAL (BLACK & GOLD SCROLLABLE) ===================== */
 .modal {
   display: none;
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.92);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.93);
+  backdrop-filter: blur(10px) saturate(120%);
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  overflow-y: auto; /* ✅ Enables scroll for long content */
+  padding: 40px 0;
 }
 
 .modal.active {
   display: flex;
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.35s ease-in-out;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.95) translateY(20px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 
 .modal-content {
-  background: linear-gradient(165deg, rgba(0, 0, 0, 0.95), rgba(5, 5, 15, 0.98));
+  background: radial-gradient(circle at top, rgba(10, 10, 10, 0.96), rgba(5, 5, 15, 0.98));
   border: 1.5px solid rgba(255, 215, 90, 0.6);
-  border-radius: 18px;
-  padding: 38px 42px;
-  color: #fdfdfd;
-  width: 400px;
+  border-radius: 22px;
+  padding: 38px 46px;
+  color: #fefefe;
+  width: 480px;
   max-width: 90%;
   text-align: left;
-  box-shadow: 0 0 40px rgba(255, 215, 90, 0.3),
-              inset 0 0 20px rgba(255, 215, 90, 0.08);
+  box-shadow: 
+    0 0 40px rgba(255, 215, 90, 0.3),
+    inset 0 0 20px rgba(255, 215, 90, 0.08);
   position: relative;
-  transition: all 0.3s ease;
+  transition: box-shadow 0.3s ease;
+  max-height: 85vh; /* ✅ Prevent overflow on small screens */
+  overflow-y: auto; /* ✅ Scroll inside modal-content if text is long */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 215, 90, 0.6) rgba(0, 0, 0, 0.3);
+}
+
+/* Custom Scrollbar */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+.modal-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ffd75a, #b5943e);
+  border-radius: 4px;
 }
 
 .modal-content:hover {
-  box-shadow: 0 0 50px rgba(255, 215, 90, 0.5),
-              inset 0 0 25px rgba(255, 215, 90, 0.1);
+  box-shadow: 
+    0 0 60px rgba(255, 215, 90, 0.5),
+    inset 0 0 25px rgba(255, 215, 90, 0.1);
 }
 
 .close-btn {
   position: absolute;
-  top: 14px;
+  top: 16px;
   right: 18px;
   font-size: 1.8em;
   cursor: pointer;
   color: #ffd75a;
-  text-shadow: 0 0 10px rgba(255, 215, 90, 0.6);
-  transition: all 0.2s ease;
+  text-shadow: 0 0 12px rgba(255, 215, 90, 0.7);
+  transition: all 0.25s ease;
 }
 
 .close-btn:hover {
   color: #fff;
   transform: scale(1.1) rotate(10deg);
-  text-shadow: 0 0 20px rgba(255, 215, 90, 0.9);
+  text-shadow: 0 0 25px rgba(255, 215, 90, 0.9);
 }
 
 .modal-content h2 {
   color: #ffd75a;
-  margin-bottom: 16px;
   text-align: center;
-  font-size: 1.7em;
+  font-size: 1.8em;
   font-weight: 700;
-  text-shadow: 0 0 18px rgba(255, 215, 90, 0.6);
-  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 20px rgba(255, 215, 90, 0.6);
+  letter-spacing: 0.6px;
+}
+
+.modal-content h3 {
+  color: #ffea9e;
+  font-size: 1.2em;
+  margin-top: 22px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 8px rgba(255, 215, 90, 0.5);
+}
+
+.modal-content p {
+  font-size: 1.03em;
+  color: #e6e6e6;
+  line-height: 1.55em;
+  margin-bottom: 10px;
 }
 
 .modal-content ul {
-  margin: 18px 0 10px;
+  margin: 14px 0 10px;
   list-style: none;
   padding: 0;
 }
@@ -248,12 +279,29 @@ body {
   color: #e8e8e8;
   border-left: 3px solid rgba(255, 215, 90, 0.4);
   padding-left: 12px;
-  transition: color 0.2s ease, border-color 0.2s ease;
+  transition: color 0.25s ease, border-color 0.25s ease;
 }
 
 .modal-content li:hover {
   color: #ffd75a;
   border-color: #ffd75a;
+}
+
+.mini-symbol {
+  width: 26px;
+  height: 26px;
+  vertical-align: middle;
+  margin-right: 8px;
+  filter: drop-shadow(0 0 6px rgba(255, 215, 90, 0.6));
+}
+
+.footer-note {
+  margin-top: 25px;
+  text-align: center;
+  color: #ffcf70;
+  font-style: italic;
+  font-size: 0.95em;
+  opacity: 0.9;
 }
 
 .mini-symbol {

@@ -2,7 +2,7 @@ const slotsConfig = {
   ClassicSlot: {
     // 💥 HIGH VOLATILITY SETTINGS (Fewer, bigger wins)
     baseWinRate: {
-      MIN: 0.6, // Low minimum chance
+      MIN: 0.8, // Low minimum chance
       MAX: 0.30  // Wide range for control logic
     },
     symbols: [
@@ -202,7 +202,6 @@ const slotsConfig = {
 
     spinDuration: 1500
   }
-
 };
 
 module.exports = slotsConfig;

@@ -114,18 +114,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const y = yOffset + i * (SYMBOL_SIZE + GAP);
                 ctx.save();
-
-                // Draw symbol
                 if (this.blur > 0) ctx.filter = `blur(${this.blur}px) brightness(${1 + this.blur * 0.05})`;
                 ctx.drawImage(imgData, this.x, y, SYMBOL_SIZE, SYMBOL_SIZE);
                 ctx.restore();
 
-                // Golden glow border for winners
+                // Glow border if winning
                 if (isWinningSymbol && glowing) {
-                    const glowAlpha = 0.6 + 0.4 * Math.sin(Date.now() / 100);
+                    const glowAlpha = 0.7 + 0.3 * Math.sin(Date.now() / 100);
                     const gradient = ctx.createLinearGradient(this.x, y, this.x + SYMBOL_SIZE, y + SYMBOL_SIZE);
-                    gradient.addColorStop(0, `rgba(255, 215, 100, ${glowAlpha})`);
-                    gradient.addColorStop(1, `rgba(255, 230, 150, ${glowAlpha})`);
+                    gradient.addColorStop(0, `rgba(200, 170, 80, ${glowAlpha})`);
+                    gradient.addColorStop(1, `rgba(220, 190, 120, ${glowAlpha})`);
+
                     ctx.strokeStyle = gradient;
                     ctx.lineWidth = 4;
                     ctx.strokeRect(this.x + 2, y + 2, SYMBOL_SIZE - 4, SYMBOL_SIZE - 4);
@@ -137,6 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ======= Effects =======
     const reels = [];
     let spinning = false, glowing = false, particles = [];
+    let glowingPharaohs = [];
+    let pharaohGlowTime = 0;
 
     const createParticles = () => {
         for (let i = 0; i < 25; i++) {
@@ -185,18 +186,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const draw = () => {
         drawDesertBackground();
         reels.forEach(r => { r.update(); r.draw(); });
+
+        // Pharaoh +5% glow
+        if (glowingPharaohs.length && pharaohGlowTime > 0) {
+            const alpha = Math.sin(Date.now() / 200) * 0.5 + 0.5;
+            const goldAlpha = alpha * 0.9 + 0.1;
+            ctx.fillStyle = `rgba(255, 215, 0, ${goldAlpha})`;
+            ctx.font = '28px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            glowingPharaohs.forEach(pos => {
+                const x = pos.x * (SYMBOL_SIZE + GAP) + SYMBOL_SIZE / 2;
+                const y = pos.y * (SYMBOL_SIZE + GAP) + SYMBOL_SIZE / 2;
+                ctx.fillText('+5%', x, y);
+            });
+            pharaohGlowTime -= 16;
+            if (pharaohGlowTime <= 0) glowingPharaohs = [];
+        }
+
         if (glowing && particles.length) drawParticles();
-        if (spinning || glowing) requestAnimationFrame(draw);
+        if (spinning || glowing || glowingPharaohs.length) requestAnimationFrame(draw);
     };
 
     const startSpin = async () => {
-        if (spinning || glowing) return;
+        if (spinning || glowing || glowingPharaohs.length) return;
+
         const bet = parseInt(betInput.value, 10) || 50;
         if (bet <= 0) return alert('Enter a valid bet!');
         if (bet > currentBalance) return alert('Not enough balance!');
 
         resultDisplay.textContent = '';
         spinBtn.disabled = true;
+
         currentBalance -= bet;
         balanceDisplay.textContent = formatChips(currentBalance);
 
@@ -207,13 +228,39 @@ document.addEventListener('DOMContentLoaded', () => {
             spinning = true;
             reels.forEach(r => r.start());
             draw();
-            reels.forEach((r, i) => setTimeout(() => r.stop(finalSymbolsFromServer[i]), i * 800 + 1000));
+            reels.forEach((r, i) =>
+                setTimeout(() => r.stop(finalSymbolsFromServer[i]), i * 800 + 1000)
+            );
 
             const stopTime = 1000 + REELS * 800 + 2000;
             setTimeout(() => {
                 spinning = false;
                 currentBalance = data.balance;
                 balanceDisplay.textContent = formatChips(currentBalance);
+
+                // Pharaoh +5% bonus
+                let pharaohBonus = 0;
+                finalSymbolsFromServer.forEach((reelSymbols, reelIndex) => {
+                    reelSymbols.forEach((symbol, rowIndex) => {
+                        if (symbol.name === 'pharaoh') {
+                            pharaohBonus += bet * 0.05;
+                        }
+                    });
+                });
+
+                if (pharaohBonus > 0) {
+                    currentBalance += pharaohBonus;
+                    balanceDisplay.textContent = formatChips(currentBalance);
+
+                    // Show glowing +5% text
+                    glowingPharaohs = finalSymbolsFromServer.map((reelSymbols, reelIndex) =>
+                        reelSymbols.map((symbol, rowIndex) =>
+                            symbol.name === 'pharaoh' ? { x: reelIndex, y: rowIndex } : null
+                        )
+                    ).flat().filter(Boolean);
+
+                    pharaohGlowTime = 2000;
+                }
 
                 if (data.winnings > 0) {
                     resultDisplay.textContent = `You won ৳${formatChips(data.winnings)}!`;
@@ -227,7 +274,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     spinBtn.disabled = false;
                 }
+
             }, stopTime);
+
         } catch (err) {
             console.error(err);
             alert(err.message || 'Spin error');

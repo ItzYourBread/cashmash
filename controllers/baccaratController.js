@@ -101,7 +101,7 @@ exports.playBaccarat = async (req, res) => {
     const totalBet = pBet + bBet + tBet;
 
     if (totalBet <= 0) return res.status(400).json({ success:false, message:"No valid bets placed." });
-    if (totalBet > user.chips) return res.status(400).json({ success:false, message:"Insufficient chips." });
+    if (totalBet > user.chips) return res.status(400).json({ success:false, message:"Insufficient Balance." });
 
     // Deduct total bet and track rakeback
     user.chips -= totalBet;

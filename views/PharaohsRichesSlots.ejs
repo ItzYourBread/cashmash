@@ -9,91 +9,184 @@
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/slots.css" />
+  <style>
+    /* ===================== PHARAOH'S RICHES THEME (DESERT + GOLD + SAND) ===================== */
+    body {
+      margin: 0;
+      background: radial-gradient(circle at center, #4d2c00 10%, #1a0d00 100%);
+      color: #f5e1b8;
+      overflow-x: hidden;
+    }
+
+    /* ===== MODAL CONTENT ===== */
+    .modal-content {
+      background: linear-gradient(145deg, rgba(60, 40, 10, 0.97), rgba(30, 20, 5, 0.95));
+      border: 2px solid rgba(255, 215, 120, 0.6);
+      box-shadow:
+        0 0 35px rgba(255, 200, 50, 0.3),
+        inset 0 0 20px rgba(255, 215, 120, 0.1);
+      border-radius: 18px;
+      padding: 36px 42px;
+      width: 480px;
+      max-width: 90%;
+      text-align: left;
+      position: relative;
+      overflow-y: auto;
+      max-height: 85vh;
+      scrollbar-width: thin;
+      scrollbar-color: #ffd580 rgba(80, 50, 0, 0.4);
+    }
+
+    .modal-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #ffcc66, #ffd580);
+      border-radius: 4px;
+    }
+
+    /* ===== CLOSE BUTTON ===== */
+    .close-btn {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      font-size: 1.8em;
+      color: #ffd780;
+      cursor: pointer;
+      text-shadow: 0 0 12px rgba(255, 180, 50, 0.9);
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      color: #fff;
+      transform: rotate(12deg) scale(1.1);
+      text-shadow: 0 0 25px rgba(255, 215, 100, 1);
+    }
+
+    /* ===== TITLES & LIST ===== */
+    .modal-content h2 {
+      text-align: center;
+      color: #ffd680;
+      font-size: 1.8em;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-shadow: 0 0 12px rgba(255, 215, 120, 0.7),
+                   0 0 25px rgba(255, 180, 50, 0.6);
+    }
+
+    .modal-content li {
+      color: #f5e1b8;
+      font-size: 1.05em;
+      margin-bottom: 10px;
+      border-left: 3px solid rgba(255, 200, 50, 0.5);
+      padding-left: 12px;
+      transition: all 0.25s ease;
+    }
+
+    .modal-content li:hover {
+      color: #ffd580;
+      border-color: #ffb740;
+      transform: translateX(3px);
+    }
+
+    /* ===== FOOTER NOTE ===== */
+    .modal-content .footer-note {
+      margin-top: 18px;
+      font-style: italic;
+      color: #f0dca1;
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body>
   <%- include('partials/header') %>
 
-    <section class="slots-section">
-      <div class="slot-machine">
-        <h2 class="neon-title">Pharaoh's Riches Slot Machine</h2>
+  <section class="slots-section">
+    <div class="slot-machine">
+      <h2 class="neon-title">Pharaoh's Riches Slot Machine</h2>
 
-        <div class="slot-canvas-wrapper">
-          <canvas id="slotCanvas"></canvas>
+      <div class="slot-canvas-wrapper">
+        <canvas id="slotCanvas"></canvas>
+      </div>
+
+      <div class="controls">
+        <div class="balance-container">
+          Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
+            <%= formatBalance(user.chips) %>
+          </strong>
         </div>
 
-        <div class="controls">
-          <div class="balance-container">
-            Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
-              <%= formatBalance(user.chips) %>
-            </strong>
-          </div>
-
-          <div class="bet-section">
-            <input type="number" id="betAmount" placeholder="200-10000" min="200" max="10000" value="200" />
-            <button id="spinBtn" class="btn gold big">SPIN</button>
-          </div>
-
-          <div class="info-icon" id="infoBtn">?</div>
+        <div class="bet-section">
+          <input type="number" id="betAmount" placeholder="200-10000" min="200" max="10000" value="200" />
+          <button id="spinBtn" class="btn gold big">SPIN</button>
         </div>
 
-        <p id="result">Place your bet and spin!</p>
+        <div class="info-icon" id="infoBtn">?</div>
       </div>
-    </section>
 
-    <div id="infoModal" class="modal">
-      <div class="modal-content">
-        <span class="close-btn">&times;</span>
-        <h2>Winning Info - Pharaohs Riches</h2>
-        <p>Hit 5 matching symbols on any of the 25 paylines to unlock epic treasures!</p>
-
-        <h3>Multipliers (5-of-a-Kind)</h3>
-        <ul>
-          <li>
-            <img src="/images/PharaohsRichesSlots/ra.png" alt="Ra" class="mini-symbol" />
-            Ra (Jackpot): x100
-          </li>
-          <li>
-            <img src="/images/PharaohsRichesSlots/pharaoh.png" alt="Pharaoh" class="mini-symbol" />
-            Pharaoh: x5
-          </li>
-          <li>
-            <img src="/images/PharaohsRichesSlots/sphinx.png" alt="Sphinx" class="mini-symbol" />
-            Sphinx: x4
-          </li>
-          <li>
-            <img src="/images/PharaohsRichesSlots/treasureChest.png" alt="Treasure Chest" class="mini-symbol" />
-            Treasure Chest: x3
-          </li>
-          <li>
-            <img src="/images/PharaohsRichesSlots/pyramid.png" alt="Pyramid" class="mini-symbol" />
-            Pyramid: x2.5
-          </li>
-          <li>
-            <img src="/images/PharaohsRichesSlots/ankh.png" alt="Ankh" class="mini-symbol" />
-            Ankh: x1.5
-          </li>
-          <li>
-            <img src="/images/PharaohsRichesSlots/scarab.png" alt="Scarab" class="mini-symbol" />
-            Scarab: x1.2
-          </li>
-          <li>
-            <img src="/images/PharaohsRichesSlots/hieroglyphScroll.png" alt="Hieroglyph Scroll" class="mini-symbol" />
-            Hieroglyph Scroll: x1.0
-          </li>
-          <li>
-            <img src="/images/PharaohsRichesSlots/goldCoin.png" alt="Gold Coin" class="mini-symbol" />
-            Gold Coin: x1x
-          </li>
-        </ul>
-
-      </div>
+      <p id="result">Place your bet and spin!</p>
     </div>
+  </section>
 
-    <%- include('partials/footer') %>
-      <script src="/js/formatBalance.js"></script>
-      <script type="module" src="/js/PharaohsRichesSlots.js"></script>
-      <script type="module" src="/js/slotsModal.js"></script>
+  <!-- 🔱 Info Modal -->
+  <div id="infoModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2>Pharaoh's Riches — Game Info</h2>
+      <p>
+        Hit <strong>5-of-a-kind</strong> symbols on <strong>25 active paylines</strong> to unlock epic treasures!
+        Each spin unveils golden rewards hidden in the sands of the Nile.
+      </p>
+
+      <h3>Symbol Multipliers (5-of-a-Kind)</h3>
+      <ul class="symbol-list">
+        <li>
+          <img src="/images/PharaohsRichesSlots/ra.png" class="mini-symbol" /> <strong>Ra (Jackpot):</strong> x100
+        </li>
+        <li>
+          <img src="/images/PharaohsRichesSlots/pharaoh.png" class="mini-symbol" /> <strong>Pharaoh:</strong> x5
+          <em> (+5% bet bonus)</em>
+        </li>
+        <li>
+          <img src="/images/PharaohsRichesSlots/sphinx.png" class="mini-symbol" /> <strong>Sphinx:</strong> x4
+        </li>
+        <li>
+          <img src="/images/PharaohsRichesSlots/treasureChest.png" class="mini-symbol" /> <strong>Treasure Chest:</strong> x3
+        </li>
+        <li>
+          <img src="/images/PharaohsRichesSlots/pyramid.png" class="mini-symbol" /> <strong>Pyramid:</strong> x2.5
+        </li>
+        <li>
+          <img src="/images/PharaohsRichesSlots/ankh.png" class="mini-symbol" /> <strong>Ankh:</strong> x1.5
+        </li>
+        <li>
+          <img src="/images/PharaohsRichesSlots/scarab.png" class="mini-symbol" /> <strong>Scarab:</strong> x1.2
+        </li>
+        <li>
+          <img src="/images/PharaohsRichesSlots/hieroglyphScroll.png" class="mini-symbol" /> <strong>Hieroglyph Scroll:</strong> x1
+        </li>
+        <li>
+          <img src="/images/PharaohsRichesSlots/goldCoin.png" class="mini-symbol" /> <strong>Gold Coin:</strong> x1
+        </li>
+      </ul>
+
+      <h3>Pharaoh Symbol Bonus</h3>
+      <p>
+        Every <strong>Pharaoh</strong> symbol appearing grants an instant <strong>+5% of your bet</strong> as bonus treasure.
+      </p>
+
+      <p class="footer-note">
+        <em>Seek the treasures, brave the desert, and may the gods of the Nile favor your spin!</em>
+      </p>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+  <script src="/js/formatBalance.js"></script>
+  <script type="module" src="/js/PharaohsRichesSlots.js"></script>
+  <script type="module" src="/js/slotsModal.js"></script>
 </body>
 
 </html>

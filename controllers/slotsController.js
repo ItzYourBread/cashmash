@@ -119,13 +119,18 @@ exports.spin = async (req, res) => {
     // --- WINNING CALC ---
     let { totalWin, finalSymbols } = calculateWinnings(matrix, bet, config);
 
-    // --- DRAGON BONUS ---
+    // --- BONUSES ---
     let dragonEyeBonus = 0;
-    for (const reel of finalSymbols)
-      for (const sym of reel)
-        if (sym.name === "dragonEye") dragonEyeBonus += bet * 0.1;
+    let pharaohBonus = 0;
 
-    totalWin += dragonEyeBonus;
+    for (const reel of finalSymbols) {
+      for (const sym of reel) {
+        if (sym.name === "dragonEye") dragonEyeBonus += bet * 0.10; // 10% per Dragon Eye
+        if (sym.name === "pharaoh") pharaohBonus += bet * 0.05;    // 5% per Pharaoh
+      }
+    }
+
+    totalWin += dragonEyeBonus + pharaohBonus;
 
     // --- RNG + Comeback logic ---
     const { MIN, MAX } = config.baseWinRate;
@@ -156,10 +161,11 @@ exports.spin = async (req, res) => {
     }
 
     // --- RNG Override ---
-    if (!isForcedWin && totalWin - dragonEyeBonus > 0 && winRoll > winThreshold) {
-      totalWin = dragonEyeBonus;
-      for (const reel of finalSymbols) for (const sym of reel) sym.win = false;
-    }
+if (!isForcedWin && totalWin - (dragonEyeBonus + pharaohBonus) > 0 && winRoll > winThreshold) {
+  totalWin = dragonEyeBonus + pharaohBonus; // ✅ preserve both bonuses
+  for (const reel of finalSymbols) for (const sym of reel) sym.win = false;
+}
+
 
     // --- Balance Update ---
     user.chips += totalWin;
@@ -176,7 +182,6 @@ exports.spin = async (req, res) => {
       betAmount: bet,
       multiplier: totalWin > 0 ? totalWin / bet : 0,
       winAmount: totalWin,
-      dragonEyeBonus,
       result: totalWin > 0 ? "Win" : "Loss",
       playedAt: new Date(),
     });
@@ -187,7 +192,6 @@ exports.spin = async (req, res) => {
       ok: true,
       finalSymbols,
       winnings: totalWin,
-      dragonEyeBonus,
       balance: user.chips,
       isLuckyDay: config.isLuckyDay,
       losingStreak: user.losingStreak,

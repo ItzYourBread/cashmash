@@ -29,7 +29,7 @@ async function processAutoCashout(userId, game) {
         delete gameState[userId];
 
         return {
-            message: `Previous game automatically cashed out for ${winnings} chips.`,
+            message: `Previous game automatically cashed out for ৳${winnings} Balance.`,
             winnings,
             balance: user ? user.chips : null
         };
@@ -67,7 +67,7 @@ exports.start = async (req, res) => {
 
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
-        if (bet > user.chips) return res.status(400).json({ ok: false, error: 'Insufficient chips' });
+        if (bet > user.chips) return res.status(400).json({ ok: false, error: 'Insufficient Balance' });
 
         // --- CHIP DEDUCTION ---
         user.chips -= bet;

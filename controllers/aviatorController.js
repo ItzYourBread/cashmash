@@ -296,7 +296,7 @@ exports.placeBet = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
-    if (amount > user.chips) return res.status(400).json({ ok: false, error: 'Insufficient chips' });
+    if (amount > user.chips) return res.status(400).json({ ok: false, error: 'Insufficient Balance' });
 
     if (roundState.bets[userId] && config.maxConcurrentBetsPerUser <= 1) {
       return res.status(400).json({ ok: false, error: 'Already have an active bet this round' });
@@ -395,7 +395,7 @@ exports.socketPlaceBet = async (socket, data, ack) => {
 
     const user = await User.findById(userId);
     if (!user) return ack && ack({ ok: false, error: 'User not found' });
-    if (amount > user.chips) return ack && ack({ ok: false, error: 'Insufficient chips' });
+    if (amount > user.chips) return ack && ack({ ok: false, error: 'Insufficient Balance' });
 
     if (roundState.bets[userId] && config.maxConcurrentBetsPerUser <= 1) {
       return ack && ack({ ok: false, error: 'Already bet this round' });

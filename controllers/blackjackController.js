@@ -50,7 +50,7 @@ exports.startGame = async (req, res) => {
     
     if (!user) return res.status(404).json({ message: 'User not found' });
     if (isNaN(bet) || bet <= 0) return res.status(400).json({ message: 'Invalid bet amount' });
-    if (bet > user.chips) return res.status(400).json({ message: 'Insufficient chips' });
+    if (bet > user.chips) return res.status(400).json({ message: 'Insufficient Balance' });
 
     // Deduct bet and track rakeback
     user.chips -= bet;
