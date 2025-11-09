@@ -1,11 +1,9 @@
-// controllers/slotsController.js
 const slotsConfig = require('../config/slotsConfig.js');
 const User = require('../models/User');
 
-// --- GLOBALS ---
+// --- GLOBAL SETTINGS ---
 let slotType = 'ClassicSlot';
-const TARGET_RTP = 0.92;
-const HOUSE_EDGE = 1 - TARGET_RTP;
+const BASE_RTP = 0.92; // 🎯 Base RTP for all slots
 const PAYOUT_FACTORS = { 3: 1.0, 4: 3.0, 5: 5.0 };
 
 // --- SET SLOT TYPE ---
@@ -14,43 +12,56 @@ const setSlotType = (req) => {
   if (type && slotsConfig[type]) slotType = type;
 };
 
-// --- PRE-CACHED RANDOM GENERATOR (avoids array re-creation every call) ---
+// --- RANDOM SYMBOL PICKER ---
 const getRandomSymbol = (config) => {
   const symbols = config._weightedSymbols;
   return symbols[Math.floor(Math.random() * symbols.length)];
 };
 
-// --- CONFIG CACHE BUILDER ---
+// --- BUILD WEIGHTED SYMBOL CACHE ---
 const buildWeightedSymbols = (config) => {
-  if (config._weightedSymbols) return config; // Cached
+  if (config._weightedSymbols) return config;
   const weighted = [];
-  const symbolChances = config.symbolChances || {};
+  const chances = config.symbolChances || {};
   for (const sym of config.symbols) {
-    const weight = symbolChances[sym.name] || 1;
+    const weight = chances[sym.name] || 1;
     for (let i = 0; i < weight; i++) weighted.push(sym);
   }
   config._weightedSymbols = weighted;
   return config;
 };
 
-// --- DYNAMIC CONFIGURATION ---
+// --- DYNAMIC CONFIG (includes Lucky Day) ---
 const getDynamicConfig = () => {
-  const today = new Date();
-  const isLuckyDay = today.getDay() <= 1; // Sunday/Monday
   const baseConfig = slotsConfig[slotType];
-  const payoutBoost = isLuckyDay ? 1.1 : 1.0;
-  const adjust = 1 - (HOUSE_EDGE / 2);
+  const today = new Date();
+  const isLuckyDay = today.getDay() === 0 || today.getDay() === 1; // Sunday=0, Monday=1
+  const payoutBoost = isLuckyDay ? 1.1 : 1.0; // +10% payouts
 
-  // Avoid deep cloning, reuse structure
   const symbols = baseConfig.symbols.map(sym => ({
     ...sym,
-    multiplier: sym.multiplier * payoutBoost * adjust
+    multiplier: sym.multiplier * BASE_RTP * payoutBoost,
   }));
 
-  return buildWeightedSymbols({ ...baseConfig, symbols, isLuckyDay });
+  return buildWeightedSymbols({
+    ...baseConfig,
+    symbols,
+    isLuckyDay,
+  });
 };
 
-// --- WIN CALCULATION (tight loop optimized) ---
+// --- PAYLINES CACHE ---
+const cacheValidPaylines = (config) => {
+  if (config._validPaylines) return config;
+  config._validPaylines = (config.paylines || []).filter(line =>
+    Array.isArray(line) &&
+    line.length === config.reels &&
+    line.every(i => Number.isInteger(i) && i >= 0 && i < config.rows)
+  );
+  return config;
+};
+
+// --- WIN CALCULATION ---
 const calculateWinnings = (matrix, bet, config) => {
   const paylines = config._validPaylines;
   let totalWin = 0;
@@ -77,17 +88,6 @@ const calculateWinnings = (matrix, bet, config) => {
   return { totalWin, finalSymbols: final };
 };
 
-// --- VALID PAYLINES CACHE ---
-const cacheValidPaylines = (config) => {
-  if (config._validPaylines) return config;
-  config._validPaylines = (config.paylines || []).filter(line =>
-    Array.isArray(line) &&
-    line.length === config.reels &&
-    line.every(i => Number.isInteger(i) && i >= 0 && i < config.rows)
-  );
-  return config;
-};
-
 // --- MAIN SPIN ---
 exports.spin = async (req, res) => {
   const bet = +req.body.bet || 0;
@@ -103,80 +103,32 @@ exports.spin = async (req, res) => {
     if (bet > user.chips) return res.status(400).json({ error: 'Insufficient balance' });
 
     user.chips -= bet;
-    user.spinsSinceLastSmallWin = (user.spinsSinceLastSmallWin || 0) + 1;
-    user.totalWagered = (user.totalWagered || 0) + bet;
-    user.losingStreak = user.losingStreak || 0;
-    user.comebackSpinsLeft = user.comebackSpinsLeft || 0;
 
-    // --- MATRIX GENERATION (optimized) ---
+    // --- GENERATE SYMBOL MATRIX ---
     const matrix = Array.from({ length: config.reels }, () =>
-      Array.from({ length: config.rows }, () => {
-        const sym = getRandomSymbol(config);
-        return sym;
-      })
+      Array.from({ length: config.rows }, () => getRandomSymbol(config))
     );
 
-    // --- WINNING CALC ---
+    // --- BASE WIN CALC ---
     let { totalWin, finalSymbols } = calculateWinnings(matrix, bet, config);
 
-    // --- BONUSES ---
+    // --- BONUS LOGIC ---
     let dragonEyeBonus = 0;
     let pharaohBonus = 0;
 
     for (const reel of finalSymbols) {
       for (const sym of reel) {
-        if (sym.name === "dragonEye") dragonEyeBonus += bet * 0.10; // 10% per Dragon Eye
-        if (sym.name === "pharaoh") pharaohBonus += bet * 0.05;    // 5% per Pharaoh
+        if (sym.name === "dragonEye") dragonEyeBonus += bet * 0.10;
+        if (sym.name === "pharaoh") pharaohBonus += bet * 0.05;
       }
     }
 
     totalWin += dragonEyeBonus + pharaohBonus;
 
-    // --- RNG + Comeback logic ---
-    const { MIN, MAX } = config.baseWinRate;
-    let winThreshold = MIN + Math.random() * (MAX - MIN);
-    if (user.comebackSpinsLeft > 0) {
-      winThreshold += 0.15 + Math.random() * 0.15;
-      user.comebackSpinsLeft--;
-    }
-    winThreshold = Math.min(Math.max(winThreshold, 0.01), 0.99);
-
-    const winRoll = Math.random();
-    let isForcedWin = false;
-
-    // --- Forced small win ---
-    if (user.spinsSinceLastSmallWin >= 10 && totalWin === 0) {
-      const smalls = config.symbols.filter(s => s.multiplier <= 1.5);
-      if (smalls.length) {
-        const sym = smalls[Math.floor(Math.random() * smalls.length)];
-        const line = config.paylines[Math.floor(Math.random() * config.paylines.length)];
-        for (let r = 0; r < 3; r++) matrix[r][line[r]] = sym;
-
-        const recalc = calculateWinnings(matrix, bet, config);
-        totalWin = recalc.totalWin;
-        finalSymbols = recalc.finalSymbols;
-        isForcedWin = true;
-      }
-      user.spinsSinceLastSmallWin = 0;
-    }
-
-    // --- RNG Override ---
-if (!isForcedWin && totalWin - (dragonEyeBonus + pharaohBonus) > 0 && winRoll > winThreshold) {
-  totalWin = dragonEyeBonus + pharaohBonus; // ✅ preserve both bonuses
-  for (const reel of finalSymbols) for (const sym of reel) sym.win = false;
-}
-
-
-    // --- Balance Update ---
+    // --- UPDATE BALANCE ---
     user.chips += totalWin;
 
-    if (totalWin > 0) user.losingStreak = 0;
-    else if (++user.losingStreak >= 10 && !user.comebackSpinsLeft) {
-      user.comebackSpinsLeft = 3 + Math.floor(Math.random() * 3);
-      user.losingStreak = 0;
-    }
-
-    // --- Push Game History (minimal fields) ---
+    // --- HISTORY LOG ---
     user.gameHistory.push({
       gameType: slotType,
       betAmount: bet,
@@ -194,9 +146,7 @@ if (!isForcedWin && totalWin - (dragonEyeBonus + pharaohBonus) > 0 && winRoll > 
       winnings: totalWin,
       balance: user.chips,
       isLuckyDay: config.isLuckyDay,
-      losingStreak: user.losingStreak,
-      comebackSpinsLeft: user.comebackSpinsLeft,
-      spinsSinceLastSmallWin: user.spinsSinceLastSmallWin,
+      rtp: BASE_RTP,
     });
   } catch (err) {
     console.error("🔥 Spin error:", err);
@@ -204,14 +154,15 @@ if (!isForcedWin && totalWin - (dragonEyeBonus + pharaohBonus) > 0 && winRoll > 
   }
 };
 
-// --- SIMULATION MODE ---
+// --- SIMULATION MODE (RTP-only, Sunday/Monday bonus applied) ---
 exports.simulate = async (req, res) => {
   try {
-    setSlotType(req);
-    const config = getDynamicConfig();
+    setSlotType(req); // Set slot type from query
+    let config = getDynamicConfig(); // Includes Sunday/Monday payout boost
+    config = cacheValidPaylines(config); // Ensure _validPaylines exists
 
-    let balance = 50000; // Starting test balance (BDT)
-    const bet = 75; // Default bet per spin
+    let balance = 50000; // Starting simulation balance (BDT)
+    const bet = 75;      // Default bet per spin
     let spinCount = 0;
     let totalWins = 0;
     let totalLosses = 0;
@@ -221,36 +172,28 @@ exports.simulate = async (req, res) => {
 
     console.log(`🎮 Simulation starting for ${slotType}`);
     console.log(`💰 Starting balance: ${balance} BDT`);
+    console.log(`🎯 Sunday/Monday payout boost: ${config.isLuckyDay ? "YES" : "NO"}`);
 
-    // Keep running until balance below 10,000
+    // Keep spinning until balance drops below threshold
     while (balance >= 10000) {
       spinCount++;
       totalWagered += bet;
 
-      // --- Generate reels
-      const symbolsMatrix = Array(config.reels).fill(0).map(() =>
-        Array(config.rows).fill(0).map(() => {
+      // --- Generate random symbols matrix ---
+      const symbolsMatrix = Array.from({ length: config.reels }, () =>
+        Array.from({ length: config.rows }, () => {
           const sym = getRandomSymbol(config);
           return { name: sym.name, file: sym.file, multiplier: sym.multiplier };
         })
       );
 
-      let { totalWin } = calculateWinnings(symbolsMatrix, bet, config);
-
-      // --- Win RNG control
-      const minRate = Math.min(config.baseWinRate.MIN, config.baseWinRate.MAX);
-      const maxRate = Math.max(config.baseWinRate.MIN, config.baseWinRate.MAX);
-      const winThreshold = minRate + Math.random() * ((maxRate - minRate) || 0.0001);
-      const winRoll = Math.random();
-
-      // RNG enforcement
-      if (totalWin > 0 && winRoll > winThreshold) {
-        totalWin = 0; // House advantage
-      }
+      // --- Calculate winnings for this spin ---
+      const { totalWin } = calculateWinnings(symbolsMatrix, bet, config);
 
       // Apply result
       balance -= bet;
       balance += totalWin;
+
       if (totalWin > 0) {
         totalWins++;
         if (totalWin > biggestWin) biggestWin = totalWin;
@@ -262,12 +205,12 @@ exports.simulate = async (req, res) => {
 
       // Optional logging every 100 spins
       if (spinCount % 100 === 0) {
-        console.log(`🌀 Spins: ${spinCount}, Balance: ${balance.toFixed(2)}, RTP: ${(balance / 50000).toFixed(3)}`);
+        console.log(`🌀 Spins: ${spinCount}, Balance: ${balance.toFixed(2)}, RTP: ${(balance / totalWagered).toFixed(3)}`);
       }
     }
 
     const netResult = balance - 50000;
-    const rtp = (balance / totalWagered).toFixed(3);
+    const rtp = totalWagered ? (balance / totalWagered).toFixed(3) : "0.000";
 
     console.log('--- Simulation Complete ---');
     console.log(`🧾 Spins: ${spinCount}`);
@@ -290,7 +233,8 @@ exports.simulate = async (req, res) => {
         biggestWin,
         finalBalance: balance,
         netResult,
-        effectiveRTP: rtp
+        effectiveRTP: rtp,
+        isLuckyDay: config.isLuckyDay
       }
     });
 
