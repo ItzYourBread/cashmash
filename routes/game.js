@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { spin, simulate } = require('../controllers/slotsController');
+const slotsConfig = require('../config/slotsConfig');
 const minesController = require('../controllers/minesController');
 const baccaratController = require("../controllers/baccaratController");
 const blackjackController = require('../controllers/blackjackController');
@@ -31,10 +32,23 @@ function getCommonRenderData(req) {
 }
 // ----------------------------
 
-// --- SLOTS ROUTES ---
-router.get('/slots', ensureAuth, (req, res) => res.render('slots', getCommonRenderData(req)));
-router.get('/slots-pharaohsriches', ensureAuth, (req, res) => res.render('PharaohsRichesSlots', getCommonRenderData(req)));
-router.get('/slots-dragonblaze', ensureAuth, (req, res) => res.render('DragonBlazeSlots', getCommonRenderData(req)));
+// --- UNIVERSAL SLOT ROUTE ---
+router.get('/slot', ensureAuth, (req, res) => {
+  const slotType = req.query.type || 'ClassicSlot';
+
+  // Validate slot type
+  if (!slotsConfig[slotType]) {
+    return res.redirect('/slot?type=ClassicSlot');
+  }
+
+  // ✅ Renders the single dynamic slot view
+  res.render('slots', {
+    ...getCommonRenderData(req),
+    slotType,
+    slotsConfig,
+  });
+});
+
 router.post('/slots/spin', ensureAuth, spin);
 
 router.get('/slots/simulate', simulate);

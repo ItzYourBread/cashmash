@@ -42,9 +42,12 @@ body {
 }
 
 @keyframes pulseGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     text-shadow: 0 0 10px rgba(245, 197, 66, 0.4);
   }
+
   60% {
     text-shadow: 0 0 25px rgba(245, 197, 66, 0.8);
   }
@@ -64,15 +67,17 @@ body {
 }
 
 /* ===================== CONTROLS ===================== */
-.controls {
+.slot-controls {
+  /* CRITICAL: Added position relative for the Bet Modal to position correctly */
+  position: relative; 
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
+  justify-content: space-between;
   margin-top: 25px;
+  gap: 12px;
   width: 100%;
   max-width: 600px;
+  margin-inline: auto;
 }
 
 .balance-container {
@@ -84,50 +89,18 @@ body {
   border-radius: 30px;
   box-shadow: inset 0 0 10px rgba(245, 197, 66, 0.3);
   min-width: 130px;
-  text-align: center;
+  text-align: left;
 }
 
-.bet-section {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-grow: 1;
-  justify-content: center;
+/* Added click indicator for the bet display */
+.bet-text {
+    cursor: pointer;
+    transition: text-shadow 0.2s;
+}
+.bet-text:hover {
+    text-shadow: 0 0 8px rgba(245, 197, 66, 0.5);
 }
 
-#betAmount {
-  padding: 12px 18px;
-  font-size: 1.1em;
-  border-radius: 30px;
-  border: none;
-  outline: none;
-  width: 130px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  transition: all 0.3s ease;
-}
-
-#betAmount:focus {
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 10px rgba(245, 197, 66, 0.5);
-}
-
-#spinBtn {
-  padding: 14px 45px;
-  font-size: 1.1em;
-  border-radius: 35px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-  background: var(--gold);
-    color: #000;
-    border: none;
-    box-shadow: 0 0 20px rgba(245, 197, 66, 0.4);
-}
- #spinBtn:hover {
-      box-shadow: 0 0 30px rgba(245, 197, 66, 0.7);
- }
 
 .info-icon {
   background: #f5c542;
@@ -155,19 +128,74 @@ body {
   margin-top: 20px;
   text-shadow: 0 0 8px rgba(245, 197, 66, 0.4);
 }
-/* ===================== MODAL (BLACK & GOLD SCROLLABLE) ===================== */
+
+/* --- NEWLY ADDED/INTEGRATED CONTROLS --- */
+.bet-spin-container {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  /* Reduced gap for a tighter feel */
+}
+
+.bet-btn {
+  background: transparent;
+  border: 2px solid #f5c542;
+  color: #ffd700;
+  font-size: 1.6em;
+  font-weight: bold;
+  width: 45px;
+  /* Matched info-icon size */
+  height: 45px;
+  /* Matched info-icon size */
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 10px rgba(245, 197, 66, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bet-btn:hover {
+  box-shadow: 0 0 15px rgba(255, 215, 90, 0.7);
+  background: rgba(245, 197, 66, 0.1);
+}
+
+.bet-spin-btn {
+  background: var(--gold);
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.3em;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+  box-shadow: 0 0 25px rgba(255, 215, 90, 0.4);
+  margin: 0 5px;
+  /* Added margin to separate from bet-btn */
+}
+
+.bet-spin-btn:hover {
+  box-shadow: 0 0 40px rgba(255, 215, 90, 0.8);
+}
+
+/* ===================== MODAL (INFO) ===================== */
 .modal {
   display: none;
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.93);
   backdrop-filter: blur(10px) saturate(120%);
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  overflow-y: auto; /* ✅ Enables scroll for long content */
+  overflow-y: auto;
   padding: 40px 0;
 }
 
@@ -181,6 +209,7 @@ body {
     opacity: 0;
     transform: scale(0.95) translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -196,13 +225,13 @@ body {
   width: 480px;
   max-width: 90%;
   text-align: left;
-  box-shadow: 
+  box-shadow:
     0 0 40px rgba(255, 215, 90, 0.3),
     inset 0 0 20px rgba(255, 215, 90, 0.08);
   position: relative;
   transition: box-shadow 0.3s ease;
-  max-height: 85vh; /* ✅ Prevent overflow on small screens */
-  overflow-y: auto; /* ✅ Scroll inside modal-content if text is long */
+  max-height: 85vh;
+  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 215, 90, 0.6) rgba(0, 0, 0, 0.3);
 }
@@ -211,16 +240,18 @@ body {
 .modal-content::-webkit-scrollbar {
   width: 6px;
 }
+
 .modal-content::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.3);
 }
+
 .modal-content::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #ffd75a, #b5943e);
   border-radius: 4px;
 }
 
 .modal-content:hover {
-  box-shadow: 
+  box-shadow:
     0 0 60px rgba(255, 215, 90, 0.5),
     inset 0 0 25px rgba(255, 215, 90, 0.1);
 }
@@ -238,7 +269,6 @@ body {
 
 .close-btn:hover {
   color: #fff;
-  transform: scale(1.1) rotate(10deg);
   text-shadow: 0 0 25px rgba(255, 215, 90, 0.9);
 }
 
@@ -312,6 +342,127 @@ body {
   filter: drop-shadow(0 0 6px rgba(255, 215, 90, 0.6));
 }
 
+/* ===================== BET MODAL (NEWLY STYLED) ===================== */
+/* Styles updated to match the .modal (info) theme */
+.bet-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(10px) saturate(120%);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 40px 0;
+}
+
+/* Use .active, just like the other modal */
+.bet-modal.active {
+  display: flex;
+  animation: fadeIn 0.35s ease-in-out;
+}
+
+.bet-modal-content {
+  /* Copied styles from .modal-content */
+  background: radial-gradient(circle at top, rgba(10, 10, 10, 0.96), rgba(5, 5, 15, 0.98));
+  border: 1.5px solid rgba(255, 215, 90, 0.6);
+  border-radius: 22px;
+  padding: 38px 46px;
+  box-shadow:
+    0 0 40px rgba(255, 215, 90, 0.3),
+    inset 0 0 20px rgba(255, 215, 90, 0.08);
+  /* --- Kept your original styles --- */
+  text-align: center;
+  color: white;
+  max-width: 350px !important;
+  max-width: 90%;
+  /* Added for responsiveness */
+}
+
+/* Modal Title (Assuming you'll add one, e.g., <h2>Set Bet</h2>) */
+.bet-modal-content h2 {
+  color: #ffd75a;
+  text-align: center;
+  font-size: 1.8em;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 0 0 20px rgba(255, 215, 90, 0.6);
+  letter-spacing: 0.6px;
+}
+
+.bet-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.bet-option {
+  background: linear-gradient(145deg, #ffd700, #ffb300);
+  border: none;
+  border-radius: 30px;
+  /* Matched to other buttons */
+  padding: 10px 22px;
+  /* Adjusted padding */
+  font-weight: 600;
+  color: #111;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.bet-option:hover {
+  background: linear-gradient(145deg, #ffec80, #ffc107);
+  box-shadow: 0 0 15px rgba(255, 215, 90, 0.5);
+}
+
+.custom-bet-input {
+  margin-top: 20px;
+  /* Increased margin */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-bet-input input {
+  /* Matched styles from #betAmount */
+  width: 130px;
+  padding: 12px 18px;
+  border-radius: 30px;
+  border: 1px solid #f5c542;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.custom-bet-input input:focus {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 10px rgba(245, 197, 66, 0.5);
+}
+
+.custom-bet-input button {
+  background: linear-gradient(145deg, #ffd700, #ffb300);
+  border: none;
+  border-radius: 30px;
+  /* Matched to other buttons */
+  padding: 12px 18px;
+  /* Matched to input */
+  font-weight: 600;
+  cursor: pointer;
+  color: #111;
+  transition: 0.2s;
+}
+
+.custom-bet-input button:hover {
+  background: linear-gradient(145deg, #ffec80, #ffc107);
+  box-shadow: 0 0 15px rgba(255, 215, 90, 0.5);
+}
+
+
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 700px) {
   .controls {
@@ -338,6 +489,19 @@ body {
     padding: 8px 15px;
     font-size: 1em;
     border-radius: 25px;
+  }
+
+  /* Responsive styles for new buttons */
+  .bet-btn {
+    width: 43px;
+    height: 43px;
+    font-size: 1.3em;
+  }
+
+  .bet-spin-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 1.1em;
   }
 
   .info-icon {
@@ -368,5 +532,32 @@ body {
     font-size: 1.5em;
     top: 10px;
     right: 14px;
+  }
+
+  /* Responsive styles for new modal */
+  .bet-modal-content {
+    width: 90%;
+    padding: 28px 26px;
+    border-radius: 15px;
+  }
+
+  .bet-modal-content h2 {
+    font-size: 1.4em;
+  }
+
+  .custom-bet-input {
+    flex-direction: column;
+    /* Stack input and button on small screens */
+    gap: 12px;
+  }
+
+  .custom-bet-input input {
+    width: 100%;
+    /* Full width */
+  }
+
+  .custom-bet-input button {
+    width: 100%;
+    /* Full width */
   }
 }

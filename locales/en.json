@@ -101,5 +101,9 @@
 	"Insufficient Balance": "Insufficient Balance",
 	"Minimum amount is": "Minimum amount is",
 	"Balance is sufficient": "Balance is sufficient",
-	"Enter Amount": "Enter Amount"
+	"Enter Amount": "Enter Amount",
+	"Crypto Deposit (NOWPayments)": "Crypto Deposit (NOWPayments)",
+	"You will be redirected to a crypto payment page.": "You will be redirected to a crypto payment page.",
+	"Pay with Crypto": "Pay with Crypto",
+	"Conversion error.Please re - enter the amount.": "Conversion error.Please re - enter the amount."
 }

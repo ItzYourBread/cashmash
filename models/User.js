@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const depositSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   amountUSD: { type: Number, required: false, default: 0 },
-  method: { type: String, enum: ['Bkash', 'Nagad', 'Upay', 'BinancePay'], required: true },
+  method: { type: String, enum: ['Bkash', 'Nagad', 'Upay', 'BinancePay', 'Crypto'], required: true },
   txnId: { type: String },
   status: { 
     type: String, 
