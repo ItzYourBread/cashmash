@@ -1,0 +1,9 @@
+curl -X POST http://localhost:3000/api/nowpayments/webhook \
+  -H "Content-Type: application/json" \
+  -H "x-nowpayments-sig: 4+XV2UlQ0Ea4CKDvHPkwvKJcDMk4NZZ5" \
+  -d '{
+    "payment_id": "5997312409",
+    "payment_status": "finished",
+    "order_id": "690a42801b961275e2001621",
+    "price_amount": 12
+  }'

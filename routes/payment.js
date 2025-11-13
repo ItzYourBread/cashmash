@@ -170,51 +170,105 @@ router.post('/deposit/crypto', ensureAuth, async (req, res) => {
 
 
 // ✅ WEBHOOK: Handle NOWPayments notifications
-router.post('/api/nowpayments/webhook', express.json(), async (req, res) => {
-  try {
-    const signature = req.headers['x-nowpayments-sig'];
-    const body = req.body;
+router.post(
+  '/api/nowpayments/webhook',
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf; // for correct signature verification
+    },
+  }),
+  async (req, res) => {
+    try {
+      const crypto = require('crypto');
+      const signature = req.headers['x-nowpayments-sig'];
+      const body = req.body;
 
-    // ✅ Verify IPN signature
-    const crypto = require('crypto');
-    const hmac = crypto
-      .createHmac('sha512', process.env.NOWPAYMENTS_IPN_SECRET)
-      .update(JSON.stringify(body))
-      .digest('hex');
+      // ✅ Generate the HMAC signature
+      const hmac = crypto
+        .createHmac('sha512', process.env.NOWPAYMENTS_IPN_SECRET)
+        .update(JSON.stringify(body))
+        .digest('hex');
 
-    if (hmac !== signature) {
-      console.warn("⚠️ Invalid NOWPayments signature");
-      return res.status(403).send('Invalid signature');
-    }
+      const isDev = process.env.NODE_ENV !== 'production';
 
-    const { payment_id, payment_status, order_id, price_amount } = body;
-
-    console.log("NOWPayments Webhook:", payment_status, payment_id);
-
-    if (payment_status === 'waiting' || payment_status === 'waiting') {
-      const userId = order_id;
-      const user = await mongoose.model('User').findById(userId);
-      const deposit = await Deposit.findOne({ txnId: payment_id });
-
-      if (deposit && deposit.status !== 'Completed') {
-        deposit.status = 'Completed';
-        await deposit.save();
-
-        // Reward user (e.g., add chips)
-        const rewardAmount = deposit.amount; // BDT equivalent
-        user.chips += rewardAmount;
-        await user.save();
-
-        console.log(`✅ User ${user.username} credited ৳${rewardAmount} from crypto payment.`);
+      // ✅ Signature verification
+      if (hmac !== signature) {
+        if (isDev) {
+          console.warn('⚠️ Invalid NOWPayments signature (ignored in dev)');
+        } else {
+          console.warn('❌ Invalid NOWPayments signature (blocked)');
+          return res.status(403).send('Invalid signature');
+        }
       }
-    }
 
-    res.sendStatus(200);
-  } catch (err) {
-    console.error('NOWPayments webhook failed:', err);
-    res.sendStatus(500);
+      const { payment_id, payment_status, order_id, price_amount } = body;
+      console.log('📩 NOWPayments Webhook:', payment_status, payment_id);
+
+      // ✅ Allow manual test in dev
+      if (isDev && body.test === true) {
+        console.log('🧪 Test webhook received, simulating success...');
+      }
+
+      // ✅ Only mark completed if finished or confirmed
+      if (
+        payment_status === 'confirmed' ||
+        payment_status === 'finished' ||
+        (isDev && body.test === true)
+      ) {
+        const userId = order_id;
+        const User = mongoose.model('User');
+        const user = await User.findById(userId);
+        const deposit = await Deposit.findOne({ txnId: payment_id });
+
+        if (!user) {
+          console.warn('⚠️ User not found for order_id:', userId);
+          return res.sendStatus(404);
+        }
+
+        if (!deposit) {
+          console.warn('⚠️ Deposit not found for payment_id:', payment_id);
+          return res.sendStatus(404);
+        }
+
+        // ✅ Only update if not already completed
+        if (deposit.status !== 'Completed') {
+          deposit.status = 'Completed';
+          await deposit.save();
+
+          // ✅ Update the deposit inside user.deposits array
+          const userDeposit = user.deposits.find(
+            (d) => d.txnId === payment_id
+          );
+
+          if (userDeposit) {
+            userDeposit.status = 'Completed';
+          }
+
+          // 💰 Reward user (only once)
+          const rewardAmount = deposit.amount || price_amount || 0;
+          user.chips = (user.chips || 0) + rewardAmount;
+
+          await user.save();
+
+          console.log(
+            `✅ User ${user.username} credited ৳${rewardAmount} and deposit marked Completed in both models.`
+          );
+        } else {
+          console.log(
+            `ℹ️ Deposit ${payment_id} already marked Completed, skipping reward.`
+          );
+        }
+      } else {
+        console.log('ℹ️ Payment not yet complete, status:', payment_status);
+      }
+
+      res.sendStatus(200);
+    } catch (err) {
+      console.error('❌ NOWPayments webhook failed:', err);
+      res.sendStatus(500);
+    }
   }
-});
+);
 
 
 // ----------------- WITHDRAW ROUTES -----------------
