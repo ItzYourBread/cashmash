@@ -191,7 +191,7 @@ router.post('/api/nowpayments/webhook', express.json(), async (req, res) => {
 
     console.log("NOWPayments Webhook:", payment_status, payment_id);
 
-    if (payment_status === 'finished' || payment_status === 'confirmed') {
+    if (payment_status === 'waiting' || payment_status === 'confirmed') {
       const userId = order_id;
       const user = await mongoose.model('User').findById(userId);
       const deposit = await Deposit.findOne({ txnId: payment_id });
