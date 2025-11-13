@@ -50,9 +50,6 @@ router.get('/deposit', ensureAuth, async (req, res) => {
         'usdtmatic',
         'usdtcelo',
         'usdtarb',
-        'usdtarc20',
-        'usdtton',
-        'usddtrc20'
       ];
 
       cachedCurrencies = currencies.filter(c =>
@@ -81,7 +78,7 @@ router.get('/deposit', ensureAuth, async (req, res) => {
       availableCryptos: cachedCurrencies || [],
       currentPage: 'deposit',
     });
-  } 
+  }
 });
 
 // Handle deposits for Bkash, Nagad, Upay
@@ -195,9 +192,6 @@ router.post('/deposit/crypto', ensureAuth, async (req, res) => {
       'usdtmatic',
       'usdtcelo',
       'usdtarb',
-      'usdtarc20',
-      'usdtton',
-      'usddtrc20'
     ];
 
     // Normalize input to lowercase for safety

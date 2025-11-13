@@ -113,7 +113,7 @@ const cryptoTitle = document.getElementById('cryptoTitle');
 const cryptoAmount = document.getElementById('cryptoAmount');
 
 // Apply same logic as Binance: USD amount validation + feedback
-const cryptoValidator = validateAmount('cryptoAmount', 'cryptoFeedback', 5, 1000, true);
+const cryptoValidator = validateAmount('cryptoAmount', 'cryptoFeedback', 10, 1000, true);
 
 document.querySelectorAll('.payment-card[data-modal="modal-crypto"]').forEach(card => {
   card.addEventListener('click', () => {

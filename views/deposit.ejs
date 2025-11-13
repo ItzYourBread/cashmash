@@ -83,18 +83,14 @@
                         <div class="payment-cards">
                             <% if (availableCryptos && availableCryptos.length) { %>
                                 <% availableCryptos.forEach(c=> {
-                                    const currency = c.toUpperCase();
-                                    const network = currency.replace('USDT', '');
-                                    const icon = network.includes('TRC') ? 'trx.png' :
-                                    network.includes('ERC') ? 'eth.png' :
-                                    network.includes('BSC') ? 'bnb.png' :
-                                    network.includes('POLYGON') ? 'matic.png' :
-                                    network.includes('ARBITRUM') ? 'arbitrum.png' : 'crypto.jpg';
+                                    const currency = c.toLowerCase();
+                                    const displayName = currency.toUpperCase().replace('USDT', 'USDT-');
+                                    const icon = `${currency}.jpg`;
                                     %>
                                     <div class="payment-card" data-modal="modal-crypto" data-currency="<%= currency %>">
-                                        <img src="/images/crypto/<%= icon %>" alt="<%= currency %>">
+                                        <img src="/images/payments/<%= icon %>" alt="<%= displayName %>">
                                         <h4>
-                                            <%= currency.replace('USDT', 'USDT-' ) %>
+                                            <%= displayName %>
                                         </h4>
                                     </div>
                                     <% }) %>
@@ -116,7 +112,7 @@
                                 <label>
                                     <%= __('Amount (USD)') %>
                                 </label>
-                                <input type="number" name="amount" id="cryptoAmount" required min="5" max="1000"/>
+                                <input type="number" name="amount" id="cryptoAmount" required min="10" max="1000" />
                                 <div id="cryptoFeedback" class="amount-feedback"></div>
 
                                 <p>
