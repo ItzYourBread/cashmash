@@ -74,36 +74,62 @@
                         </div>
                     </div>
 
+                    <!-- ✅ CRYPTO SECTION -->
                     <div id="crypto" class="content-section">
                         <h2>
                             <%= __('Crypto') %>
                         </h2>
+
                         <div class="payment-cards">
-                            <div class="payment-card" data-modal="modal-crypto">
-                                <img src="/images/payments/crypto.jpg" alt="Crypto">
-                                <h4>Crypto (NOWPayments)</h4>
+                            <div class="payment-card" data-modal="modal-crypto" data-currency="USDTTRC20">
+                                <img src="/images/crypto/trx.png" alt="USDT TRC20">
+                                <h4>USDT (TRC20)</h4>
+                            </div>
+
+                            <div class="payment-card" data-modal="modal-crypto" data-currency="USDTERC20">
+                                <img src="/images/crypto/eth.png" alt="USDT ERC20">
+                                <h4>USDT (ERC20)</h4>
+                            </div>
+
+                            <div class="payment-card" data-modal="modal-crypto" data-currency="USDTBEP20">
+                                <img src="/images/crypto/bnb.png" alt="USDT BEP20">
+                                <h4>USDT (BEP20)</h4>
+                            </div>
+
+                            <div class="payment-card" data-modal="modal-crypto" data-currency="USDTPOLYGON">
+                                <img src="/images/crypto/matic.png" alt="USDT Polygon">
+                                <h4>USDT (Polygon)</h4>
+                            </div>
+
+                            <div class="payment-card" data-modal="modal-crypto" data-currency="USDTARBITRUM">
+                                <img src="/images/crypto/arbitrum.png" alt="USDT Arbitrum">
+                                <h4>USDT (Arbitrum)</h4>
                             </div>
                         </div>
                     </div>
 
-                    <!-- MODAL: CRYPTO DEPOSIT -->
+                    <!-- ✅ MODAL -->
                     <div id="modal-crypto" class="modal">
                         <div class="modal-content">
                             <span class="close">&times;</span>
-                            <h3>
+                            <h3 id="cryptoTitle">
                                 <%= __('Crypto Deposit (NOWPayments)') %>
                             </h3>
+
                             <form method="POST" action="/deposit/crypto">
+                                <!-- this will be filled automatically -->
+                                <input type="hidden" name="currency" id="cryptoCurrency" value="USDTTRC20">
+
                                 <label>
                                     <%= __('Amount (USD)') %>
                                 </label>
                                 <input type="number" name="amount" id="cryptoAmount" required min="5" max="1000"
                                     step="0.01">
-                                <div id="cryptoFeedback" class="amount-feedback"></div>
 
                                 <p>
                                     <%= __('You will be redirected to a crypto payment page.') %>
                                 </p>
+
                                 <button type="submit">
                                     <%= __('Pay with Crypto') %>
                                 </button>
@@ -434,6 +460,32 @@
                     });
                 }
 
+                // Get modal and close button
+                const modal = document.getElementById('modal-crypto');
+                const closeBtn = modal.querySelector('.close');
+                const cryptoCurrencyInput = document.getElementById('cryptoCurrency');
+                const cryptoTitle = document.getElementById('cryptoTitle');
+
+                // Open modal for each card
+                document.querySelectorAll('.payment-card[data-modal="modal-crypto"]').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const currency = card.getAttribute('data-currency');
+                        const label = currency.replace('USDT', 'USDT-'); // visual dash for display
+                        cryptoCurrencyInput.value = currency;
+                        cryptoTitle.textContent = `Deposit with ${label}`;
+                        modal.style.display = 'flex';
+                    });
+
+                });
+
+                // Close modal
+                closeBtn.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                });
+
+                window.addEventListener('click', e => {
+                    if (e.target === modal) modal.style.display = 'none';
+                });
             </script>
 </body>
 

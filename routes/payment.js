@@ -120,39 +120,51 @@ router.post('/deposit/binance', ensureAuth, async (req, res) => {
 
 router.post('/deposit/crypto', ensureAuth, async (req, res) => {
   try {
-    const { amount } = req.body;
+    const { amount, currency } = req.body; // ✅ include currency
     const usdAmount = Number(amount);
 
     if (!usdAmount || usdAmount < 1) {
       return res.status(400).send('Invalid amount');
     }
 
-    // Create payment at NOWPayments
+    // ✅ Allowed stablecoins only (no BTC/ETH)
+    const allowedCurrencies = [
+      'USDTTRC20',
+      'USDTERC20',
+      'USDTBEP20',
+      'USDTARBITRUM',
+      'USDTPOLYGON',
+    ];
+
+    if (!allowedCurrencies.includes(currency)) {
+      return res.status(400).send('Unsupported USDT network');
+    }
+
+    // ✅ Create NOWPayments invoice
     const payment = await npApi.createInvoice({
       price_amount: usdAmount,
       price_currency: "usd",
+      pay_currency: currency, // 👈 set user-selected stablecoin
       order_id: req.user._id.toString(),
       order_description: `Crypto deposit by ${req.user.username}`,
       ipn_callback_url: `${process.env.BASE_URL}/api/nowpayments/webhook`
     });
 
+    console.log("NOWPayments Payment:", payment);
 
-    console.log("NOWPayments Payment:", payment); // 🧠 inspect the returned fields
-
-    // Use whichever ID field exists
     const txnId = payment.id || payment.payment_id || payment.invoice_id;
     if (!txnId) {
       console.warn("⚠️ NOWPayments did not return a payment ID");
       return res.status(500).send("Failed to create payment ID.");
     }
 
-    // Create pending deposit
+    // ✅ Store in DB
     const depositData = {
       user: req.user._id,
-      amount: usdAmount * 122.24, // convert USD → BDT if needed
+      amount: usdAmount * 122.24, // optional: convert USD→BDT
       amountUSD: usdAmount,
-      method: "Crypto",
-      txnId, // ✅ now guaranteed to exist
+      method: `Crypto (${currency})`, // 👈 identify network
+      txnId,
       status: "Pending"
     };
 
@@ -160,13 +172,13 @@ router.post('/deposit/crypto', ensureAuth, async (req, res) => {
     await req.user.save();
     await Deposit.create(depositData);
 
-    // Redirect to NOWPayments checkout page
     return res.redirect(payment.invoice_url);
   } catch (err) {
     console.error("NOWPayments error:", err);
     return res.status(500).send("Failed to create crypto payment.");
   }
 });
+
 
 
 // ✅ WEBHOOK: Handle NOWPayments notifications
