@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 const Deposit = require('../models/Deposit');
 const Withdraw = require('../models/Withdraw');
 const NowPaymentsApi = require('@nowpaymentsio/nowpayments-api-js');
@@ -21,9 +22,66 @@ function ensureAuth(req, res, next) {
 const agentPaymentsPath = path.join(__dirname, '../agent-payments.json');
 const agentPayments = JSON.parse(fs.readFileSync(agentPaymentsPath, 'utf-8'));
 
-// ----------------- DEPOSIT ROUTES -----------------
-router.get('/deposit', (req, res) => {
-  res.render('deposit', { user: req.user, currentPage: 'deposit', agentPayments });
+let cachedCurrencies = null;
+let lastFetch = 0;
+
+router.get('/deposit', ensureAuth, async (req, res) => {
+  try {
+    const now = Date.now();
+
+    // Cache refresh every 10 minutes
+    const CACHE_DURATION = 10 * 60 * 1000;
+
+    if (!cachedCurrencies || now - lastFetch > CACHE_DURATION) {
+      console.log("🔄 Fetching NOWPayments currencies...");
+
+      const { data } = await axios.get('https://api.nowpayments.io/v1/currencies', {
+        headers: { 'x-api-key': process.env.NOWPAYMENTS_API_KEY }
+      });
+
+      // Ensure we have data
+      const currencies = Array.isArray(data.currencies) ? data.currencies : [];
+
+      const allowedStablecoins = [
+        'usdttrc20',
+        'usdterc20',
+        'usdtbsc',
+        'usdtsol',
+        'usdtmatic',
+        'usdtcelo',
+        'usdtarb',
+        'usdtarc20',
+        'usdtton',
+        'usddtrc20'
+      ];
+
+      cachedCurrencies = currencies.filter(c =>
+        allowedStablecoins.includes(c.toLowerCase())
+      );
+
+      lastFetch = now;
+      console.log(`✅ Cached ${cachedCurrencies.length} stablecoin networks`);
+    }
+
+    // Render deposit page
+    res.render('deposit', {
+      user: req.user,
+      agentPayments,
+      availableCryptos: cachedCurrencies || [],
+      currentPage: 'deposit',
+    });
+
+  } catch (err) {
+    console.error("❌ Error fetching NOWPayments currencies:", err.message);
+
+    // Use cached data if available, otherwise fallback to empty
+    res.render('deposit', {
+      user: req.user,
+      agentPayments,
+      availableCryptos: cachedCurrencies || [],
+      currentPage: 'deposit',
+    });
+  } 
 });
 
 // Handle deposits for Bkash, Nagad, Upay
@@ -120,31 +178,40 @@ router.post('/deposit/binance', ensureAuth, async (req, res) => {
 
 router.post('/deposit/crypto', ensureAuth, async (req, res) => {
   try {
-    const { amount, currency } = req.body; // ✅ include currency
+    const { amount, currency } = req.body;
     const usdAmount = Number(amount);
 
+    // Validate amount
     if (!usdAmount || usdAmount < 1) {
       return res.status(400).send('Invalid amount');
     }
 
-    // ✅ Allowed stablecoins only (no BTC/ETH)
+    // Allowed USDT networks
     const allowedCurrencies = [
-      'USDTTRC20',
-      'USDTERC20',
-      'USDTBEP20',
-      'USDTARBITRUM',
-      'USDTPOLYGON',
+      'usdttrc20',
+      'usdterc20',
+      'usdtbsc',
+      'usdtsol',
+      'usdtmatic',
+      'usdtcelo',
+      'usdtarb',
+      'usdtarc20',
+      'usdtton',
+      'usddtrc20'
     ];
 
-    if (!allowedCurrencies.includes(currency)) {
+    // Normalize input to lowercase for safety
+    const currencyLower = currency.toLowerCase();
+
+    if (!allowedCurrencies.includes(currencyLower)) {
       return res.status(400).send('Unsupported USDT network');
     }
 
-    // ✅ Create NOWPayments invoice
+    // Create NOWPayments invoice
     const payment = await npApi.createInvoice({
       price_amount: usdAmount,
       price_currency: "usd",
-      pay_currency: currency, // 👈 set user-selected stablecoin
+      pay_currency: currencyLower, // set network
       order_id: req.user._id.toString(),
       order_description: `Crypto deposit by ${req.user.username}`,
       ipn_callback_url: `${process.env.BASE_URL}/api/nowpayments/webhook`
@@ -152,18 +219,19 @@ router.post('/deposit/crypto', ensureAuth, async (req, res) => {
 
     console.log("NOWPayments Payment:", payment);
 
+    // Extract transaction ID
     const txnId = payment.id || payment.payment_id || payment.invoice_id;
     if (!txnId) {
       console.warn("⚠️ NOWPayments did not return a payment ID");
       return res.status(500).send("Failed to create payment ID.");
     }
 
-    // ✅ Store in DB
+    // Store deposit in DB
     const depositData = {
       user: req.user._id,
-      amount: usdAmount * 122.24, // optional: convert USD→BDT
+      amount: usdAmount * 122.24, // optional: USD→BDT conversion
       amountUSD: usdAmount,
-      method: `Crypto (${currency})`, // 👈 identify network
+      method: `Crypto (${currency.toUpperCase()})`, // show network
       txnId,
       status: "Pending"
     };
@@ -172,13 +240,20 @@ router.post('/deposit/crypto', ensureAuth, async (req, res) => {
     await req.user.save();
     await Deposit.create(depositData);
 
+    // Redirect to payment page
     return res.redirect(payment.invoice_url);
+
   } catch (err) {
     console.error("NOWPayments error:", err);
+
+    // Handle known NOWPayments errors
+    if (err.code === 'INVALID_REQUEST_PARAMS') {
+      return res.status(400).send(`NOWPayments error: ${err.message}`);
+    }
+
     return res.status(500).send("Failed to create crypto payment.");
   }
 });
-
 
 
 // ✅ WEBHOOK: Handle NOWPayments notifications

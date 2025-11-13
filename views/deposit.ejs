@@ -74,69 +74,60 @@
                         </div>
                     </div>
 
-                    <!-- ✅ CRYPTO SECTION -->
+                    <!-- CRYPTO SECTION -->
                     <div id="crypto" class="content-section">
                         <h2>
                             <%= __('Crypto') %>
                         </h2>
 
                         <div class="payment-cards">
-                            <div class="payment-card" data-modal="modal-crypto" data-currency="USDTTRC20">
-                                <img src="/images/crypto/trx.png" alt="USDT TRC20">
-                                <h4>USDT (TRC20)</h4>
-                            </div>
-
-                            <div class="payment-card" data-modal="modal-crypto" data-currency="USDTERC20">
-                                <img src="/images/crypto/eth.png" alt="USDT ERC20">
-                                <h4>USDT (ERC20)</h4>
-                            </div>
-
-                            <div class="payment-card" data-modal="modal-crypto" data-currency="USDTBEP20">
-                                <img src="/images/crypto/bnb.png" alt="USDT BEP20">
-                                <h4>USDT (BEP20)</h4>
-                            </div>
-
-                            <div class="payment-card" data-modal="modal-crypto" data-currency="USDTPOLYGON">
-                                <img src="/images/crypto/matic.png" alt="USDT Polygon">
-                                <h4>USDT (Polygon)</h4>
-                            </div>
-
-                            <div class="payment-card" data-modal="modal-crypto" data-currency="USDTARBITRUM">
-                                <img src="/images/crypto/arbitrum.png" alt="USDT Arbitrum">
-                                <h4>USDT (Arbitrum)</h4>
-                            </div>
+                            <% if (availableCryptos && availableCryptos.length) { %>
+                                <% availableCryptos.forEach(c=> {
+                                    const currency = c.toUpperCase();
+                                    const network = currency.replace('USDT', '');
+                                    const icon = network.includes('TRC') ? 'trx.png' :
+                                    network.includes('ERC') ? 'eth.png' :
+                                    network.includes('BSC') ? 'bnb.png' :
+                                    network.includes('POLYGON') ? 'matic.png' :
+                                    network.includes('ARBITRUM') ? 'arbitrum.png' : 'crypto.jpg';
+                                    %>
+                                    <div class="payment-card" data-modal="modal-crypto" data-currency="<%= currency %>">
+                                        <img src="/images/crypto/<%= icon %>" alt="<%= currency %>">
+                                        <h4>
+                                            <%= currency.replace('USDT', 'USDT-' ) %>
+                                        </h4>
+                                    </div>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <p>No available cryptos.</p>
+                                            <% } %>
                         </div>
                     </div>
 
-                    <!-- ✅ MODAL -->
+                    <!-- CRYPTO MODAL -->
                     <div id="modal-crypto" class="modal">
                         <div class="modal-content">
                             <span class="close">&times;</span>
                             <h3 id="cryptoTitle">
                                 <%= __('Crypto Deposit (NOWPayments)') %>
                             </h3>
-
                             <form method="POST" action="/deposit/crypto">
-                                <!-- this will be filled automatically -->
-                                <input type="hidden" name="currency" id="cryptoCurrency" value="USDTTRC20">
-
+                                <input type="hidden" name="currency" id="cryptoCurrency" value="">
                                 <label>
                                     <%= __('Amount (USD)') %>
                                 </label>
-                                <input type="number" name="amount" id="cryptoAmount" required min="5" max="1000"
-                                    step="0.01">
+                                <input type="number" name="amount" id="cryptoAmount" required min="5" max="1000"/>
+                                <div id="cryptoFeedback" class="amount-feedback"></div>
 
                                 <p>
                                     <%= __('You will be redirected to a crypto payment page.') %>
                                 </p>
-
                                 <button type="submit">
                                     <%= __('Pay with Crypto') %>
                                 </button>
                             </form>
                         </div>
                     </div>
-
 
                     <div id="bank" class="content-section">
                         <h2>
@@ -310,183 +301,20 @@
         </div>
 
         <%- include('partials/footer') %>
-
             <script>
-                // Server-injected login status
                 const isLoggedIn = <%= user ? 'true' : 'false' %>;
-
-                // LOCALIZED STRINGS injected from EJS
                 const L = {
-                    amountMustBe: '<%= __('Amount must be between') %>',
-                    and: '<%= __('and') %>',
-                    bdt: '<%= __(' BDT') %>',
-                    usd: '<%= __(' USD') %>',
-                    equivalentInBdt: '<%= __('Equivalent in BDT') %>',
-                    amountOK: '<%= __('Amount OK') %>'
-    };
-
-                // Tabs
-                const tabs = document.querySelectorAll('.sidebar-menu li');
-                const sections = document.querySelectorAll('.content-section');
-                tabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        tabs.forEach(t => t.classList.remove('active'));
-                        sections.forEach(s => s.classList.remove('active'));
-                        tab.classList.add('active');
-                        document.getElementById(tab.dataset.tab).classList.add('active');
-                    });
-                });
-
-                // Modals
-                const cards = document.querySelectorAll('.payment-card');
-                const modals = document.querySelectorAll('.modal');
-                const closes = document.querySelectorAll('.close');
-
-                // Login modal elements
-                const loginModal = document.getElementById('loginModal');
-                const closeLoginModal = document.getElementById('closeLoginModal');
-
-                cards.forEach(card => {
-                    const modal = document.getElementById(card.dataset.modal);
-                    card.addEventListener('click', () => {
-                        if (!isLoggedIn) {
-                            loginModal.classList.add('show');
-                        } else {
-                            modal.style.display = 'flex';
-                        }
-                    });
-                });
-
-                closes.forEach(c => {
-                    c.addEventListener('click', () => c.closest('.modal').style.display = 'none');
-                });
-
-                window.addEventListener('click', e => {
-                    if (e.target.classList.contains('modal')) e.target.style.display = 'none';
-                    if (e.target === loginModal) loginModal.classList.remove('show');
-                });
-
-                closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
-
-                // ==================== Deposit Validations & Calculations ====================
-                const usdToBdt = 122.24; // Static conversion example
-
-                function validateAmount(inputId, feedbackId, min, max, isUsd = false, bdtInputId = null) {
-                    const amountInput = document.getElementById(inputId);
-                    const feedback = document.getElementById(feedbackId);
-                    const bdtInput = bdtInputId ? document.getElementById(bdtInputId) : null;
-
-                    const handler = () => {
-                        const value = parseFloat(amountInput.value);
-
-                        if (isNaN(value) || value === 0) {
-                            feedback.textContent = '';
-                            if (bdtInput) bdtInput.value = '';
-                            return;
-                        }
-
-                        const minUnit = isUsd ? ' USD' : ' BDT';
-
-                        let isValid = true;
-                        let bdtEquivalent = value; // Default for non-USD forms
-
-                        if (value < min || value > max) {
-                            // Localized validation error message
-                            feedback.textContent = `${L.amountMustBe} ${min}${minUnit} ${L.and} ${max}${minUnit}`;
-                            feedback.className = 'amount-feedback amount-invalid';
-                            isValid = false;
-                        } else {
-                            let display = value;
-
-                            if (isUsd) {
-                                bdtEquivalent = (value * usdToBdt);
-                                // Use Math.round/toFixed for display, but keep bdtEquivalent accurate
-                                display = bdtEquivalent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                // Localized equivalent message
-                                feedback.textContent = `${L.equivalentInBdt}: ৳${display}`;
-                            } else {
-                                // Localized 'Amount OK' message
-                                feedback.textContent = `${L.amountOK}: ৳${display.toLocaleString()}`;
-                            }
-
-                            feedback.className = 'amount-feedback amount-valid';
-                        }
-
-                        // Update hidden BDT field for Binance
-                        if (bdtInput) {
-                            if (isValid) {
-                                // Store the precise calculated BDT value
-                                bdtInput.value = bdtEquivalent.toFixed(2);
-                            } else {
-                                bdtInput.value = '';
-                            }
-                        }
-                        return isValid;
-                    };
-
-                    amountInput.addEventListener('input', handler);
-                    return handler; // Return handler for direct calling (useful for form submission check)
-                }
-
-                // Standard BDT validations
-                validateAmount('bkashAmount', 'bkashFeedback', 300, 25000);
-                validateAmount('nagadAmount', 'nagadFeedback', 300, 25000);
-                validateAmount('upayAmount', 'upayFeedback', 300, 25000);
-
-                // Binance validation with BDT conversion submission
-                const binanceValidator = validateAmount('binanceAmount', 'binanceFeedback', 5, 500, true, 'binanceBdtAmount');
-
-                // --- NEW: Form Submission Check ---
-                const binanceForm = document.getElementById('binanceForm');
-                const binanceAmountInput = document.getElementById('binanceAmount');
-
-                if (binanceForm) {
-                    binanceForm.addEventListener('submit', function (e) {
-                        // Re-run validation just before submit
-                        const isValid = binanceValidator();
-
-                        if (!isValid) {
-                            e.preventDefault();
-                            alert('<%= __('Please enter a valid amount and transaction ID.') %>'); // Fallback alert
-                            return;
-                        }
-
-                        // Ensure the hidden BDT field is definitely populated, otherwise the server will fail
-                        const bdtField = document.getElementById('binanceBdtAmount');
-                        if (!bdtField || !bdtField.value || parseFloat(bdtField.value) < 10) {
-                            e.preventDefault();
-                            alert('<%= __('Conversion error.Please re - enter the amount.') %>');
-                        }
-                    });
-                }
-
-                // Get modal and close button
-                const modal = document.getElementById('modal-crypto');
-                const closeBtn = modal.querySelector('.close');
-                const cryptoCurrencyInput = document.getElementById('cryptoCurrency');
-                const cryptoTitle = document.getElementById('cryptoTitle');
-
-                // Open modal for each card
-                document.querySelectorAll('.payment-card[data-modal="modal-crypto"]').forEach(card => {
-                    card.addEventListener('click', () => {
-                        const currency = card.getAttribute('data-currency');
-                        const label = currency.replace('USDT', 'USDT-'); // visual dash for display
-                        cryptoCurrencyInput.value = currency;
-                        cryptoTitle.textContent = `Deposit with ${label}`;
-                        modal.style.display = 'flex';
-                    });
-
-                });
-
-                // Close modal
-                closeBtn.addEventListener('click', () => {
-                    modal.style.display = 'none';
-                });
-
-                window.addEventListener('click', e => {
-                    if (e.target === modal) modal.style.display = 'none';
-                });
+                    amountMustBe: '<%= __("Amount must be between") %>',
+                    and: '<%= __("and") %>',
+                    bdt: '<%= __(" BDT") %>',
+                    usd: '<%= __(" USD") %>',
+                    equivalentInBdt: '<%= __("Equivalent in BDT") %>',
+                    amountOK: '<%= __("Amount OK") %>',
+                    pleaseEnterValid: '<%= __("Please enter a valid amount and transaction ID.") %>',
+                    conversionError: '<%= __("Conversion error. Please re-enter the amount.") %>'
+                };
             </script>
+            <script src="/js/deposit.js"></script>
 </body>
 
 </html>

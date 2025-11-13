@@ -277,6 +277,12 @@
   background: rgba(245, 197, 66, 0.1);
 }
 
+.amount-feedback {
+  margin-left: 30px;
+  font-weight: bold;
+  font-size: 0.95em;
+}
+
 /* ==========================================
   ANIMATIONS - Required for modal functionality
   ========================================== */

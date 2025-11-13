@@ -105,5 +105,6 @@
 	"Crypto Deposit (NOWPayments)": "Crypto Deposit (NOWPayments)",
 	"You will be redirected to a crypto payment page.": "You will be redirected to a crypto payment page.",
 	"Pay with Crypto": "Pay with Crypto",
-	"Conversion error.Please re - enter the amount.": "Conversion error.Please re - enter the amount."
+	"Conversion error.Please re - enter the amount.": "Conversion error.Please re - enter the amount.",
+	"No crypto networks available right now.": "No crypto networks available right now."
 }
