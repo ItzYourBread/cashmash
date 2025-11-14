@@ -28,6 +28,11 @@
           <canvas id="slotCanvas" data-slot-type="<%= slotType %>"></canvas>
         </div>
 
+        <!-- 🏆 Result Display -->
+        <div class="slot-result" id="slotResult">
+          <div class="result-text" id="resultText">Best of Luck</div>
+        </div>
+
         <div class="slot-controls">
           <input type="hidden" id="betAmount" value="<%= slotsConfig[slotType].minBet %>">
           <button id="spinBtn" style="display: none;">Spin Hidden</button>
@@ -43,6 +48,8 @@
               </span></div>
           </div>
 
+          <div class="result-amount" id="resultAmount"></div>
+
           <!-- Bet + Spin -->
           <div class="bet-spin-container">
             <button class="bet-btn" id="betMinus">−</button>
@@ -50,6 +57,7 @@
             <button class="bet-btn" id="betPlus">+</button>
           </div>
         </div>
+        <div class="info-icon" id="infoBtn">?</div>
 
         <!-- 💰 Bet Modal (UPDATED STRUCTURE) -->
         <div id="betModal" class="bet-modal">
@@ -68,10 +76,11 @@
             </div>
           </div>
         </div>
-
-        <p id="result">Place your bet and spin!</p>
       </div>
     </section>
+
+      <div id="infoModal" class="modal"></div>
+
 
     <%- include('partials/footer') %>
       <script>
@@ -80,8 +89,8 @@
       </script>
 
       <script src="/js/formatBalance.js"></script>
-      <script src="/js/slotsModal.js"></script>
       <script src="/js/slotEngine.js"></script>
+      <script src="/js/slotsModal.js"></script>
 </body>
 
 </html>

@@ -73,7 +73,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 25px;
+  margin-top: 5px;
   gap: 12px;
   width: 100%;
   max-width: 600px;
@@ -81,7 +81,7 @@ body {
 }
 
 .balance-container {
-  font-size: 1.1em;
+  font-size: 0.9em;
   font-weight: 600;
   color: #f5c542;
   padding: 10px 20px;
@@ -101,7 +101,6 @@ body {
     text-shadow: 0 0 8px rgba(245, 197, 66, 0.5);
 }
 
-
 .info-icon {
   background: #f5c542;
   color: #000b38;
@@ -115,6 +114,7 @@ body {
   cursor: pointer;
   box-shadow: 0 0 10px rgba(245, 197, 66, 0.3);
   transition: 0.3s;
+  margin-top: 5px;
 }
 
 .info-icon:hover {
@@ -143,10 +143,8 @@ body {
   color: #ffd700;
   font-size: 1.6em;
   font-weight: bold;
-  width: 45px;
-  /* Matched info-icon size */
-  height: 45px;
-  /* Matched info-icon size */
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -462,6 +460,30 @@ body {
   box-shadow: 0 0 15px rgba(255, 215, 90, 0.5);
 }
 
+/* ================== SLOT RESULT DISPLAY ================== */
+.slot-result {
+  text-align: center;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.result-text {
+  margin-top: 5px;
+  font-size: 1.6em;
+  color: #ffd75a;
+  opacity: 0.9;
+  text-shadow: 0 0 10px rgba(255, 215, 90, 0.6);
+}
+
+.result-amount {
+  font-size: 2em;
+  font-weight: 800;
+  color: #ffd75a;
+  text-shadow:
+    0 0 20px var(--gold),
+    0 0 40px var(--gold);
+}
 
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 700px) {
@@ -510,8 +532,8 @@ body {
     font-size: 0.9em;
   }
 
-  #result {
-    font-size: 1.1em;
+  .result-amount { 
+    font-size: 1em;
   }
 
   .modal-content {

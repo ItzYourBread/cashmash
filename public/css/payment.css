@@ -22,15 +22,12 @@
 
 /* Inner container for logo */
 .payment-card img {
-  width: 100px;
-  height: auto;
-  margin: 18px auto 18px;
+  width: 200px;
+  height: auto; /* set the box height you want */
+  object-fit: cover; /* makes it act like background-size: cover */
+  object-position: center; /* center crop */
   display: block;
   transition: transform 0.3s ease;
-}
-
-.payment-card:hover img {
-  transform: scale(1.2);
 }
 
 /* Bottom bar for name */

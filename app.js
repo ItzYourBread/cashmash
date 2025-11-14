@@ -47,11 +47,9 @@ const cors = require('cors');
 
 app.use(cors({
   origin: [
-    'https://cashmash.onrender.com',   // your hosted frontend (change this if different)
+    'https://cashmash.onrender.com', 
     'https://cashmash.watchnsfw.com',
     'http://localhost:3000',
-    'http://127.0.0.1:5500', // <-- The origin of your HTML file (Live Server)
-    'http://localhost:5500'
   ],
   methods: ['GET', 'POST'],
   credentials: true
@@ -74,6 +72,7 @@ const languageMap = {
     'bn': 'বাংলা',
     'hi': 'हिन्दी'
 };
+
 function getLangName(langCode) {
     return languageMap[langCode] || 'English'; // Default to English
 }
@@ -120,8 +119,6 @@ app.use('/', require('./routes/user'));
 app.use('/', require('./routes/game'));
 app.use('/', require('./routes/payment'));
 app.use('/api/admin', require('./routes/admin'));
-
-
 
 // HTTP + Socket.IO
 const server = http.createServer(app);
