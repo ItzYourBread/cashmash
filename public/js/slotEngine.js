@@ -1,7 +1,7 @@
 /* slotEngine.js
    Single engine for multiple slot types (uses global `slotsConfig`).
    Canvas: <canvas id="slotCanvas" data-slot-type="PharaohsRiches"></canvas>
-   Controls: #spinBtn, #balance (data-raw-chips), #betAmount
+   Controls: #spinBtn, #balance (data-raw-balance), #betAmount
    Result display: #resultText + #resultAmount (new)
 */
 

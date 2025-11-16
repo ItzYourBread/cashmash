@@ -71,7 +71,7 @@
 	"Deposit confirmation message": "টাকা পাঠানোর পর, আপনার জমা নিশ্চিত করতে উপরে লেনদেন আইডি লিখুন। জমা প্রতিফলিত হতে ৫ মিনিট পর্যন্ত সময় নিতে পারে।",
 	"Binance deposit confirmation message": "টাকা পাঠানোর পর, আপনার জমা নিশ্চিত করতে উপরে অর্ডার আইডি লিখুন। জমা প্রতিফলিত হতে ৫ মিনিট পর্যন্ত সময় নিতে পারে।",
 	"Login Required": "লগইন প্রয়োজন",
-	"You need to be logged in to deposit chips.": "চিপস জমা করার জন্য আপনাকে লগইন করতে হবে।",
+	"You need to be logged in to deposit balance.": "চিপস জমা করার জন্য আপনাকে লগইন করতে হবে।",
 	"Cancel": "বাতিল করুন",
 	"Amount must be between": "পরিমাণ এর মধ্যে হতে হবে",
 	"and": "এবং",

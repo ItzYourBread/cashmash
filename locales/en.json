@@ -70,7 +70,7 @@
 	"Deposit confirmation message": "After sending money, please enter the Transaction ID above to confirm your deposit. Deposits may take up to 5 minutes to reflect.",
 	"Binance deposit confirmation message": "After sending money, please enter the Order ID above to confirm your deposit. Deposits may take up to 5 minutes to reflect.",
 	"Login Required": "Login Required",
-	"You need to be logged in to deposit chips.": "You need to be logged in to deposit chips.",
+	"You need to be logged in to deposit balance.": "You need to be logged in to deposit balance.",
 	"Cancel": "Cancel",
 	"Amount must be between": "Amount must be between",
 	"and": "and",

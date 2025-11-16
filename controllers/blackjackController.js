@@ -50,10 +50,10 @@ exports.startGame = async (req, res) => {
     
     if (!user) return res.status(404).json({ message: 'User not found' });
     if (isNaN(bet) || bet <= 0) return res.status(400).json({ message: 'Invalid bet amount' });
-    if (bet > user.chips) return res.status(400).json({ message: 'Insufficient Balance' });
+    if (bet > user.balance) return res.status(400).json({ message: 'Insufficient Balance' });
 
     // Deduct bet and track rakeback
-    user.chips -= bet;
+    user.balance -= bet;
     user.totalWagered = (user.totalWagered || 0) + bet; // ✅ Track wager for rakeback
 
     const deck = createDeck();
@@ -94,7 +94,7 @@ exports.startGame = async (req, res) => {
             }
         }
         
-        user.chips += payout;
+        user.balance += payout;
         gameState[req.user._id].gameOver = true;
         gameState[req.user._id].result = result;
         
@@ -106,7 +106,7 @@ exports.startGame = async (req, res) => {
             dealerHand,
             playerScore,
             dealerScore,
-            balance: user.chips,
+            balance: user.balance,
             result
         });
     }
@@ -118,7 +118,7 @@ exports.startGame = async (req, res) => {
       dealerHand: [dealerHand[0], { rank: dealerHand[1].rank, suit: dealerHand[1].suit, hidden: true }],
       playerScore,
       dealerScore: getCardValue(dealerHand[0]),
-      balance: user.chips,
+      balance: user.balance,
       result
     });
   } catch (err) {
@@ -146,7 +146,7 @@ exports.hit = async (req, res) => {
       result = state.result;
 
       const user = await User.findById(req.user._id);
-      newBalance = user.chips; // Chip deduction already applied
+      newBalance = user.balance; // Chip deduction already applied
       await user.save();
       delete gameState[req.user._id];
     }
@@ -204,7 +204,7 @@ exports.stand = async (req, res) => {
     else if (winnings < 0) result += ` -৳${Math.abs(winnings).toFixed(2)}`;
     else if (winnings === 0 && amountToReturn > 0) result += ` (+৳0.00)`;
 
-    user.chips += amountToReturn;
+    user.balance += amountToReturn;
 
     // ✅ Rakeback tracking: all bets count
     user.totalWagered = (user.totalWagered || 0) + bet;
@@ -221,7 +221,7 @@ exports.stand = async (req, res) => {
       result,
       payout: amountToReturn,
       winnings,
-      balance: user.chips
+      balance: user.balance
     });
   } catch (err) {
     console.error('Stand error:', err);

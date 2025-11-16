@@ -12,11 +12,11 @@ async function processAutoCashout(userId, game) {
         const multiplier = 1 + 0.25 * game.revealed.length;
         const winnings = parseFloat((game.bet * multiplier).toFixed(2));
 
-        // 2. Update user chips and rakeback stats
+        // 2. Update user balance and rakeback stats
         const user = await User.findById(userId);
         if (user) {
             // Add winnings (payout)
-            user.chips += winnings;
+            user.balance += winnings;
 
             // ✅ Rakeback tracking: increment total wagered by bet amount
             user.totalWagered = (user.totalWagered || 0) + game.bet;
@@ -31,7 +31,7 @@ async function processAutoCashout(userId, game) {
         return {
             message: `Previous game automatically cashed out for ৳${winnings} Balance.`,
             winnings,
-            balance: user ? user.chips : null
+            balance: user ? user.balance : null
         };
     } else {
         delete gameState[userId];
@@ -67,10 +67,10 @@ exports.start = async (req, res) => {
 
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
-        if (bet > user.chips) return res.status(400).json({ ok: false, error: 'Insufficient Balance' });
+        if (bet > user.balance) return res.status(400).json({ ok: false, error: 'Insufficient Balance' });
 
         // --- CHIP DEDUCTION ---
-        user.chips -= bet;
+        user.balance -= bet;
 
         // ✅ Track rakeback wagering
         user.totalWagered = (user.totalWagered || 0) + bet;
@@ -93,14 +93,14 @@ exports.start = async (req, res) => {
             mines,
             revealed: [],
             cashedOut: false,
-            balance: user.chips
+            balance: user.balance
         };
 
         res.json({
             ok: true,
             gameId,
             gridSize: 25,
-            balance: user.chips,
+            balance: user.balance,
             autoCashout: autoCashoutResult
         });
     } catch (err) {
@@ -162,7 +162,7 @@ exports.cashout = async (req, res) => {
 
         const user = await User.findById(userId);
         if (user) {
-            user.chips += winnings;
+            user.balance += winnings;
 
             // ✅ Rakeback tracking (wager)
             user.totalWagered = (user.totalWagered || 0) + game.bet;
@@ -173,7 +173,7 @@ exports.cashout = async (req, res) => {
         game.cashedOut = true;
         delete gameState[userId];
 
-        res.json({ ok: true, winnings, balance: user.chips });
+        res.json({ ok: true, winnings, balance: user.balance });
     } catch (err) {
         console.error('Cashout error', err);
         delete gameState[req.user.id];

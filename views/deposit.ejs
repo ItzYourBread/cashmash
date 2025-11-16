@@ -26,7 +26,7 @@
                             <%= __('Balance') %>
                         </h3>
                         <% if (user) { %>
-                            <p>৳<%= user.chips.toLocaleString() %>
+                            <p>৳<%= user.balance.toLocaleString() %>
                             </p>
                             <% } else { %>
                                 <p>
@@ -283,7 +283,7 @@
                     <%= __('Login Required') %>
                 </h2>
                 <p>
-                    <%= __('You need to be logged in to deposit chips.') %>
+                    <%= __('You need to be logged in to deposit balance.') %>
                 </p>
                 <div class="login-modal-actions">
                     <a href="/login" class="login-btn gold">

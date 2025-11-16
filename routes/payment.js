@@ -327,7 +327,7 @@ router.post(
 
           // 💰 Reward user (only once)
           const rewardAmount = deposit.amount || price_amount || 0;
-          user.chips = (user.chips || 0) + rewardAmount;
+          user.balance = (user.balance || 0) + rewardAmount;
 
           await user.save();
 
@@ -364,7 +364,7 @@ router.get('/withdraw', (req, res) => {
       const { fullName, contact, amount } = req.body;
       if (!fullName || !contact || !amount) throw new Error('Invalid input');
 
-      // Deduct chips from user (Place this before DB writes)
+      // Deduct balance from user (Place this before DB writes)
       await req.user.deductChips(Number(amount));
 
       // ⭐ CRITICAL FIX: Generate ID here to ensure consistency ⭐
@@ -404,7 +404,7 @@ router.post('/withdraw/binance', ensureAuth, async (req, res) => {
     const { userIdOrEmail, amount } = req.body;
     if (!userIdOrEmail || !amount) throw new Error('Invalid input');
 
-    // Deduct chips from user
+    // Deduct balance from user
     await req.user.deductChips(Number(amount));
 
     // ⭐ CRITICAL FIX: Generate ID here to ensure consistency ⭐
@@ -482,19 +482,19 @@ router.post('/withdraw/cancel/:id', ensureAuth, async (req, res) => {
     withdrawal.status = 'Cancelled';
     await withdrawal.save();
 
-    // 4. Update the embedded withdrawal record in the User document AND refund chips
+    // 4. Update the embedded withdrawal record in the User document AND refund balance
     const userWithdrawalIndex = req.user.withdrawals.findIndex(w => w._id.toString() === withdrawId);
 
     if (userWithdrawalIndex !== -1) {
       req.user.withdrawals[userWithdrawalIndex].status = 'Cancelled';
       const amountToRefund = withdrawal.amount;
-      req.user.chips += amountToRefund;
+      req.user.balance += amountToRefund;
       await req.user.save();
       console.log(`5. Successfully cancelled and refunded ৳${amountToRefund}.`);
     } else {
       console.error(`5. [INCONSISTENCY] Embedded record ${withdrawId} not found in user subdocument. Refunding anyway.`);
       // Ensure refund still happens even if the subdocument is missing
-      req.user.chips += withdrawal.amount;
+      req.user.balance += withdrawal.amount;
       await req.user.save();
     }
 

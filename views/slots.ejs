@@ -42,8 +42,8 @@
 
           <!-- Balance + Bet Display -->
           <div class="balance-container">
-            <div class="balance-text">Balance: ৳<span id="balance" data-raw-chips="<%= user.chips %>">
-                <%= formatBalance(user.chips) %>
+            <div class="balance-text">Balance: ৳<span id="balance" data-raw-balance="<%= user.balance %>">
+                <%= formatBalance(user.balance) %>
               </span></div>
             <!-- Added bet-text class for clickability on the displayed bet amount -->
             <div class="bet-text">Bet: ৳<span id="liveBet">

@@ -61,7 +61,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, sparse: true },
   password: { type: String, required: true },
 
-  chips: { type: Number, default: 0 },
+  balance: { type: Number, default: 0 },
   deposits: [depositSchema],
   withdrawals: [withdrawSchema],
   gameHistory: [gameHistorySchema],
@@ -104,16 +104,16 @@ userSchema.methods.comparePassword = async function (password) {
 };
 
 userSchema.methods.addChips = async function (amount) {
-  this.chips += amount;
+  this.balance += amount;
   await this.save();
-  return this.chips;
+  return this.balance;
 };
 
 userSchema.methods.deductChips = async function (amount) {
-  if (this.chips < amount) throw new Error('Insufficient Balance');
-  this.chips -= amount;
+  if (this.balance < amount) throw new Error('Insufficient Balance');
+  this.balance -= amount;
   await this.save();
-  return this.chips;
+  return this.balance;
 };
 
 userSchema.methods.logGame = async function (data) {
@@ -123,12 +123,12 @@ userSchema.methods.logGame = async function (data) {
 
 // ✅ NEW: Method to log rakeback automatically
 userSchema.methods.addRakeback = async function (amount, weekStart, weekEnd, note = 'Weekly rakeback credited') {
-  this.chips += amount;
+  this.balance += amount;
   this.rakebackBalance = 0;
   this.totalWagered = 0; // Reset for next week
   this.rakebackHistory.push({ amount, weekStart, weekEnd, note });
   await this.save();
-  return this.chips;
+  return this.balance;
 };
 
 module.exports = mongoose.model('User', userSchema);

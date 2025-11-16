@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Draws all active chips on the canvas.
+     * Draws all active balance on the canvas.
      */
     function drawChips() {
         const CHIP_RADIUS = 15;
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Main render loop. Redraws the board and all chips.
+     * Main render loop. Redraws the board and all balance.
      */
     function render() {
         drawGrid();
@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
             totalWagered = 0;
             userBalance += totalWinnings;
             updateBalanceDisplay();
-            render(); // Clear chips from canvas
+            render(); // Clear balance from canvas
 
             resultText.textContent = `Winning Number: ${winningNumber} (${winningColor.toUpperCase()}). You won ৳${totalWinnings.toFixed(0)}.`;
 

@@ -15,17 +15,17 @@ router.get('/games', (req, res) => {
 // Leaderboard
 router.get('/leaderboard', async (req, res) => {
   try {
-    // Get top 10 users by chips (or balance)
+    // Get top 10 users by balance (or balance)
     const topUsers = await User.find({})
-      .sort({ chips: -1 })
+      .sort({ balance: -1 })
       .limit(10)
-      .select('username email chips');
+      .select('username email balance');
 
     let userRank = null;
 
     if (req.user) {
       // Find the rank (position) of logged-in user
-      const higherUsersCount = await User.countDocuments({ chips: { $gt: req.user.chips } });
+      const higherUsersCount = await User.countDocuments({ balance: { $gt: req.user.balance } });
       userRank = higherUsersCount + 1;
     }
 

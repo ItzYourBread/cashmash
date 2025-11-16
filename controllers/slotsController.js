@@ -100,9 +100,9 @@ exports.spin = async (req, res) => {
 
     const user = await User.findById(req.user.id).lean(false);
     if (!user) return res.status(404).json({ error: 'User not found' });
-    if (bet > user.chips) return res.status(400).json({ error: 'Insufficient balance' });
+    if (bet > user.balance) return res.status(400).json({ error: 'Insufficient balance' });
 
-    user.chips -= bet;
+    user.balance -= bet;
 
     // --- GENERATE SYMBOL MATRIX ---
     const matrix = Array.from({ length: config.reels }, () =>
@@ -126,7 +126,7 @@ exports.spin = async (req, res) => {
     totalWin += dragonEyeBonus + pharaohBonus;
 
     // --- UPDATE BALANCE ---
-    user.chips += totalWin;
+    user.balance += totalWin;
 
     // --- HISTORY LOG ---
     user.gameHistory.push({
@@ -144,7 +144,7 @@ exports.spin = async (req, res) => {
       ok: true,
       finalSymbols,
       winnings: totalWin,
-      balance: user.chips,
+      balance: user.balance,
       isLuckyDay: config.isLuckyDay,
       rtp: BASE_RTP,
     });

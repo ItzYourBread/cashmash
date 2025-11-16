@@ -296,13 +296,13 @@ exports.placeBet = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
-    if (amount > user.chips) return res.status(400).json({ ok: false, error: 'Insufficient Balance' });
+    if (amount > user.balance) return res.status(400).json({ ok: false, error: 'Insufficient Balance' });
 
     if (roundState.bets[userId] && config.maxConcurrentBetsPerUser <= 1) {
       return res.status(400).json({ ok: false, error: 'Already have an active bet this round' });
     }
 
-    user.chips -= amount;
+    user.balance -= amount;
 
     user.totalWagered = (user.totalWagered || 0) + amount;
 
@@ -316,7 +316,7 @@ exports.placeBet = async (req, res) => {
       username: user.username,
     });
 
-    return res.json({ ok: true, balance: user.chips });
+    return res.json({ ok: true, balance: user.balance });
   } catch (err) {
     console.error('placeBet error', err);
     return res.status(500).json({ ok: false, error: 'Server error' });
@@ -355,7 +355,7 @@ exports.cashOut = async (req, res) => {
     // Update user balance
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
-    user.chips += winnings;
+    user.balance += winnings;
     await user.save();
 
     // Update bet record
@@ -375,7 +375,7 @@ exports.cashOut = async (req, res) => {
       ok: true,
       winnings,
       multiplier: currentM,
-      balance: user.chips,
+      balance: user.balance,
     });
   } catch (err) {
     console.error('cashOut error', err);
@@ -395,13 +395,13 @@ exports.socketPlaceBet = async (socket, data, ack) => {
 
     const user = await User.findById(userId);
     if (!user) return ack && ack({ ok: false, error: 'User not found' });
-    if (amount > user.chips) return ack && ack({ ok: false, error: 'Insufficient Balance' });
+    if (amount > user.balance) return ack && ack({ ok: false, error: 'Insufficient Balance' });
 
     if (roundState.bets[userId] && config.maxConcurrentBetsPerUser <= 1) {
       return ack && ack({ ok: false, error: 'Already bet this round' });
     }
 
-    user.chips -= amount;
+    user.balance -= amount;
 
     user.totalWagered = (user.totalWagered || 0) + amount;
 
@@ -410,7 +410,7 @@ exports.socketPlaceBet = async (socket, data, ack) => {
     roundState.bets[userId] = { amount, cashedOut: false, cashedOutAtMultiplier: null, winnings: 0 };
     safeEmit('betPlaced', { userId, amount, username: user.username });
 
-    return ack && ack({ ok: true, balance: user.chips });
+    return ack && ack({ ok: true, balance: user.balance });
   } catch (err) {
     console.error('socketPlaceBet error', err);
     return ack && ack({ ok: false, error: 'Server error' });
@@ -437,7 +437,7 @@ exports.socketCashOut = async (socket, data, ack) => {
     const winnings = Math.floor(bet.amount * currentM);
     const user = await User.findById(userId);
     if (!user) return ack && ack({ ok: false, error: 'User not found' });
-    user.chips += winnings;
+    user.balance += winnings;
     await user.save();
 
     bet.cashedOut = true;
@@ -446,7 +446,7 @@ exports.socketCashOut = async (socket, data, ack) => {
 
     safeEmit('cashedOut', { userId, username: user.username, win: winnings, multiplier: currentM });
 
-    return ack && ack({ ok: true, winnings, multiplier: currentM, balance: user.chips });
+    return ack && ack({ ok: true, winnings, multiplier: currentM, balance: user.balance });
   } catch (err) {
     console.error('socketCashOut error', err);
     return ack && ack({ ok: false, error: 'Server error' });

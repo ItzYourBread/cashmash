@@ -40,7 +40,7 @@
                         <h3><%= __('Balance') %></h3>
                         <% if (user) { %>
                             <p id="userBalanceDisplay">
-                                ৳<%= user.chips.toLocaleString() %>
+                                ৳<%= user.balance.toLocaleString() %>
                             </p>
                             <% } else { %>
                                 <p><%= __('Login to see balance') %></p>
@@ -145,8 +145,8 @@
                     const MIN_WITHDRAWAL_AMOUNT = 300;
                     
                     const isLoggedIn = <%= user ? 'true' : 'false' %>;
-                    // Extract user chips, converting to a number from the server-side EJS injection
-                    const userBalance = isLoggedIn ? parseFloat("<%= user.chips %>") : 0; 
+                    // Extract user balance, converting to a number from the server-side EJS injection
+                    const userBalance = isLoggedIn ? parseFloat("<%= user.balance %>") : 0; 
                     
                     // Localization strings
                     const L = {

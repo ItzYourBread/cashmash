@@ -101,10 +101,10 @@ exports.playBaccarat = async (req, res) => {
     const totalBet = pBet + bBet + tBet;
 
     if (totalBet <= 0) return res.status(400).json({ success:false, message:"No valid bets placed." });
-    if (totalBet > user.chips) return res.status(400).json({ success:false, message:"Insufficient Balance." });
+    if (totalBet > user.balance) return res.status(400).json({ success:false, message:"Insufficient Balance." });
 
     // Deduct total bet and track rakeback
-    user.chips -= totalBet;
+    user.balance -= totalBet;
     user.totalWagered = (user.totalWagered || 0) + totalBet; // ✅ Track wager for rakeback
 
     const winner = determineBiasedWinner(pBet, bBet, tBet);
@@ -136,7 +136,7 @@ exports.playBaccarat = async (req, res) => {
         }
     }
 
-    user.chips += winnings;
+    user.balance += winnings;
     await user.save();
 
     return res.json({
@@ -145,7 +145,7 @@ exports.playBaccarat = async (req, res) => {
       player: gameResult.player,
       banker: gameResult.banker,
       profit,
-      balance: user.chips
+      balance: user.balance
     });
 
   } catch (err) {

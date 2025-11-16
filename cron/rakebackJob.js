@@ -60,7 +60,7 @@ try {
         const rakebackAmount = (user.totalWagered * percent) / 100;
 
         if (rakebackAmount > 0) {
-            user.chips += rakebackAmount;
+            user.balance += rakebackAmount;
 
             // --- Add rakeback history
             if (!Array.isArray(user.rakebackHistory)) user.rakebackHistory = [];

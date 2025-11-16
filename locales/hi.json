@@ -71,7 +71,7 @@
 	"Deposit confirmation message": "पैसे भेजने के बाद, अपनी जमा राशि की पुष्टि करने के लिए ऊपर लेनदेन आईडी दर्ज करें। जमा को दिखने में 5 मिनट तक लग सकते हैं।",
 	"Binance deposit confirmation message": "पैसे भेजने के बाद, अपनी जमा राशि की पुष्टि करने के लिए ऊपर ऑर्डर आईडी दर्ज करें। जमा को दिखने में 5 मिनट तक लग सकते हैं।",
 	"Login Required": "लॉगिन आवश्यक है",
-	"You need to be logged in to deposit chips.": "चिप्स जमा करने के लिए आपको लॉगिन करना होगा।",
+	"You need to be logged in to deposit balance.": "चिप्स जमा करने के लिए आपको लॉगिन करना होगा।",
 	"Cancel": "रद्द करें",
 	"Amount must be between": "राशि के बीच होनी चाहिए",
 	"and": "और",
