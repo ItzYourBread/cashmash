@@ -50,6 +50,8 @@ app.use(cors({
     'https://cashmash.onrender.com', 
     'https://cashmash.watchnsfw.com',
     'http://localhost:3000',
+    'http://127.0.0.1:5500',
+    'http://0.0.0.0:3000'
   ],
   methods: ['GET', 'POST'],
   credentials: true
