@@ -23,9 +23,12 @@
 /* Inner container for logo */
 .payment-card img {
   width: 200px;
-  height: auto; /* set the box height you want */
-  object-fit: cover; /* makes it act like background-size: cover */
-  object-position: center; /* center crop */
+  height: auto;
+  /* set the box height you want */
+  object-fit: cover;
+  /* makes it act like background-size: cover */
+  object-position: center;
+  /* center crop */
   display: block;
   transition: transform 0.3s ease;
 }
@@ -54,8 +57,12 @@
   }
 
   .payment-card img {
-    width: 100px;
-    margin: 18px auto 18px;
+    width: 175px;
+    height: auto;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: transform 0.3s ease;
   }
 }
 
