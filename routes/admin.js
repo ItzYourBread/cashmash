@@ -43,7 +43,7 @@ const sendDepositSuccessEmail = async (userEmail, amount, method) => {
                         <table style="width: 100%; margin: 20px 0; border-collapse: separate; border-spacing: 0; background-color: #1a1a1a; border-radius: 8px;">
                             <tr>
                                 <td style="padding: 10px; font-weight: bold; color: #f5c542; border-bottom: 1px solid #333;">Amount:</td>
-                                <td style="padding: 10px; border-bottom: 1px solid #333; color: #4CAF50; font-weight: bold;">৳${amount}</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #333; color: #4CAF50; font-weight: bold;">$${amount}</td>
                             </tr>
                             <tr>
                                 <td style="padding: 10px; font-weight: bold; color: #f5c542; border-bottom: 1px solid #333;">Method:</td>

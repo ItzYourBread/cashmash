@@ -24,7 +24,7 @@
         <h3>Your Ranking</h3>
         <p>
           Position: <span><%= userRank ? userRank : 'Unranked' %></span><br>
-          Balance: <span>৳<%= user.balance ? user.balance.toLocaleString() : 0 %></span>
+          Balance: <span>$<%= user.balance ? user.balance.toLocaleString() : 0 %></span>
         </p>
       </div>
     <% } %>
@@ -37,7 +37,7 @@
             <div class="info">
               <h3><%= u.username || (u.email ? u.email.split('@')[0] : 'Unknown') %></h3>
               <p>ID: <%= u._id.toString().slice(-5) %></p>
-              <p class="balance">৳<%= u.balance ? u.balance.toLocaleString() : 0 %></p>
+              <p class="balance">$<%= u.balance ? u.balance.toLocaleString() : 0 %></p>
             </div>
           </div>
         <% }) %>

@@ -237,7 +237,7 @@ socket.on('betPlaced', ({ userId: bidderId, amount, username }) => {
   // Show small UI notification in the result area
   if (bidderId === window.user?._id) {
     // FIX: Format the displayed bet amount
-    resultText.textContent = `Bet placed ৳${formatChips(amount)}`;
+    resultText.textContent = `Bet placed $${formatChips(amount)}`;
     hasBet = true;
     placeBetBtn.textContent = 'Bet Placed';
     toggleButton(placeBetBtn, false);

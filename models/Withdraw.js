@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const withdrawSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   amount: { type: Number, required: true },
-  amountUSD: { type: Number, required: false, default: 0 },
   method: { 
       type: String, 
       enum: ['Bkash', 'Nagad', 'Upay', 'BinancePay'], // Use the same enums as deposits

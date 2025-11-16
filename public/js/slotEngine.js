@@ -33,7 +33,7 @@
         break;
       case 'win':
         resultText.textContent = 'Win';
-        resultAmount.textContent = `৳${formatBalance(amount)}`;
+        resultAmount.textContent = `$${formatBalance(amount)}`;
         resultAmount.classList.add('animate');
         setTimeout(() => resultAmount.classList.remove('animate'), 900);
         break;
@@ -256,8 +256,8 @@
   async function startSpin() {
     if (spinning || glowing || bonusMarkers.length) return;
     const bet = parseInt(betInput?.value, 10) || MIN_BET;
-    if (bet < MIN_BET) return alert(`Minimum bet is ৳${MIN_BET}`);
-    if (bet > MAX_BET) return alert(`Maximum bet is ৳${MAX_BET}`);
+    if (bet < MIN_BET) return alert(`Minimum bet is $${MIN_BET}`);
+    if (bet > MAX_BET) return alert(`Maximum bet is $${MAX_BET}`);
     if (bet > currentBalance) return alert('Not enough balance!');
 
     showMessage('start');

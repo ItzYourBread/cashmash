@@ -19,7 +19,7 @@
           <div class="balance-box">
             <h3>Balance</h3>
             <p>
-              ৳<%= user.balance.toLocaleString() %>
+              $<%= user.balance.toLocaleString() %>
             </p>
           </div>
 
@@ -102,7 +102,7 @@
                                   <%= new Date(dep.createdAt).toLocaleDateString() %>
                                 </td>
                                 <td>
-                                  ৳<%= parseFloat(dep.amount.toFixed(2)).toLocaleString('en-US', {
+                                  $<%= parseFloat(dep.amount.toFixed(2)).toLocaleString('en-US', {
                                     minimumFractionDigits: 2 }) %>
                                 </td>
                                 <td>
@@ -143,7 +143,7 @@
                                   <%= new Date(w.createdAt).toLocaleDateString() %>
                                 </td>
                                 <td>
-                                  ৳<%= parseFloat(w.amount.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits:
+                                  $<%= parseFloat(w.amount.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits:
                                     2 }) %>
                                 </td>
                                 <td>
@@ -240,12 +240,12 @@
                             <td>
                               <%= rb.date.toLocaleDateString() %>
                             </td>
-                            <td>৳<%= rb.weeklyWagered.toLocaleString() %>
+                            <td>$<%= rb.weeklyWagered.toLocaleString() %>
                             </td>
                             <td>
                               <%= rb.percent %>%
                             </td>
-                            <td>৳<%= rb.rakeback.toLocaleString('en-US', { minimumFractionDigits: 2 }) %>
+                            <td>$<%= rb.rakeback.toLocaleString('en-US', { minimumFractionDigits: 2 }) %>
                             </td>
                           </tr>
                           <% }) %>

@@ -1,6 +1,6 @@
 // ==================== Deposit.js ====================
 
-// Static conversion example
+// Static conversion example (USD → BDT)
 const usdToBdt = 122.24;
 
 // Tabs
@@ -40,7 +40,7 @@ window.addEventListener('click', e => {
 if (closeLoginModal) closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
 
 // ==================== Validation Function ====================
-function validateAmount(inputId, feedbackId, min, max, isUsd = false, bdtInputId = null) {
+function validateAmount(inputId, feedbackId, minUsd, maxUsd, showBdt = false, bdtInputId = null) {
     const amountInput = document.getElementById(inputId);
     const feedback = document.getElementById(feedbackId);
     const bdtInput = bdtInputId ? document.getElementById(bdtInputId) : null;
@@ -48,26 +48,26 @@ function validateAmount(inputId, feedbackId, min, max, isUsd = false, bdtInputId
     const handler = () => {
         const value = parseFloat(amountInput.value);
 
-        if (isNaN(value) || value === 0) {
+        if (isNaN(value) || value <= 0) {
             feedback.textContent = '';
             if (bdtInput) bdtInput.value = '';
-            return;
+            return false;
         }
 
         let isValid = true;
         let bdtEquivalent = value;
 
-        if (value < min || value > max) {
-            feedback.textContent = `${L.amountMustBe} ${min}${isUsd ? L.usd : L.bdt} ${L.and} ${max}${isUsd ? L.usd : L.bdt}`;
+        if (value < minUsd || value > maxUsd) {
+            feedback.textContent = `${L.amountMustBe} ${minUsd} USD ${L.and} ${maxUsd} USD`;
             feedback.className = 'amount-feedback amount-invalid';
             isValid = false;
         } else {
-            if (isUsd) {
+            if (showBdt) {
                 bdtEquivalent = value * usdToBdt;
                 const display = bdtEquivalent.toLocaleString(undefined, { minimumFractionDigits: 2 });
                 feedback.textContent = `${L.equivalentInBdt}: ৳${display}`;
             } else {
-                feedback.textContent = `${L.amountOK}: ৳${value.toLocaleString()}`;
+                feedback.textContent = ``;
             }
             feedback.className = 'amount-feedback amount-valid';
         }
@@ -81,12 +81,13 @@ function validateAmount(inputId, feedbackId, min, max, isUsd = false, bdtInputId
 }
 
 // ==================== E-Wallet Validations ====================
-validateAmount('bkashAmount', 'bkashFeedback', 300, 25000);
-validateAmount('nagadAmount', 'nagadFeedback', 300, 25000);
-validateAmount('upayAmount', 'upayFeedback', 300, 25000);
+// E-Wallets show BDT equivalent of USD
+validateAmount('bkashAmount', 'bkashFeedback', 5, 200, true, null);
+validateAmount('nagadAmount', 'nagadFeedback', 5, 200, true, null);
+validateAmount('upayAmount', 'upayFeedback', 5, 200, true, null);
 
 // ==================== Binance Validation ====================
-const binanceValidator = validateAmount('binanceAmount', 'binanceFeedback', 5, 500, true, 'binanceBdtAmount');
+const binanceValidator = validateAmount('binanceAmount', 'binanceFeedback', 5, 500, false, 'binanceBdtAmount');
 const binanceForm = document.getElementById('binanceForm');
 
 if (binanceForm) {
@@ -112,8 +113,8 @@ const cryptoCurrencyInput = document.getElementById('cryptoCurrency');
 const cryptoTitle = document.getElementById('cryptoTitle');
 const cryptoAmount = document.getElementById('cryptoAmount');
 
-// Apply same logic as Binance: USD amount validation + feedback
-const cryptoValidator = validateAmount('cryptoAmount', 'cryptoFeedback', 10, 1000, true);
+// Crypto validation: min 10 USD, max 1,000 USD
+const cryptoValidator = validateAmount('cryptoAmount', 'cryptoFeedback', 10, 1000, false);
 
 document.querySelectorAll('.payment-card[data-modal="modal-crypto"]').forEach(card => {
     card.addEventListener('click', () => {

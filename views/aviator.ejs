@@ -46,7 +46,7 @@
           <div class="controls">
             <div class="control-line">
               <div class="balance-container">
-                Balance: ৳<strong id="balance" data-raw-balance="<%= user.balance %>">
+                Balance: $<strong id="balance" data-raw-balance="<%= user.balance %>">
                   <%= formatBalance(user.balance) %>
                 </strong>
               </div>
@@ -89,14 +89,14 @@
 
               if (value < MIN_BET || isNaN(value)) {
                 e.preventDefault();
-                alert(`Minimum bet: ৳${MIN_BET}`);
+                alert(`Minimum bet: $${MIN_BET}`);
                 betInput.value = MIN_BET;
                 return;
               }
 
               if (value > MAX_BET) {
                 e.preventDefault();
-                alert(`Maximum bet: ৳${MAX_BET}`);
+                alert(`Maximum bet: $${MAX_BET}`);
                 betInput.value = MAX_BET;
                 return;
               }

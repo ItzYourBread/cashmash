@@ -161,7 +161,7 @@ exports.simulate = async (req, res) => {
     let config = getDynamicConfig(); // Includes Sunday/Monday payout boost
     config = cacheValidPaylines(config); // Ensure _validPaylines exists
 
-    let balance = 50000; // Starting simulation balance (BDT)
+    let balance = 50000; // Starting simulation balance (USD)
     const bet = 75;      // Default bet per spin
     let spinCount = 0;
     let totalWins = 0;
@@ -171,7 +171,7 @@ exports.simulate = async (req, res) => {
     let biggestWin = 0;
 
     console.log(`🎮 Simulation starting for ${slotType}`);
-    console.log(`💰 Starting balance: ${balance} BDT`);
+    console.log(`💰 Starting balance: ${balance} USD`);
     console.log(`🎯 Sunday/Monday payout boost: ${config.isLuckyDay ? "YES" : "NO"}`);
 
     // Keep spinning until balance drops below threshold

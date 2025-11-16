@@ -1,17 +1,17 @@
-// replaceChips.js
+// replaceTakaToDollar.js
 const fs = require('fs');
 const path = require('path');
 
 // Directory to start from (current folder)
 const baseDir = path.resolve(__dirname);
 
-// File extensions to scan (you can add more if needed)
+// File extensions to scan
 const fileExtensions = ['.js', '.ejs', '.html', '.css', '.ts', '.json'];
 
 function replaceInFile(filePath) {
     const content = fs.readFileSync(filePath, 'utf8');
-    if (content.includes('balance')) {
-        const updated = content.replace(/\bchips\b/g, 'balance'); // replace whole word only
+    if (content.includes('USD')) {
+        const updated = content.replace(/USD/g, 'USD'); // replace all instances of $ with $
         fs.writeFileSync(filePath, updated, 'utf8');
         console.log(`Updated: ${filePath}`);
     }
@@ -30,4 +30,4 @@ function walkDir(dir) {
 }
 
 walkDir(baseDir);
-console.log('All occurrences of "balance" have been replaced with "balance".');
+console.log('All occurrences of "$" have been replaced with "$".');

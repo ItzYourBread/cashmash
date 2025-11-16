@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (userBalance < amount) {
-            resultText.textContent = `You need ৳${amount} to place this bet. Current balance: ৳${userBalance}`;
+            resultText.textContent = `You need $${amount} to place this bet. Current balance: $${userBalance}`;
             return;
         }
 
@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update UI
         updateBalanceDisplay();
         render(); // Redraw canvas to show the new chip
-        resultText.textContent = `Bet ৳${amount} placed on ${spotData.spot}. Total Wagered: ৳${totalWagered}.`;
+        resultText.textContent = `Bet $${amount} placed on ${spotData.spot}. Total Wagered: $${totalWagered}.`;
     }
 
     // --- GAME LOGIC FUNCTIONS ---
@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chipPalette.querySelectorAll('.chip-btn').forEach(btn => btn.classList.remove('active'));
         if (targetBtn) targetBtn.classList.add('active');
         currentChipValue = value;
-        resultText.textContent = `Wagering ৳${currentChipValue}. Click a spot to place a bet.`;
+        resultText.textContent = `Wagering $${currentChipValue}. Click a spot to place a bet.`;
     }
 
     function undoLastWager() {
@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
             totalWagered -= lastBet.amount;
             updateBalanceDisplay();
             render(); // Redraw canvas
-            resultText.textContent = `Undo successful. Returned ৳${lastBet.amount}. Total Wagered: ৳${totalWagered}.`;
+            resultText.textContent = `Undo successful. Returned $${lastBet.amount}. Total Wagered: $${totalWagered}.`;
         }
     }
 
@@ -479,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBalanceDisplay();
             render(); // Clear balance from canvas
 
-            resultText.textContent = `Winning Number: ${winningNumber} (${winningColor.toUpperCase()}). You won ৳${totalWinnings.toFixed(0)}.`;
+            resultText.textContent = `Winning Number: ${winningNumber} (${winningColor.toUpperCase()}). You won $${totalWinnings.toFixed(0)}.`;
 
             setTimeout(() => {
                 if (spinModal) spinModal.classList.add('hidden');

@@ -222,7 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
             updateBalanceDisplay();
 
             // Format winnings for the pop-up message
-            showPopup(`You Cashed Out ৳${formatChips(data.winnings)}!!`);
+            showPopup(`You Cashed Out $${formatChips(data.winnings)}!!`);
             gameActive = false;
             cashOutBtn.disabled = true;
             newGameBtn.textContent = "Next Game";

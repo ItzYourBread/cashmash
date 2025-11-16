@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (value <= maxBet) {
       const button = document.createElement("button");
       button.className = "bet-option";
-      button.textContent = "৳" + value.toLocaleString();
+      button.textContent = "$" + value.toLocaleString();
       button.addEventListener("click", () => {
         currentBet = value;
         updateBetDisplay();

@@ -182,7 +182,7 @@ placeBetBtn.onclick = () => {
   }
   currentBet = bet;
   // FIX: Format the displayed bet amount
-  resultText.textContent = `Bet set to: ৳${formatChips(bet)}. Click Deal.`;
+  resultText.textContent = `Bet set to: $${formatChips(bet)}. Click Deal.`;
   placeBetBtn.disabled = true;
   dealBtn.disabled = false;
 };

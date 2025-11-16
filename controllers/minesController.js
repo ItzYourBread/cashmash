@@ -29,7 +29,7 @@ async function processAutoCashout(userId, game) {
         delete gameState[userId];
 
         return {
-            message: `Previous game automatically cashed out for ৳${winnings} Balance.`,
+            message: `Previous game automatically cashed out for $${winnings} Balance.`,
             winnings,
             balance: user ? user.balance : null
         };

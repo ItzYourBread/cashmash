@@ -81,16 +81,16 @@ exports.startGame = async (req, res) => {
         if (dealerScore === 21) {
             payout = bet;
             winnings = 0;
-            result = `Push: Both Blackjack (+৳${winnings.toFixed(2)})`;
+            result = `Push: Both Blackjack (+$${winnings.toFixed(2)})`;
         } else {
             if (isLuckyDay()) {
                 payout = bet * 2.5; 
                 winnings = bet * 1.5;
-                result = `Blackjack! You win (3:2 Payout) +৳${winnings.toFixed(2)}`;
+                result = `Blackjack! You win (3:2 Payout) +$${winnings.toFixed(2)}`;
             } else {
                 payout = bet * 2.2; 
                 winnings = bet * 1.2;
-                result = `Blackjack! You win (6:5 Payout) +৳${winnings.toFixed(2)}`;
+                result = `Blackjack! You win (6:5 Payout) +$${winnings.toFixed(2)}`;
             }
         }
         
@@ -142,7 +142,7 @@ exports.hit = async (req, res) => {
 
     if (playerScore > 21) {
       state.gameOver = true;
-      state.result = `Bust! Dealer Wins -৳${bet.toFixed(2)}`;
+      state.result = `Bust! Dealer Wins -$${bet.toFixed(2)}`;
       result = state.result;
 
       const user = await User.findById(req.user._id);
@@ -200,9 +200,9 @@ exports.stand = async (req, res) => {
       winnings = 0;
     }
 
-    if (winnings > 0) result += ` +৳${winnings.toFixed(2)}`;
-    else if (winnings < 0) result += ` -৳${Math.abs(winnings).toFixed(2)}`;
-    else if (winnings === 0 && amountToReturn > 0) result += ` (+৳0.00)`;
+    if (winnings > 0) result += ` +$${winnings.toFixed(2)}`;
+    else if (winnings < 0) result += ` -$${Math.abs(winnings).toFixed(2)}`;
+    else if (winnings === 0 && amountToReturn > 0) result += ` (+$0.00)`;
 
     user.balance += amountToReturn;
 

@@ -26,7 +26,7 @@
                             <%= __('Balance') %>
                         </h3>
                         <% if (user) { %>
-                            <p>৳<%= user.balance.toLocaleString() %>
+                            <p>$<%= user.balance.toLocaleString() %>
                             </p>
                             <% } else { %>
                                 <p>
@@ -157,7 +157,7 @@
                     </p>
                     <form method="POST" action="/deposit/bkash">
                         <label>
-                            <%= __('Amount (BDT)') %>
+                            <%= __('Amount (USD)') %>
                         </label>
                         <input type="number" name="amount" id="bkashAmount" required min="300" max="25000">
                         <div id="bkashFeedback" class="amount-feedback"></div>
@@ -193,7 +193,7 @@
                     </p>
                     <form method="POST" action="/deposit/nagad">
                         <label>
-                            <%= __('Amount (BDT)') %>
+                            <%= __('Amount (USD)') %>
                         </label>
                         <input type="number" name="amount" id="nagadAmount" required min="300" max="25000">
                         <div id="nagadFeedback" class="amount-feedback"></div>
@@ -229,7 +229,7 @@
                     </p>
                     <form method="POST" action="/deposit/upay">
                         <label>
-                            <%= __('Amount (BDT)') %>
+                            <%= __('Amount (USD)') %>
                         </label>
                         <input type="number" name="amount" id="upayAmount" required min="300" max="25000">
                         <div id="upayFeedback" class="amount-feedback"></div>
@@ -305,7 +305,6 @@
                     bdt: '<%= __(" BDT") %>',
                     usd: '<%= __(" USD") %>',
                     equivalentInBdt: '<%= __("Equivalent in BDT") %>',
-                    amountOK: '<%= __("Amount OK") %>',
                     pleaseEnterValid: '<%= __("Please enter a valid amount and transaction ID.") %>',
                     conversionError: '<%= __("Conversion error. Please re-enter the amount.") %>'
                 };

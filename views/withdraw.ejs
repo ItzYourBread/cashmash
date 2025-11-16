@@ -40,7 +40,7 @@
                         <h3><%= __('Balance') %></h3>
                         <% if (user) { %>
                             <p id="userBalanceDisplay">
-                                ৳<%= user.balance.toLocaleString() %>
+                                $<%= user.balance.toLocaleString() %>
                             </p>
                             <% } else { %>
                                 <p><%= __('Login to see balance') %></p>
@@ -100,7 +100,7 @@
                             <%= method.charAt(0).toUpperCase() + method.slice(1) %> <%= __('Number') %>
                         </label>
                         <input type="text" name="contact" required>
-                        <label><%= __('Amount') %> (<%= __('BDT') %>)</label>
+                        <label><%= __('Amount') %> (<%= __('USD') %>)</label>
                         <input type="number" name="amount" id="<%= method %>Amount" required min="300">
                         <div id="<%= method %>Feedback" class="amount-feedback"></div>
 
@@ -118,7 +118,7 @@
                         <form method="POST" action="/withdraw/binance">
                             <label><%= __('Email or User ID') %></label>
                             <input type="text" name="userIdOrEmail" required>
-                            <label><%= __('Amount') %> (<%= __('BDT') %>)</label>
+                            <label><%= __('Amount') %> (<%= __('USD') %>)</label>
                             <input type="number" name="amount" id="binanceAmount" required min="300">
                             <div id="binanceFeedback" class="amount-feedback"></div>
 
@@ -131,7 +131,7 @@
                 <div class="login-modal" id="loginModal">
                     <div class="login-modal-content">
                         <h2><%= __('Login Required') %></h2>
-                        <p><%= __('You need to be logged in to withdraw BDT.') %></p>
+                        <p><%= __('You need to be logged in to withdraw USD.') %></p>
                         <div class="login-modal-actions">
                             <a href="/login" class="login-btn gold"><%= __('Login') %></a>
                             <button class="login-btn outline" id="closeLoginModal"><%= __('Cancel') %></button>
@@ -153,7 +153,7 @@
                         insufficientBalance: '<%= __('Insufficient Balance') %>',
                         minAmount: '<%= __('Minimum amount is') %>',
                         balanceOK: '<%= __('Balance is sufficient') %>',
-                        bdt: '<%= __('BDT') %>',
+                        bdt: '<%= __('USD') %>',
                         enterAmount: '<%= __('Enter Amount') %>',
                     };
 
@@ -233,7 +233,7 @@
 
                             // Check 3: Insufficient Balance (Only runs if logged in)
                             if (isLoggedIn && amount > userBalance) {
-                                feedback.textContent = `${L.insufficientBalance}: ৳${userBalance.toLocaleString()}`;
+                                feedback.textContent = `${L.insufficientBalance}: $${userBalance.toLocaleString()}`;
                                 feedback.className = 'amount-feedback amount-invalid';
                                 confirmBtn.disabled = true;
                                 return;

@@ -129,37 +129,33 @@ router.get('/deposit', ensureAuth, async (req, res) => {
   });
 });
 
-// Handle BinancePay deposit
+// Handle BinancePay deposit (USD only)
 router.post('/deposit/binance', ensureAuth, async (req, res) => {
   try {
-    const { amount: usdAmount, bdtAmount, txnId } = req.body;
+    const { amount, txnId } = req.body;
+    const parsedAmount = Number(amount);
 
-    const parsedUsdAmount = Number(usdAmount);
-    const parsedBdtAmount = Number(bdtAmount);
-
-    if (!txnId || isNaN(parsedUsdAmount) || isNaN(parsedBdtAmount) || parsedBdtAmount < 10) {
+    if (!txnId || isNaN(parsedAmount) || parsedAmount < 1) {
       throw new Error('Invalid deposit details');
     }
 
-    // ✅ FIX: Use consistent ID for deposit
     const newDepositId = new mongoose.Types.ObjectId();
 
     const depositData = {
       _id: newDepositId,
-      amount: parsedBdtAmount,
-      amountUSD: parsedUsdAmount,
+      amount: parsedAmount, // USD amount
       method: 'BinancePay',
       txnId,
       status: 'Pending',
       agentName: "MD Arif",
-      agentContact: "01341803889"
+      agentContact: "01341803889",
     };
 
     // Save in user's deposits array
     req.user.deposits.push(depositData);
     await req.user.save();
 
-    // Save in Deposit model (Explicitly pass _id and user)
+    // Save in Deposit model
     await Deposit.create({
       _id: newDepositId,
       user: req.user._id,
@@ -173,17 +169,16 @@ router.post('/deposit/binance', ensureAuth, async (req, res) => {
   }
 });
 
+// Handle Crypto deposit (USD only)
 router.post('/deposit/crypto', ensureAuth, async (req, res) => {
   try {
     const { amount, currency } = req.body;
     const usdAmount = Number(amount);
 
-    // Validate amount
     if (!usdAmount || usdAmount < 1) {
       return res.status(400).send('Invalid amount');
     }
 
-    // Allowed USDT networks
     const allowedCurrencies = [
       'usdttrc20',
       'usdterc20',
@@ -194,38 +189,27 @@ router.post('/deposit/crypto', ensureAuth, async (req, res) => {
       'usdtarb',
     ];
 
-    // Normalize input to lowercase for safety
     const currencyLower = currency.toLowerCase();
-
     if (!allowedCurrencies.includes(currencyLower)) {
       return res.status(400).send('Unsupported USDT network');
     }
 
-    // Create NOWPayments invoice
     const payment = await npApi.createInvoice({
       price_amount: usdAmount,
       price_currency: "usd",
-      pay_currency: currencyLower, // set network
+      pay_currency: currencyLower,
       order_id: req.user._id.toString(),
       order_description: `Crypto deposit by ${req.user.username}`,
       ipn_callback_url: `${process.env.BASE_URL}/api/nowpayments/webhook`
     });
 
-    console.log("NOWPayments Payment:", payment);
-
-    // Extract transaction ID
     const txnId = payment.id || payment.payment_id || payment.invoice_id;
-    if (!txnId) {
-      console.warn("⚠️ NOWPayments did not return a payment ID");
-      return res.status(500).send("Failed to create payment ID.");
-    }
+    if (!txnId) return res.status(500).send("Failed to create payment ID.");
 
-    // Store deposit in DB
     const depositData = {
       user: req.user._id,
-      amount: usdAmount * 122.24, // optional: USD→BDT conversion
-      amountUSD: usdAmount,
-      method: `Crypto (${currency.toUpperCase()})`, // show network
+      amount: usdAmount, // USD only
+      method: `Crypto (${currency.toUpperCase()})`,
       txnId,
       status: "Pending"
     };
@@ -234,20 +218,14 @@ router.post('/deposit/crypto', ensureAuth, async (req, res) => {
     await req.user.save();
     await Deposit.create(depositData);
 
-    // Redirect to payment page
     return res.redirect(payment.invoice_url);
 
   } catch (err) {
     console.error("NOWPayments error:", err);
-
-    // Handle known NOWPayments errors
-    if (err.code === 'INVALID_REQUEST_PARAMS') {
-      return res.status(400).send(`NOWPayments error: ${err.message}`);
-    }
-
     return res.status(500).send("Failed to create crypto payment.");
   }
 });
+
 
 
 // ✅ WEBHOOK: Handle NOWPayments notifications
@@ -332,7 +310,7 @@ router.post(
           await user.save();
 
           console.log(
-            `✅ User ${user.username} credited ৳${rewardAmount} and deposit marked Completed in both models.`
+            `✅ User ${user.username} credited $${rewardAmount} and deposit marked Completed in both models.`
           );
         } else {
           console.log(
@@ -490,7 +468,7 @@ router.post('/withdraw/cancel/:id', ensureAuth, async (req, res) => {
       const amountToRefund = withdrawal.amount;
       req.user.balance += amountToRefund;
       await req.user.save();
-      console.log(`5. Successfully cancelled and refunded ৳${amountToRefund}.`);
+      console.log(`5. Successfully cancelled and refunded $${amountToRefund}.`);
     } else {
       console.error(`5. [INCONSISTENCY] Embedded record ${withdrawId} not found in user subdocument. Refunding anyway.`);
       // Ensure refund still happens even if the subdocument is missing

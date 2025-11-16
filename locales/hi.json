@@ -62,7 +62,6 @@
 	"Upay Deposit": "उपाय जमा",
 	"BinancePay Deposit": "बाइनेंसपे जमा",
 	"Send money to": "पैसे भेजें:",
-	"Amount (BDT)": "राशि (BDT)",
 	"Amount (USD)": "राशि (USD)",
 	"Transaction ID": "लेनदेन आईडी",
 	"Order ID": "ऑर्डर आईडी",
@@ -75,9 +74,8 @@
 	"Cancel": "रद्द करें",
 	"Amount must be between": "राशि के बीच होनी चाहिए",
 	"and": "और",
-	" BDT": " BDT",
 	" USD": " USD",
-	"Equivalent in BDT": "BDT में समतुल्य",
+	"Equivalent in USD": "USD में समतुल्य",
 	"Amount OK": "राशि ठीक है",
 	"Withdraw Title": "निकालें",
 	"Full Name": "पूरा नाम",
@@ -85,8 +83,8 @@
 	"Amount": "राशि",
 	"Email or User ID": "ईमेल या यूजर आईडी",
 	"Withdrawal processing time": "जमा करने के बाद, आपके निकासी अनुरोध को 48 घंटे के भीतर संसाधित किया जाएगा।",
-	"BDT": "BDT",
-	"You need to be logged in to withdraw BDT.": "BDT निकालने के लिए आपको लॉग इन होना आवश्यक है।",
+	"USD": "USD",
+	"You need to be logged in to withdraw USD.": "USD निकालने के लिए आपको लॉग इन होना आवश्यक है।",
 	"User UID": "उपयोगकर्ता UID",
 	"BinancePay QR Code for User 1055162864": "उपयोगकर्ता 1055162864 के लिए BinancePay QR कोड",
 	"Scan this QR code using the Binance app.": "Binance ऐप का उपयोग करके इस QR कोड को स्कैन करें।",
@@ -106,5 +104,7 @@
 	"You will be redirected to a crypto payment page.": "You will be redirected to a crypto payment page.",
 	"Pay with Crypto": "Pay with Crypto",
 	"Conversion error.Please re - enter the amount.": "Conversion error.Please re - enter the amount.",
-	"No crypto networks available right now.": "No crypto networks available right now."
+	"No crypto networks available right now.": "No crypto networks available right now.",
+	" BDT": " BDT",
+	"Equivalent in BDT": "Equivalent in BDT"
 }
