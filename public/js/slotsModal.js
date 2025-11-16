@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
         (s) => `
         <li>
           <img src="${s.file}" class="mini-symbol" />
-          <strong>${s.name}:</strong> x${s.multiplier}
+          <strong>${formatSymbolName(s.name)}:</strong> x${s.multiplier}
           ${s.bonus ? `<em>(${s.bonus})</em>` : ""}
         </li>
       `
@@ -164,3 +164,12 @@ document.addEventListener("DOMContentLoaded", () => {
   ---------------------------------------------------- */
   updateBetDisplay();
 });
+
+function formatSymbolName(name) {
+  return name
+    .replace(/([A-Z])/g, " $1")    // camelCase → words
+    .replace(/[_-]+/g, " ")        // snake_case or dash-case → space
+    .replace(/\s+/g, " ")          // remove double spaces
+    .trim()
+    .replace(/\b\w/g, c => c.toUpperCase()); // capitalize words
+}

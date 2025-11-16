@@ -17,48 +17,96 @@
 <body>
   <%- include('partials/header') %>
 
-    <section class="aviator-section">
-      <div class="aviator-header">
-        <div class="neon-title">CashMash Aviator</div>
-      </div>
+    <%- include('partials/gameLoader') %>
 
-      <!-- MAIN GAME AREA -->
-      <div class="aviator-table">
-        <div class="flight-area">
-          <div class="flight-info">
-            <div class="multiplier-display" id="multiplierDisplay">
-              <span id="multiplier">1.00x</span>
-            </div>
-            <div class="result small-result" id="resultText"></div>
-          </div>
-          <div class="sunburst-container">
-            <div class="sunburst"></div>
-          </div>
-          <div class="flight-path"></div>
-          <svg id="graph-svg" class="graph-svg"></svg>
-          <div class="plane" id="plane"></div>
+
+      <section class="aviator-section">
+        <div class="aviator-header">
+          <div class="neon-title">CashMash Aviator</div>
         </div>
 
-        <!-- CONTROLS AREA -->
-        <div class="controls">
-          <div class="control-line">
-            <div class="balance-container">
-              Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
-              <%= formatBalance(user.chips) %>
-              </strong>
+        <!-- MAIN GAME AREA -->
+        <div class="aviator-table">
+          <div class="flight-area">
+            <div class="flight-info">
+              <div class="multiplier-display" id="multiplierDisplay">
+                <span id="multiplier">1.00x</span>
+              </div>
+              <div class="result small-result" id="resultText"></div>
             </div>
-            <input id="betAmount" type="number" min="1" value="10" />
-            <button id="placeBetBtn" class="btn gold">Place Bet</button>
-            <button id="cashOutBtn" class="btn gold" disabled>Cash Out</button>
+            <div class="sunburst-container">
+              <div class="sunburst"></div>
+            </div>
+            <div class="flight-path"></div>
+            <svg id="graph-svg" class="graph-svg"></svg>
+            <div class="plane" id="plane"></div>
+          </div>
+
+          <!-- CONTROLS AREA -->
+          <div class="controls">
+            <div class="control-line">
+              <div class="balance-container">
+                Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
+                  <%= formatBalance(user.chips) %>
+                </strong>
+              </div>
+              <input id="betAmount" type="number" min="75" max="10000" value="75" />
+              <button id="placeBetBtn" class="btn gold">Place Bet</button>
+              <button id="cashOutBtn" class="btn gold" disabled>Cash Out</button>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <%- include('partials/footer') %>
-      <script src="/socket.io/socket.io.js"></script>
-      <script src="/js/formatBalance.js"></script>
-      <script src="/js/aviator.js"></script>
+      <%- include('partials/footer') %>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/formatBalance.js"></script>
+        <script src="/js/aviator.js"></script>
+        <script>
+          document.addEventListener("DOMContentLoaded", () => {
+            const betInput = document.getElementById("betAmount");
+            const placeBetBtn = document.getElementById("placeBetBtn");
+
+            const MIN_BET = 75;
+            const MAX_BET = 10000;
+
+            // Auto-correct when user leaves the field
+            betInput.addEventListener("blur", () => {
+              let value = parseInt(betInput.value, 10);
+
+              if (isNaN(value)) {
+                betInput.value = MIN_BET;
+                return;
+              }
+
+              if (value < MIN_BET) betInput.value = MIN_BET;
+              if (value > MAX_BET) betInput.value = MAX_BET;
+            });
+
+            // Extra safety: validate on click
+            placeBetBtn.addEventListener("click", (e) => {
+              const value = parseInt(betInput.value, 10);
+
+              if (value < MIN_BET || isNaN(value)) {
+                e.preventDefault();
+                alert(`Minimum bet: ৳${MIN_BET}`);
+                betInput.value = MIN_BET;
+                return;
+              }
+
+              if (value > MAX_BET) {
+                e.preventDefault();
+                alert(`Maximum bet: ৳${MAX_BET}`);
+                betInput.value = MAX_BET;
+                return;
+              }
+
+              // valid → aviator.js will continue automatically
+            });
+          });
+        </script>
+
+
 </body>
 
 </html>

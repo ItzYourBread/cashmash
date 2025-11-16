@@ -9,7 +9,7 @@ const slotsConfig = {
     description: "A timeless slot experience with bright fruits and simple wins!",
     bonusInfo: "No bonus round — pure old-school fun and clean wins!",
 
-    baseWinRate: { MIN: 0.9, MAX: 0.1 },
+    baseWinRate: { MIN: 0.7, MAX: 0.3 },
 
     symbols: [
       { name: 'cherry', file: '/images/ClassicSlot/cherry.png', multiplier: 0.5 },
@@ -108,7 +108,7 @@ const slotsConfig = {
     description: "Uncover treasures in the golden sands of the Nile.",
     bonusInfo: "Every Pharaoh gives +5% bet bonus instantly.",
 
-    baseWinRate: { MIN: 0.3, MAX: 0.7 },
+    baseWinRate: { MIN: 0.7, MAX: 0.3 },
 
     symbols: [
       { name: 'goldCoin', file: '/images/PharaohsRichesSlots/goldCoin.png', multiplier: 0.6 },
@@ -192,7 +192,7 @@ const slotsConfig = {
     description: "Feel the flames — unleash blazing wins and fire bonuses.",
     bonusInfo: "Dragon Eye grants +10% bet bonus instantly.",
 
-    baseWinRate: { MIN: 0.3, MAX: 0.7 },
+    baseWinRate: { MIN: 0.7, MAX: 0.3 },
 
     symbols: [
       { name: 'emberCoin', file: '/images/DragonBlazeSlots/emberCoin.png', multiplier: 0.5 },

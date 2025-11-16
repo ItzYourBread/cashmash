@@ -14,59 +14,62 @@
 <body>
   <%- include('partials/header') %>
 
-    <section class="blackjack-section">
-      <div class="blackjack-game">
-
-        <h2 class="neon-title">Blackjack</h2>
-
-        <!-- MAIN BLACKJACK TABLE -->
-        <div class="blackjack-table">
+    <%- include('partials/gameLoader') %>
 
 
-          <!-- DEALER SECTION -->
-          <div class="seat dealer-seat">
-            <div class="label">DEALER</div>
-            <div class="hand dealer-hand" id="dealerHand"><!-- Cards added by JS --></div>
-            <div class="score" id="dealerScore">0</div>
-          </div>
+      <section class="blackjack-section">
+        <div class="blackjack-game">
 
-          <!-- PLAYER SECTION -->
-          <div class="seat player-seat">
-            <div class="label">PLAYER</div>
-            <div class="hand player-hand" id="playerHand"><!-- Cards added by JS --></div>
-            <div class="score" id="playerScore">0</div>
-          </div>
+          <h2 class="neon-title">Blackjack</h2>
 
-        </div>
+          <!-- MAIN BLACKJACK TABLE -->
+          <div class="blackjack-table">
 
-        <!-- CONTROLS AREA -->
-        <div class="controls">
-          <div class="bet-controls">
-            <div class="balance-container">
-              Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
-              <%= formatBalance(user.chips) %>
-              </strong>
+
+            <!-- DEALER SECTION -->
+            <div class="seat dealer-seat">
+              <div class="label">DEALER</div>
+              <div class="hand dealer-hand" id="dealerHand"><!-- Cards added by JS --></div>
+              <div class="score" id="dealerScore">0</div>
             </div>
-            <input id="betAmount" type="number" min="10" value="10" />
-            <button id="placeBetBtn" class="btn gold" style="width: 100px;">Place Bet</button>
+
+            <!-- PLAYER SECTION -->
+            <div class="seat player-seat">
+              <div class="label">PLAYER</div>
+              <div class="hand player-hand" id="playerHand"><!-- Cards added by JS --></div>
+              <div class="score" id="playerScore">0</div>
+            </div>
+
           </div>
 
-          <div class="action-buttons">
-            <button id="hitBtn" class="btn gold big" disabled>Hit</button>
-            <button id="standBtn" class="btn gold big" disabled>Stand</button>
-            <button id="dealBtn" class="btn gold big" disabled>Deal</button>
+          <!-- CONTROLS AREA -->
+          <div class="controls">
+            <div class="bet-controls">
+              <div class="balance-container">
+                Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
+                  <%= formatBalance(user.chips) %>
+                </strong>
+              </div>
+              <input id="betAmount" type="number" min="10" value="10" />
+              <button id="placeBetBtn" class="btn gold" style="width: 100px;">Place Bet</button>
+            </div>
+
+            <div class="action-buttons">
+              <button id="hitBtn" class="btn gold big" disabled>Hit</button>
+              <button id="standBtn" class="btn gold big" disabled>Stand</button>
+              <button id="dealBtn" class="btn gold big" disabled>Deal</button>
+            </div>
+
+            <div class="result" id="resultText">Place your bet and deal.</div>
           </div>
 
-          <div class="result" id="resultText">Place your bet and deal.</div>
+          <div class="history" id="history"><!-- Results badges added by JS --></div>
         </div>
+      </section>
 
-        <div class="history" id="history"><!-- Results badges added by JS --></div>
-      </div>
-    </section>
-
-    <%- include('partials/footer') %>
-      <script src="/js/formatBalance.js"></script>
-      <script src="/js/blackjack.js"></script>
+      <%- include('partials/footer') %>
+        <script src="/js/formatBalance.js"></script>
+        <script src="/js/blackjack.js"></script>
 </body>
 
 </html>

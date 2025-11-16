@@ -1,0 +1,202 @@
+<!-- CASHMASH PREMIUM LOADER -->
+<div id="cashmash-loader">
+  <canvas id="cashmash-loader-canvas"></canvas>
+
+  <div class="loader-center">
+
+    <!-- Gold rotating vortex -->
+    <div class="loader-vortex"></div>
+
+    <!-- Hologram logo with Cash/white & Mash/gold -->
+    <div class="loader-logo">
+      <span class="logo-cash">Cash</span><span class="logo-mash">Mash</span>
+    </div>
+
+    <!-- Dynamic loading text -->
+    <p class="loader-text">Initializing...</p>
+  </div>
+</div>
+
+<style>
+  :root {
+    --gold: #f5c542;
+    --gold-light: #ffdb6e;
+    --bg-dark: #000;
+  }
+
+  /* FULLY SCOPED UNDER CASHMASH LOADER */
+  #cashmash-loader {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 70px);
+    background: radial-gradient(circle at center, #000 10%, #020617 100%);
+    z-index: 99999;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  #cashmash-loader-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+  #cashmash-loader .loader-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+  }
+
+  /* GOLD VORTEX */
+  .loader-vortex {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 4px solid rgba(245,197,66,0.18);
+    border-top-color: var(--gold-light);
+    margin: 0 auto 20px;
+    animation: loader-spin 1.4s linear infinite, loader-glow 3s infinite ease-in-out;
+    box-shadow: 0 0 35px rgba(255,200,100,0.25);
+  }
+
+  @keyframes loader-spin { to { transform: rotate(360deg); } }
+  @keyframes loader-glow {
+    0%,100% { box-shadow: 0 0 20px rgba(245,197,66,0.4); }
+    50% { box-shadow: 0 0 60px rgba(245,197,66,0.9); }
+  }
+
+  /* HOLOGRAM LOGO */
+  .loader-logo {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.8em;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    text-shadow: 0 0 20px rgba(245,197,66,0.6);
+    animation: loader-logo-pulse 2s infinite linear;
+    margin-bottom: 10px;
+  }
+
+  .loader-logo .logo-cash {
+    color: #fff;
+    margin-right: 5px;
+  }
+
+  .loader-logo .logo-mash {
+    color: var(--gold);
+    position: relative;
+  }
+
+  /* Animated glowing behind Mash */
+  .loader-logo .logo-mash::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 160%;
+    height: 160%;
+    background: radial-gradient(circle, rgba(245,197,66,0.3), transparent 70%);
+    border-radius: 50%;
+    z-index: -1;
+    filter: blur(16px);
+    animation: mash-glow 2.5s infinite alternate;
+  }
+
+  @keyframes mash-glow {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  }
+
+  @keyframes loader-logo-pulse {
+    0%,100% { text-shadow: 0 0 15px rgba(245,197,66,0.3); }
+    50% { text-shadow: 0 0 45px rgba(245,197,66,0.9); }
+  }
+
+  /* DYNAMIC LOADING TEXT */
+  .loader-text {
+    margin-top: 12px;
+    font-size: 1.1em;
+    color: #ccc;
+    letter-spacing: 1px;
+    animation: loader-text-fade 1s infinite alternate;
+  }
+
+  @keyframes loader-text-fade { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+</style>
+
+<script>
+(function(){
+  // CANVAS PARTICLES
+  const canvas = document.getElementById("cashmash-loader-canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const particles = [];
+  const particleCount = 70;
+
+  for (let i=0; i<particleCount; i++){
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      size: Math.random()*2+1,
+      speedX: (Math.random()*1)-0.5,
+      speedY: (Math.random()*1)-0.5,
+      opacity: Math.random()
+    });
+  }
+
+  function animateParticles(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      ctx.fillStyle = `rgba(245,197,66,${p.opacity})`;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx.fill();
+
+      p.x += p.speedX;
+      p.y += p.speedY;
+
+      if(p.x<0)p.x=canvas.width;
+      if(p.x>canvas.width)p.x=0;
+      if(p.y<0)p.y=canvas.height;
+      if(p.y>canvas.height)p.y=0;
+    });
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
+
+  // DYNAMIC TEXT
+  const texts = [
+    "Initializing engine...",
+    "Loading RTP matrix...",
+    "Shuffling outcome seeds...",
+    "Connecting to CashMash servers...",
+    "Calibrating luck algorithm...",
+    "Balancing gold multipliers...",
+    "Generating paylines...",
+    "Preparing bonus modules...",
+    "Finalizing session..."
+  ];
+  let index = 0;
+  const loadText = document.querySelector(".loader-text");
+  setInterval(()=> {
+    loadText.textContent = texts[index];
+    index = (index+1)%texts.length;
+  },800);
+
+  // AUTO HIDE
+  setTimeout(()=>{
+    const loader = document.getElementById("cashmash-loader");
+    loader.style.opacity="0";
+    loader.style.transition="0.7s ease";
+    setTimeout(()=>loader.style.display="none",700);
+  },3000);
+})();
+</script>

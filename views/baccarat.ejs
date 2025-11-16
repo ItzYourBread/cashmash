@@ -14,64 +14,67 @@
 <body>
   <%- include('partials/header') %>
 
-    <section class="baccarat-section">
-      <div class="baccarat-header">
-        <div class="neon-title">CashMash Baccarat</div>
-      </div>
+    <%- include('partials/gameLoader') %>
 
-      <div class="baccarat-table">
-        <div class="table-top">
-          <div class="seat player-seat">
-            <div class="label">PLAYER</div>
-            <div class="hand" id="playerHand">
-              <div class="card-slot card-placeholder"></div>
-              <div class="card-slot card-placeholder"></div>
-            </div>
-            <div class="score" id="playerScore">0</div>
-          </div>
 
-          <div class="seat banker-seat">
-            <div class="label">BANKER</div>
-            <div class="hand" id="bankerHand">
-              <div class="card-slot card-placeholder"></div>
-              <div class="card-slot card-placeholder"></div>
-            </div>
-            <div class="score" id="bankerScore">0</div>
-          </div>
+      <section class="baccarat-section">
+        <div class="baccarat-header">
+          <div class="neon-title">CashMash Baccarat</div>
         </div>
 
-        <div class="multi-bet">
-          <div class="bet-option">
-            <label for="betPlayer">Player Bet</label>
-            <input type="number" id="betPlayer" min="0" value="0" />
-          </div>
-          <div class="bet-option">
-            <label for="betBanker">Banker Bet</label>
-            <input type="number" id="betBanker" min="0" value="0" />
-          </div>
-          <div class="bet-option">
-            <label for="betTie">Tie Bet</label>
-            <input type="number" id="betTie" min="0" value="0" />
-          </div>
-
-          <div class="control-line">
-            <div class="balance-container">
-              Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
-              <%= formatBalance(user.chips) %>
-              </strong>
+        <div class="baccarat-table">
+          <div class="table-top">
+            <div class="seat player-seat">
+              <div class="label">PLAYER</div>
+              <div class="hand" id="playerHand">
+                <div class="card-slot card-placeholder"></div>
+                <div class="card-slot card-placeholder"></div>
+              </div>
+              <div class="score" id="playerScore">0</div>
             </div>
-            <button id="dealBtn" class="btn gold big">Deal</button>
+
+            <div class="seat banker-seat">
+              <div class="label">BANKER</div>
+              <div class="hand" id="bankerHand">
+                <div class="card-slot card-placeholder"></div>
+                <div class="card-slot card-placeholder"></div>
+              </div>
+              <div class="score" id="bankerScore">0</div>
+            </div>
           </div>
 
+          <div class="multi-bet">
+            <div class="bet-option">
+              <label for="betPlayer">Player Bet</label>
+              <input type="number" id="betPlayer" min="0" value="0" />
+            </div>
+            <div class="bet-option">
+              <label for="betBanker">Banker Bet</label>
+              <input type="number" id="betBanker" min="0" value="0" />
+            </div>
+            <div class="bet-option">
+              <label for="betTie">Tie Bet</label>
+              <input type="number" id="betTie" min="0" value="0" />
+            </div>
 
+            <div class="control-line">
+              <div class="balance-container">
+                Balance: ৳<strong id="balance" data-raw-chips="<%= user.chips %>">
+                  <%= formatBalance(user.chips) %>
+                </strong>
+              </div>
+              <button id="dealBtn" class="btn gold big">Deal</button>
+            </div>
+
+
+          </div>
+          <div class="result" id="resultText">Place your bets and deal.</div>
         </div>
-        <div class="result"  id="resultText">Place your bets and deal.</div>
-      </div>
-    </section>
+      </section>
 
-    <%- include('partials/footer') %>
-      <script src="/js/formatBalance.js"></script>
-      <script src="/js/baccarat.js"></script>
+      <%- include('partials/footer') %>
+        <script src="/js/formatBalance.js"></script>
+        <script src="/js/baccarat.js"></script>
 </body>
 
 </html>
