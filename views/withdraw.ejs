@@ -1,60 +1,40 @@
 <!DOCTYPE html>
-<html lang="<%= currentLang %>">
+<html lang="">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= __('Withdraw Title') %> | CashMash</title>
+    <title>Withdraw Title Placeholder | CashMash</title>
     <link rel="stylesheet" href="/css/header.css" />
     <link rel="stylesheet" href="/css/footer.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
     <link rel="stylesheet" href="/css/payment.css" />
-    <style>
-        /* Optional: Add a style for the disabled button state if not already in payment.css */
-        .modal-content button:disabled {
-            background-color: #444;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .amount-feedback {
-            margin-bottom: 15px;
-            font-size: 0.9em;
-            padding: 5px;
-            border-radius: 4px;
-            width: 300px;
-            margin-left: 20px;
-        }
-        .amount-invalid {
-            color: #ff4d4d;
-        }
-        .amount-valid {
-            color: #79f291;
-        }
-    </style>
 </head>
+
 <body>
     <%- include('partials/header') %>
         <section class="dashboard">
             <div class="dashboard-container">
                 <aside class="sidebar">
                     <div class="balance-box">
-                        <h3><%= __('Balance') %></h3>
+                        <h3>Balance</h3>
                         <% if (user) { %>
                             <p id="userBalanceDisplay">
                                 $<%= user.balance.toLocaleString() %>
                             </p>
                             <% } else { %>
-                                <p><%= __('Login to see balance') %></p>
+                                <p>Login to see balance</p>
                                 <% } %>
                     </div>
                     <ul class="sidebar-menu">
-                        <li class="active" data-tab="ewallets"><%= __('E-Wallets') %></li>
-                        <li data-tab="crypto"><%= __('Crypto') %></li>
-                        <li data-tab="bank"><%= __('Bank') %></li>
+                        <li class="active" data-tab="ewallets">E-Wallets</li>
+                        <li data-tab="crypto">Crypto</li>
+                        <li data-tab="bank">Bank</li>
                     </ul>
                 </aside>
                 <div class="content-area">
                     <div id="ewallets" class="content-section active">
-                        <h2><%= __('E-Wallets') %></h2>
+                        <h2>E-Wallets</h2>
                         <div class="payment-cards">
                             <div class="payment-card" data-modal="modal-bkash">
                                 <img src="/images/payments/bkash.jpg" alt="Bkash">
@@ -75,12 +55,12 @@
                         </div>
                     </div>
                     <div id="crypto" class="content-section">
-                        <h2><%= __('Crypto') %></h2>
-                        <h2 style="margin-top: 20px;"><%= __('Coming Soon...') %></h2>
+                        <h2>Crypto</h2>
+                        <h2 style="margin-top: 20px;">Coming Soon...</h2>
                     </div>
                     <div id="bank" class="content-section">
-                        <h2><%= __('Bank') %></h2>
-                        <h2 style="margin-top: 20px;"><%= __('Coming Soon...') %></h2>
+                        <h2>Bank</h2>
+                        <h2 style="margin-top: 20px;">Coming Soon...</h2>
                     </div>
                 </div>
             </div>
@@ -91,21 +71,21 @@
                 <div class="modal-content">
                     <span class="close">&times;</span>
                     <h3>
-                        <%= method.charAt(0).toUpperCase() + method.slice(1) %> <%= __('Withdraw') %>
+                        <%= method.charAt(0).toUpperCase() + method.slice(1) %> Withdraw
                     </h3>
                     <form method="POST" action="/withdraw/<%= method %>">
-                        <label><%= __('Full Name') %></label>
+                        <label>Full Name</label>
                         <input type="text" name="fullName" required>
                         <label>
-                            <%= method.charAt(0).toUpperCase() + method.slice(1) %> <%= __('Number') %>
+                            <%= method.charAt(0).toUpperCase() + method.slice(1) %> Number
                         </label>
                         <input type="text" name="contact" required>
-                        <label><%= __('Amount') %> (<%= __('USD') %>)</label>
-                        <input type="number" name="amount" id="<%= method %>Amount" required min="300">
+                        <label>Amount (USD)</label>
+                        <input type="number" name="amount" id="<%= method %>Amount" required min="10">
                         <div id="<%= method %>Feedback" class="amount-feedback"></div>
 
-                        <p><%= __('Withdrawal processing time') %></p>
-                        <button type="submit" id="<%= method %>ConfirmBtn" disabled><%= __('Confirm') %></button>
+                        <p>Withdrawal processing time</p>
+                        <button type="submit" id="<%= method %>ConfirmBtn" disabled>Confirm</button>
                     </form>
                 </div>
             </div>
@@ -114,149 +94,38 @@
                 <div id="modal-binance" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h3>BinancePay <%= __('Withdraw') %></h3>
+                        <h3>BinancePay Withdraw</h3>
                         <form method="POST" action="/withdraw/binance">
-                            <label><%= __('Email or User ID') %></label>
+                            <label>Email or User ID</label>
                             <input type="text" name="userIdOrEmail" required>
-                            <label><%= __('Amount') %> (<%= __('USD') %>)</label>
-                            <input type="number" name="amount" id="binanceAmount" required min="300">
+                            <label>Amount (USD)</label>
+                            <input type="number" name="amount" id="binanceAmount" required min="10">
                             <div id="binanceFeedback" class="amount-feedback"></div>
 
-                            <p><%= __('Withdrawal processing time') %></p>
-                            <button type="submit" id="binanceConfirmBtn" disabled><%= __('Confirm') %></button>
+                            <p>Withdrawal processing time</p>
+                            <button type="submit" id="binanceConfirmBtn" disabled>Confirm</button>
                         </form>
                     </div>
                 </div>
 
                 <div class="login-modal" id="loginModal">
                     <div class="login-modal-content">
-                        <h2><%= __('Login Required') %></h2>
-                        <p><%= __('You need to be logged in to withdraw USD.') %></p>
+                        <h2>Login Required</h2>
+                        <p>You need to be logged in to withdraw USD.</p>
                         <div class="login-modal-actions">
-                            <a href="/login" class="login-btn gold"><%= __('Login') %></a>
-                            <button class="login-btn outline" id="closeLoginModal"><%= __('Cancel') %></button>
+                            <a href="/login" class="login-btn gold">Login</a>
+                            <button class="login-btn outline" id="closeLoginModal">Cancel</button>
                         </div>
                     </div>
                 </div>
                 <%- include('partials/footer') %>
+                    <script>
+                        // Server-side user login check logic is retained
+                        const isLoggedIn = <%= user ? 'true' : 'false' %>;
 
-                <script>
-                    // --- Configuration ---
-                    const MIN_WITHDRAWAL_AMOUNT = 300;
-                    
-                    const isLoggedIn = <%= user ? 'true' : 'false' %>;
-                    // Extract user balance, converting to a number from the server-side EJS injection
-                    const userBalance = isLoggedIn ? parseFloat("<%= user.balance %>") : 0; 
-                    
-                    // Localization strings
-                    const L = {
-                        insufficientBalance: '<%= __('Insufficient Balance') %>',
-                        minAmount: '<%= __('Minimum amount is') %>',
-                        balanceOK: '<%= __('Balance is sufficient') %>',
-                        bdt: '<%= __('USD') %>',
-                        enterAmount: '<%= __('Enter Amount') %>',
-                    };
+                    </script>
+                    <script src="/js/withdraw.js"></script>
 
-                    // --- Tab and Modal Logic (Unchanged) ---
-                    const tabs = document.querySelectorAll('.sidebar-menu li');
-                    const sections = document.querySelectorAll('.content-section');
-                    tabs.forEach(tab => {
-                        tab.addEventListener('click', () => {
-                            tabs.forEach(t => t.classList.remove('active'));
-                            sections.forEach(s => s.classList.remove('active'));
-                            tab.classList.add('active');
-                            document.getElementById(tab.dataset.tab).classList.add('active');
-                        });
-                    });
-
-                    const cards = document.querySelectorAll('.payment-card');
-                    const modals = document.querySelectorAll('.modal');
-                    const closes = document.querySelectorAll('.close');
-                    const loginModal = document.getElementById('loginModal');
-                    const closeLoginModal = document.getElementById('closeLoginModal');
-                    
-                    cards.forEach(card => {
-                        const modal = document.getElementById(card.dataset.modal);
-                        card.addEventListener('click', () => {
-                            if (!isLoggedIn) {
-                                loginModal.classList.add('show');
-                            } else {
-                                modal.style.display = 'flex';
-                            }
-                        });
-                    });
-                    
-                    closes.forEach(c => {
-                        c.addEventListener('click', () => c.closest('.modal').style.display = 'none');
-                    });
-                    
-                    window.addEventListener('click', e => {
-                        if (e.target.classList.contains('modal')) e.target.style.display = 'none';
-                        if (e.target === loginModal) loginModal.classList.remove('show');
-                    });
-                    
-                    closeLoginModal.addEventListener('click', () => loginModal.classList.remove('show'));
-
-                    // ==================== Withdrawal Validation Logic (Updated Min Amount) ====================
-
-                    /**
-                     * Sets up live validation for a withdrawal amount input.
-                     * @param {string} inputId - ID of the amount input field.
-                     * @param {string} feedbackId - ID of the feedback div.
-                     * @param {string} buttonId - ID of the confirm button.
-                     */
-                    function setupWithdrawalValidation(inputId, feedbackId, buttonId) {
-                        const amountInput = document.getElementById(inputId);
-                        const feedback = document.getElementById(feedbackId);
-                        const confirmBtn = document.getElementById(buttonId);
-
-                        if (!amountInput || !feedback || !confirmBtn) return;
-
-                        const validate = () => {
-                            const amount = parseFloat(amountInput.value);
-                            
-                            // Check 1: Empty or Invalid Input
-                            if (isNaN(amount) || amount <= 0) {
-                                feedback.textContent = L.enterAmount;
-                                feedback.className = 'amount-feedback';
-                                confirmBtn.disabled = true;
-                                return;
-                            }
-                            
-                            // Check 2: Minimum Amount (using the global config)
-                            if (amount < MIN_WITHDRAWAL_AMOUNT) {
-                                feedback.textContent = `${L.minAmount} ${MIN_WITHDRAWAL_AMOUNT} ${L.bdt}.`;
-                                feedback.className = 'amount-feedback amount-invalid';
-                                confirmBtn.disabled = true;
-                                return;
-                            }
-
-                            // Check 3: Insufficient Balance (Only runs if logged in)
-                            if (isLoggedIn && amount > userBalance) {
-                                feedback.textContent = `${L.insufficientBalance}: $${userBalance.toLocaleString()}`;
-                                feedback.className = 'amount-feedback amount-invalid';
-                                confirmBtn.disabled = true;
-                                return;
-                            }
-
-                            // All Checks Passed
-                            feedback.textContent = L.balanceOK;
-                            feedback.className = 'amount-feedback amount-valid';
-                            confirmBtn.disabled = false;
-                        };
-
-                        amountInput.addEventListener('input', validate);
-                        
-                        // Ensure the check runs once on load/modal open if data is prefilled
-                        validate();
-                    }
-
-                    // Apply validation to all withdrawal forms, no need to pass min amount now
-                    setupWithdrawalValidation('bkashAmount', 'bkashFeedback', 'bkashConfirmBtn');
-                    setupWithdrawalValidation('nagadAmount', 'nagadFeedback', 'nagadConfirmBtn');
-                    setupWithdrawalValidation('upayAmount', 'upayFeedback', 'upayConfirmBtn');
-                    setupWithdrawalValidation('binanceAmount', 'binanceFeedback', 'binanceConfirmBtn');
-
-                </script>
 </body>
+
 </html>

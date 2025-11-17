@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="<%= currentLang %>">
+<html lang="">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
-        <%= __('Deposit Title') %> | CashMash
+        Deposit Title Placeholder | CashMash
     </title>
 
     <link rel="stylesheet" href="/css/header.css" />
@@ -23,27 +23,27 @@
                 <aside class="sidebar">
                     <div class="balance-box">
                         <h3>
-                            <%= __('Balance') %>
+                            Balance
                         </h3>
                         <% if (user) { %>
                             <p>$<%= user.balance.toLocaleString() %>
                             </p>
                             <% } else { %>
                                 <p>
-                                    <%= __('Login to see balance') %>
+                                    Login to see balance
                                 </p>
                                 <% } %>
                     </div>
 
                     <ul class="sidebar-menu">
                         <li class="active" data-tab="ewallets">
-                            <%= __('E-Wallets') %>
+                            E-Wallets
                         </li>
                         <li data-tab="crypto">
-                            <%= __('Crypto') %>
+                            Crypto
                         </li>
                         <li data-tab="bank">
-                            <%= __('Bank') %>
+                            Bank
                         </li>
                     </ul>
                 </aside>
@@ -52,7 +52,7 @@
 
                     <div id="ewallets" class="content-section active">
                         <h2>
-                            <%= __('E-Wallets') %>
+                            E-Wallets
                         </h2>
                         <div class="payment-cards">
                             <div class="payment-card" data-modal="modal-bkash">
@@ -74,10 +74,9 @@
                         </div>
                     </div>
 
-                    <!-- CRYPTO SECTION -->
                     <div id="crypto" class="content-section">
                         <h2>
-                            <%= __('Crypto') %>
+                            Crypto
                         </h2>
 
                         <div class="payment-cards">
@@ -100,26 +99,25 @@
                         </div>
                     </div>
 
-                    <!-- CRYPTO MODAL -->
                     <div id="modal-crypto" class="modal">
                         <div class="modal-content">
                             <span class="close">&times;</span>
                             <h3 id="cryptoTitle">
-                                <%= __('Crypto Deposit (NOWPayments)') %>
+                                Crypto Deposit (NOWPayments)
                             </h3>
                             <form method="POST" action="/deposit/crypto">
                                 <input type="hidden" name="currency" id="cryptoCurrency" value="">
                                 <label>
-                                    <%= __('Amount (USD)') %>
+                                    Amount (USD)
                                 </label>
                                 <input type="number" name="amount" id="cryptoAmount" required min="10" max="1000" />
                                 <div id="cryptoFeedback" class="amount-feedback"></div>
 
                                 <p>
-                                    <%= __('You will be redirected to a crypto payment page.') %>
+                                    You will be redirected to a crypto payment page.
                                 </p>
-                                <button type="submit">
-                                    <%= __('Pay with Crypto') %>
+                                <button type="submit" disabled>
+                                    Pay with Crypto
                                 </button>
                             </form>
                         </div>
@@ -127,12 +125,12 @@
 
                     <div id="bank" class="content-section">
                         <h2>
-                            <%= __('Bank') %>
+                            Bank
                         </h2>
                         <div class="payment-cards">
                         </div>
                         <h2 style="margin-top: 20px;">
-                            <%= __('Coming Soon...') %>
+                            Coming Soon...
                         </h2>
                     </div>
 
@@ -144,12 +142,12 @@
             <div class="modal-content">
                 <span class="close">&times;</span>
                 <h3>
-                    <%= __('Bkash Deposit') %>
+                    Bkash Deposit
                 </h3>
                 <% const bkashAgents=agentPayments['Bkash']; const randomBkashAgent=bkashAgents[Math.floor(Math.random()
                     * bkashAgents.length)]; %>
                     <h4>
-                        <%= __('Send money to') %>:
+                        Send money to:
                     </h4>
                     <p><strong>
                             <%= randomBkashAgent.full_name %>
@@ -157,20 +155,20 @@
                     </p>
                     <form method="POST" action="/deposit/bkash">
                         <label>
-                            <%= __('Amount (USD)') %>
+                            Amount (USD)
                         </label>
                         <input type="number" name="amount" id="bkashAmount" required min="300" max="25000">
                         <div id="bkashFeedback" class="amount-feedback"></div>
 
                         <label>
-                            <%= __('Transaction ID') %>
+                            Transaction ID
                         </label>
                         <input type="text" name="transactionId" required>
                         <p>
-                            <%= __('Deposit confirmation message') %>
+                            After sending money, please enter the Transaction ID above to confirm your deposit. Deposits may take up to 5 minutes to reflect.
                         </p>
-                        <button type="submit">
-                            <%= __('Confirm') %>
+                        <button type="submit" disabled>
+                            Confirm
                         </button>
                     </form>
             </div>
@@ -180,12 +178,12 @@
             <div class="modal-content">
                 <span class="close">&times;</span>
                 <h3>
-                    <%= __('Nagad Deposit') %>
+                    Nagad Deposit
                 </h3>
                 <% const nagadAgents=agentPayments['Nagad']; const randomNagadAgent=nagadAgents[Math.floor(Math.random()
                     * nagadAgents.length)]; %>
                     <h4>
-                        <%= __('Send money to') %>:
+                        Send money to:
                     </h4>
                     <p><strong>
                             <%= randomNagadAgent.full_name %>
@@ -193,20 +191,20 @@
                     </p>
                     <form method="POST" action="/deposit/nagad">
                         <label>
-                            <%= __('Amount (USD)') %>
+                            Amount (USD)
                         </label>
                         <input type="number" name="amount" id="nagadAmount" required min="300" max="25000">
                         <div id="nagadFeedback" class="amount-feedback"></div>
 
                         <label>
-                            <%= __('Transaction ID') %>
+                            Transaction ID
                         </label>
                         <input type="text" name="transactionId" required>
                         <p>
-                            <%= __('Deposit confirmation message') %>
+                            After sending money, please enter the Transaction ID above to confirm your deposit. Deposits may take up to 5 minutes to reflect.
                         </p>
-                        <button type="submit">
-                            <%= __('Confirm') %>
+                        <button type="submit" disabled>
+                            Confirm
                         </button>
                     </form>
             </div>
@@ -216,12 +214,12 @@
             <div class="modal-content">
                 <span class="close">&times;</span>
                 <h3>
-                    <%= __('Upay Deposit') %>
+                    Upay Deposit
                 </h3>
                 <% const upayAgents=agentPayments['Upay']; const randomUpayAgent=upayAgents[Math.floor(Math.random() *
                     upayAgents.length)]; %>
                     <h4>
-                        <%= __('Send money to') %>:
+                        Send money to:
                     </h4>
                     <p><strong>
                             <%= randomUpayAgent.full_name %>
@@ -229,20 +227,20 @@
                     </p>
                     <form method="POST" action="/deposit/upay">
                         <label>
-                            <%= __('Amount (USD)') %>
+                            Amount (USD)
                         </label>
                         <input type="number" name="amount" id="upayAmount" required min="300" max="25000">
                         <div id="upayFeedback" class="amount-feedback"></div>
 
                         <label>
-                            <%= __('Transaction ID') %>
+                            Transaction ID
                         </label>
                         <input type="text" name="transactionId" required>
                         <p>
-                            <%= __('Deposit confirmation message') %>
+                            After sending money, please enter the Transaction ID above to confirm your deposit. Deposits may take up to 5 minutes to reflect.
                         </p>
-                        <button type="submit">
-                            <%= __('Confirm') %>
+                        <button type="submit" disabled>
+                            Confirm
                         </button>
                     </form>
             </div>
@@ -252,11 +250,11 @@
             <div class="modal-content">
                 <span class="close">&times;</span>
                 <h3>
-                    <%= __('BinancePay Deposit') %>
+                    BinancePay Deposit
                 </h3>
                 <form method="POST" action="/deposit/binance" id="binanceForm">
                     <label>
-                        <%= __('Amount (USD)') %>
+                        Amount (USD)
                     </label>
                     <input type="number" name="amount" id="binanceAmount" required min="5" max="500" step="0.01">
                     <div id="binanceFeedback" class="amount-feedback"></div>
@@ -264,14 +262,14 @@
                     <input type="hidden" name="bdtAmount" id="binanceBdtAmount">
 
                     <label>
-                        <%= __('Order ID') %>
+                        Order ID
                     </label>
-                    <input type="text" name="txnId" required placeholder="<%= __('Enter your Order ID') %>" />
+                    <input type="text" name="txnId" required placeholder="Enter your Order ID" />
                     <p>
-                        <%= __('Binance deposit confirmation message') %>
+                        After sending money, please enter the Order ID above to confirm your deposit. Deposits may take up to 5 minutes to reflect.
                     </p>
-                    <button type="submit">
-                        <%= __('Confirm') %>
+                    <button type="submit" disabled>
+                        Confirm
                     </button>
                 </form>
             </div>
@@ -280,17 +278,17 @@
         <div class="login-modal" id="loginModal">
             <div class="login-modal-content">
                 <h2>
-                    <%= __('Login Required') %>
+                    Login Required
                 </h2>
                 <p>
-                    <%= __('You need to be logged in to deposit balance.') %>
+                    You need to be logged in to deposit balance.
                 </p>
                 <div class="login-modal-actions">
                     <a href="/login" class="login-btn gold">
-                        <%= __('Login') %>
+                        Login
                     </a>
                     <button class="login-btn outline" id="closeLoginModal">
-                        <%= __('Cancel') %>
+                        Cancel
                     </button>
                 </div>
             </div>
@@ -298,16 +296,9 @@
 
         <%- include('partials/footer') %>
             <script>
+                // Server-side user login check logic is retained
                 const isLoggedIn = <%= user ? 'true' : 'false' %>;
-                const L = {
-                    amountMustBe: '<%= __("Amount must be between") %>',
-                    and: '<%= __("and") %>',
-                    bdt: '<%= __(" BDT") %>',
-                    usd: '<%= __(" USD") %>',
-                    equivalentInBdt: '<%= __("Equivalent in BDT") %>',
-                    pleaseEnterValid: '<%= __("Please enter a valid amount and transaction ID.") %>',
-                    conversionError: '<%= __("Conversion error. Please re-enter the amount.") %>'
-                };
+
             </script>
             <script src="/js/deposit.js"></script>
 </body>

@@ -87,26 +87,30 @@ router.get('/dashboard', ensureAuth, async (req, res) => {
   }
 });
 
-// Update phone
+// Update profile details
 router.post('/account/update', ensureAuth, async (req, res) => {
   try {
-    const { phone, password, confirm } = req.body;
+    const { firstName, lastName, address, phone, country } = req.body;
+
     const user = await User.findById(req.user._id);
 
-    if (phone) user.phone = phone;
-
-    if (password) {
-      if (password !== confirm)
-        return res.send('<script>alert("Passwords do not match");window.history.back();</script>');
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(password, salt);
+    if (!user) {
+      // This is unlikely if ensureAuth is working, but it's safe to check.
+      return res.send('<script>alert("User not found. Please log in again.");window.location.href="/login";</script>');
     }
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.address = address;
+    user.phone = phone;
+    user.country = country;
 
     await user.save();
-    res.send('<script>alert("Account updated successfully!");window.location.href="/dashboard";</script>');
+
+    res.redirect('/dashboard?section=account');
+
   } catch (err) {
     console.error(err);
-    res.send('<script>alert("Error updating account.");window.history.back();</script>');
+    res.send('<script>alert("Error updating profile.");window.history.back();</script>');
   }
 });
 

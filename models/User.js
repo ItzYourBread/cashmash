@@ -2,6 +2,20 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+// Add this definition to your Mongoose schema file if you want to use Enum:
+const COUNTRY_CODES = [
+  // Popular
+  'US', 'CA', 'GB', 'AU', 'IN', 'BD', 'DE', 'BR', 
+  // Europe
+  'FR', 'ES', 'IT', 'PL', 'NL', 'SE', 'CH', 'IE', 'GR',
+  // North & South America
+  'MX', 'AR', 'CO', 'PE', 'CL', 'EC',
+  // Asia & Oceania
+  'CN', 'JP', 'KR', 'ID', 'PK', 'PH', 'VN', 'NZ',
+  // Africa & Middle East
+  'NG', 'ZA', 'EG', 'SA', 'TR',
+];
+
 // ----------------- SUBSCHEMAS -----------------
 const depositSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
@@ -58,6 +72,15 @@ const rakebackHistorySchema = new mongoose.Schema({
 // ----------------- MAIN USER SCHEMA -----------------
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, trim: true },
+  firstName: { type: String, required: false },
+  lastName: { type: String, required: false },
+  phone: { type: String, required: false },
+  country: { 
+    type: String, 
+    required: false, 
+    enum: COUNTRY_CODES 
+  },
+  address: { type: String, required: false },
   email: { type: String, unique: true, sparse: true },
   password: { type: String, required: true },
 

@@ -195,6 +195,30 @@
   box-shadow: 0 0 35px rgba(245, 197, 66, 0.7);
 }
 
+/* Optional: Add a style for the disabled button state if not already in payment.css */
+        .modal-content button:disabled {
+            background-color: #444;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .amount-feedback {
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            padding: 5px;
+            border-radius: 4px;
+            width: 300px;
+            margin-left: 20px;
+        }
+
+        .amount-invalid {
+            color: #ff4d4d;
+        }
+
+        .amount-valid {
+            color: #79f291;
+        }
+
 /* ==========================================
   MODAL STYLE (Login Modal)
   ========================================== */
