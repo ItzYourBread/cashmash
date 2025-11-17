@@ -4,8 +4,8 @@ const slotsConfig = {
     theme: `
       /* Classic Slot — No Theme */
     `,
-    minBet: 75,
-    maxBet: 5000,
+    minBet: 0.1,
+    maxBet: 100,
     description: "A timeless slot experience with bright fruits and simple wins!",
     bonusInfo: "No bonus round — pure old-school fun and clean wins!",
 
@@ -103,8 +103,8 @@ const slotsConfig = {
       }
     `,
 
-    minBet: 200,
-    maxBet: 10000,
+    minBet: 0.1,
+    maxBet: 100,
     description: "Uncover treasures in the golden sands of the Nile.",
     bonusInfo: "Every Pharaoh gives +5% bet bonus instantly.",
 
@@ -187,8 +187,8 @@ const slotsConfig = {
       }
     `,
 
-    minBet: 400,
-    maxBet: 10000,
+    minBet: 0.1,
+    maxBet: 100,
     description: "Feel the flames — unleash blazing wins and fire bonuses.",
     bonusInfo: "Dragon Eye grants +10% bet bonus instantly.",
 

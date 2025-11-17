@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="<%= currentLang %>">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><%= __('Login Title') %> | CashMash</title>
+  <title>Login | CashMash</title> 
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
@@ -19,27 +19,27 @@
 
   <section class="auth-section">
     <form id="loginForm" class="auth-form" novalidate>
-      <h2><%= __('Login to CashMash') %></h2>
+      <h2>Login to CashMash</h2>
 
       <div id="step-login">
-        <input type="text" name="identifier" id="identifier" placeholder="<%= __('Email or Username') %>" required />
-        <input type="password" name="password" id="password" placeholder="<%= __('Password') %>" required />
-        <button type="submit"><%= __('Login') %></button>
+        <input type="text" name="identifier" id="identifier" placeholder="Email or Username" required /> 
+        <input type="password" name="password" id="password" placeholder="Password" required /> 
+        <button type="submit">Login</button>
       </div>
 
       <div id="step-otp" class="hidden">
         <p class="auth-message">
-          <%= __('OTP new device warning line 1') %><br />
-          <%= __('OTP new device warning line 2') %>
+          A new device was detected.<br />
+          Please check your email for a 6-digit OTP.
         </p>
-        <input type="text" id="otp" name="otp" placeholder="<%= __('Enter 6-digit OTP') %>" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" />
-        <button type="button" id="verifyOtpBtn"><%= __('Verify OTP') %></button>
+        <input type="text" id="otp" name="otp" placeholder="Enter 6-digit OTP" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" /> 
+        <button type="button" id="verifyOtpBtn">Verify OTP</button> 
       </div>
 
       <p id="responseMsg"></p>
       <p>
-        <%= __("Don't have an account?") %> 
-        <a href="/register"><%= __('Sign Up') %></a>
+        Don't have an account? 
+        <a href="/register">Sign Up</a> 
       </p>
     </form>
   </section>
@@ -57,12 +57,13 @@
     const verifyOtpBtn = document.getElementById('verifyOtpBtn');
     const loginBtn = stepLogin.querySelector('button[type="submit"]');
 
+    // Static messages replacing the MSGS object 
     const MSGS = {
-      otpSent: '<%= __("OTP sent to your email.") %>',
-      loginFailed: '<%= __("Login failed.") %>',
-      otpRequired: '<%= __("Please enter the OTP.") %>',
-      loginSuccessful: '<%= __("Login successful!") %>',
-      invalidOtp: '<%= __("Invalid OTP.") %>'
+      otpSent: 'OTP sent to your email.',
+      loginFailed: 'Login failed.',
+      otpRequired: 'Please enter the OTP.',
+      loginSuccessful: 'Login successful!',
+      invalidOtp: 'Invalid OTP.'
     };
 
     // Login step
@@ -106,8 +107,9 @@
 
       // Re-enable login button after delay
       setTimeout(() => {
+        // Replaced <%= __("Login") %>
         loginBtn.disabled = false;
-        loginBtn.textContent = '<%= __("Login") %>';
+        loginBtn.textContent = 'Login'; 
         loginBtn.style.opacity = '1';
       }, 1500);
     });
@@ -152,8 +154,9 @@
       }
 
       setTimeout(() => {
+        // Replaced <%= __("Verify OTP") %>
         verifyOtpBtn.disabled = false;
-        verifyOtpBtn.textContent = '<%= __("Verify OTP") %>';
+        verifyOtpBtn.textContent = 'Verify OTP'; 
         verifyOtpBtn.style.opacity = '1';
       }, 1500);
     });

@@ -63,14 +63,14 @@
 
   // balance init
   let currentBalance =
-    parseFloat(balanceDisplay?.dataset?.rawChips) ||
+    parseFloat(balanceDisplay?.dataset?.rawBalance) ||
     parseFloat(balanceDisplay?.textContent) ||
     0;
   if (balanceDisplay) balanceDisplay.textContent = formatBalance(currentBalance);
 
   // bet limits
-  const MIN_BET = Number.isFinite(cfg.minBet) ? cfg.minBet : 1;
-  const MAX_BET = Number.isFinite(cfg.maxBet) ? cfg.maxBet : 100000000;
+  const MIN_BET = Number.isFinite(cfg.minBet) ? cfg.minBet : 0.1;
+  const MAX_BET = Number.isFinite(cfg.maxBet) ? cfg.maxBet : 100;
 
   if (betInput) {
     betInput.min = MIN_BET;

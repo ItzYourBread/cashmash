@@ -12,59 +12,46 @@
       </span>
       <div class="lang-dropdown" id="langDropdown">
         <a href="#" data-lang="en">English</a>
-        <a href="#" data-lang="bn">বাংলা</a>
-        <a href="#" data-lang="hi">हिन्दी</a>
       </div>
     </div>
 
     <nav class="nav-links">
       <a href="/" class="nav-item <%= currentPage === '' ? 'active-link' : '' %>">
-        <%= __('Home') %>
+        Home
       </a>
       <a href="/games" class="nav-item <%= currentPage === 'games' ? 'active-link' : '' %>">
-        <%= __('Games') %>
+        Games
       </a>
       <a href="/leaderboard" class="nav-item <%= currentPage === 'leaderboard' ? 'active-link' : '' %>">
-        <%= __('Leaderboard') %>
+        Leaderboard
       </a>
       <a href="/deposit" class="nav-item <%= currentPage === 'deposit' ? 'active-link' : '' %>">
-        <%= __('Deposit') %>
+        Deposit
       </a>
       <a href="/withdraw" class="nav-item <%= currentPage === 'withdraw' ? 'active-link' : '' %>">
-        <%= __('Withdraw') %>
+        Withdraw
       </a>
     </nav>
 
     <% if (user) { %>
       <div class="nav-buttons">
         <a href="/dashboard" class="btn btn-gold">
-          <%= __('Dashboard') %>
+          Dashboard
         </a>
         <a href="/logout" class="btn btn-outline">
-          <%= __('Logout') %>
+          Logout
         </a>
       </div>
       <% } else { %>
         <div class="nav-buttons">
           <a href="/login" class="btn btn-gold">
-            <%= __('Login') %>
+            Login
           </a>
           <a href="/register" class="btn btn-outline">
-            <%= __('Sign Up') %>
+            Sign Up
           </a>
         </div>
         <% } %>
-
-          <div class="language-selector mobile-lang">
-            <span class="lang-current" id="langCurrentMobile">
-              <%= getLangName(currentLang) %> <i class="arrow-down"></i>
-            </span>
-            <div class="lang-dropdown" id="langDropdownMobile">
-              <a href="#" data-lang="en">English</a>
-              <a href="#" data-lang="bn">বাংলা</a>
-              <a href="#" data-lang="hi">हिन्दी</a>
-            </div>
-          </div>
 
           <div class="menu-toggle" id="menuToggle">
             <span></span><span></span><span></span>
@@ -75,33 +62,33 @@
 <div class="mobile-menu" id="mobileMenu">
   <nav>
     <a href="/" class="nav-item <%= currentPage === '' ? 'active-link' : '' %>">
-      <%= __('Home') %>
+      Home
     </a>
     <a href="/games" class="nav-item <%= currentPage === 'games' ? 'active-link' : '' %>">
-      <%= __('Games') %>
+      Games
     </a>
     <a href="/leaderboard" class="nav-item <%= currentPage === 'leaderboard' ? 'active-link' : '' %>">
-      <%= __('Leaderboard') %>
+      Leaderboard
     </a>
     <a href="/deposit" class="nav-item <%= currentPage === 'deposit' ? 'active-link' : '' %>">
-      <%= __('Deposit') %>
+      Deposit
     </a>
     <a href="/withdraw" class="nav-item <%= currentPage === 'withdraw' ? 'active-link' : '' %>">
-      <%= __('Withdraw') %>
+      Withdraw
     </a>
     <% if (user) { %>
       <a href="/dashboard" class="nav-item <%= currentPage === 'dashboard' ? 'active-link' : '' %>">
-        <%= __('Dashboard') %>
+        Dashboard
       </a>
       <a href="/logout" class="nav-item">
-        <%= __('Logout') %>
+        Logout
       </a>
       <% } else { %>
         <a href="/login" class="nav-item <%= currentPage === 'login' ? 'active-link' : '' %>">
-          <%= __('Login') %>
+          Login
         </a>
         <a href="/register" class="nav-item <%= currentPage === 'register' ? 'active-link' : '' %>">
-          <%= __('Sign Up') %>
+          Sign Up
         </a>
         <% } %>
   </nav>

@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const infoBtn = document.getElementById("infoBtn");
   const infoModal = document.getElementById("infoModal");
 
-  const STEP = 10;
+  const STEP = 0.5;
 
   /* ----------------------------------------------------
      BET SYSTEM (Updated Modal System)
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   betOptionsContainer.innerHTML = "";
-  const betValues = [100, 250, 500, 1000];
+  const betValues = [1, 5, 10, 15, 25, 50, 100];
   betValues.forEach((value) => {
     if (value <= maxBet) {
       const button = document.createElement("button");

@@ -91,7 +91,7 @@ const calculateWinnings = (matrix, bet, config) => {
 // --- MAIN SPIN ---
 exports.spin = async (req, res) => {
   const bet = +req.body.bet || 0;
-  if (bet < 1) return res.status(400).json({ error: 'Invalid bet' });
+  if (bet < 0.1) return res.status(400).json({ error: 'Invalid bet' });
 
   try {
     setSlotType(req);
@@ -161,8 +161,8 @@ exports.simulate = async (req, res) => {
     let config = getDynamicConfig(); // Includes Sunday/Monday payout boost
     config = cacheValidPaylines(config); // Ensure _validPaylines exists
 
-    let balance = 50000; // Starting simulation balance (USD)
-    const bet = 75;      // Default bet per spin
+    let balance = 100; // Starting simulation balance (USD)
+    const bet = 0.5;      // Default bet per spin
     let spinCount = 0;
     let totalWins = 0;
     let totalLosses = 0;

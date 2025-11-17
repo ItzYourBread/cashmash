@@ -50,7 +50,7 @@
                   <%= formatBalance(user.balance) %>
                 </strong>
               </div>
-              <input id="betAmount" type="number" min="75" max="10000" value="75" />
+              <input id="betAmount" type="number" min="5" max="100" value="5" />
               <button id="placeBetBtn" class="btn gold">Place Bet</button>
               <button id="cashOutBtn" class="btn gold" disabled>Cash Out</button>
             </div>
@@ -67,8 +67,8 @@
             const betInput = document.getElementById("betAmount");
             const placeBetBtn = document.getElementById("placeBetBtn");
 
-            const MIN_BET = 75;
-            const MAX_BET = 10000;
+            const MIN_BET = 5;
+            const MAX_BET = 100;
 
             // Auto-correct when user leaves the field
             betInput.addEventListener("blur", () => {

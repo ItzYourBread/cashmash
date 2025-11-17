@@ -42,12 +42,11 @@ const balanceEl = document.getElementById('balance');
 if (balanceEl) {
     let initialBalance = parseFloat(balanceEl.textContent) || 0;
     // Check for a data attribute containing the raw balance first
-    if (balanceEl.dataset.rawChips) {
-        initialBalance = parseFloat(balanceEl.dataset.rawChips);
+    if (balanceEl.dataset.rawBalance) {
+        initialBalance = parseFloat(balanceEl.dataset.rawBalance);
     }
     balanceEl.textContent = formatChips(initialBalance);
 }
-
 
 // A DOM container for small fading trail dots
 const trailContainer = document.createElement('div');

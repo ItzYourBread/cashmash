@@ -47,7 +47,7 @@ let gameActive = false;
 let currentBet = 0;
 // Initial balance is read once, subsequent changes come from the backend response.
 // FIX: Ensure balance is parsed as a number from the formatted display if data-raw-balance isn't used
-let balance = parseFloat(balanceEl.dataset.rawChips) || parseFloat(balanceEl.textContent) || 1000;
+let balance = parseFloat(balanceEl.dataset.rawBalance) || parseFloat(balanceEl.textContent) || 1000;
 // FIX: Apply K/M formatting to the initial display
 balanceEl.textContent = formatChips(balance);
 

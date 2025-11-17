@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="<%= currentLang %>">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>
-    <%= __('Register Title') %> | CashMash
+    Register | CashMash
   </title>
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/header.css" />
@@ -27,27 +27,24 @@
     <section class="auth-section">
       <form id="registerForm" class="auth-form" novalidate>
         <h2>
-          <%= __('Create Your Account') %>
+          Create Your Account
         </h2>
 
-        <!-- Username -->
-        <input type="text" name="username" id="username" placeholder="<%= __('Username') %>" required />
+        <input type="text" name="username" id="username" placeholder="Username" required />
         <p id="usernameMsg" class="availability-msg"></p>
 
-        <!-- Email -->
-        <input type="email" name="email" id="email" placeholder="<%= __('Email') %>" required />
+        <input type="email" name="email" id="email" placeholder="Email" required />
 
-        <!-- Password -->
-        <input type="password" name="password" id="password" placeholder="<%= __('Password') %>" required />
+        <input type="password" name="password" id="password" placeholder="Password" required />
 
         <button type="submit" class="btn gold big">
-          <%= __('Register') %>
+          Register
         </button>
 
         <p>
-          <%= __('Already have an account?') %>
+          Already have an account?
             <a href="/login">
-              <%= __('Login') %>
+              Login
             </a>
         </p>
         <p id="responseMsg"></p>
@@ -63,6 +60,18 @@
         const responseMsg = document.getElementById('responseMsg');
 
         let usernameTimer = null;
+
+        // Static Text for Availability Messages
+        const MSGS = {
+            usernameAvailable: 'Username available',
+            usernameTaken: 'Username already taken',
+            usernameErrorCheck: 'Error checking username',
+            usernameLength: 'Username must be at least 3 characters',
+            passwordLength: 'Password must be at least 6 characters long',
+            registrationSuccess: 'Registration successful!',
+            registrationFailed: 'Registration failed.',
+            somethingWrong: 'Something went wrong.'
+        };
 
         // 🔹 Auto-lowercase username and check availability
         usernameInput.addEventListener('input', () => {
@@ -81,13 +90,15 @@
               const data = await res.json();
 
               if (data.available) {
-                usernameMsg.textContent = '<%= __("Username available") %>';
+                // Replaced <%= __("Username available") %>
+                usernameMsg.textContent = MSGS.usernameAvailable; 
                 usernameMsg.style.color = '#4CAF50';
                 usernameMsg.style.marginTop = '5px';
                 usernameMsg.style.marginLeft = '5px';
                 usernameMsg.style.textAlign = 'left';
               } else {
-                usernameMsg.textContent = '<%= __("Username already taken") %>';
+                // Replaced <%= __("Username already taken") %>
+                usernameMsg.textContent = MSGS.usernameTaken;
                 usernameMsg.style.color = 'red';
                 usernameMsg.style.marginTop = '5px';
                 usernameMsg.style.marginLeft = '5px';
@@ -95,7 +106,8 @@
               }
             } catch (err) {
               console.error(err);
-              usernameMsg.textContent = '<%= __("Error checking username") %>';
+              // Replaced <%= __("Error checking username") %>
+              usernameMsg.textContent = MSGS.usernameErrorCheck; 
               usernameMsg.style.color = 'red';
               usernameMsg.style.marginTop = '5px';
               usernameMsg.style.marginLeft = '5px';
@@ -115,14 +127,16 @@
 
           // Validation: username
           if (username.length < 3) {
-            responseMsg.textContent = '<%= __("Username must be at least 3 characters") %>';
+            // Replaced <%= __("Username must be at least 3 characters") %>
+            responseMsg.textContent = MSGS.usernameLength;
             responseMsg.style.color = 'red';
             return;
           }
 
           // Validation: password length
           if (password.length < 6) {
-            responseMsg.textContent = '<%= __("Password must be at least 6 characters long") %>';
+            // Replaced <%= __("Password must be at least 6 characters long") %>
+            responseMsg.textContent = MSGS.passwordLength;
             responseMsg.style.color = 'red';
             return;
           }
@@ -137,16 +151,19 @@
             const data = await res.json().catch(() => ({}));
 
             if (res.ok) {
-              responseMsg.textContent = data.message || '<%= __("Registration successful!") %>';
+              // Replaced <%= __("Registration successful!") %>
+              responseMsg.textContent = data.message || MSGS.registrationSuccess;
               responseMsg.style.color = '#f5c542';
               setTimeout(() => { window.location.href = '/login'; }, 1200);
             } else {
-              responseMsg.textContent = data.message || '<%= __("Registration failed.") %>';
+              // Replaced <%= __("Registration failed.") %>
+              responseMsg.textContent = data.message || MSGS.registrationFailed;
               responseMsg.style.color = 'red';
             }
           } catch (err) {
             console.error(err);
-            responseMsg.textContent = '<%= __("Something went wrong.") %>';
+            // Replaced <%= __("Something went wrong.") %>
+            responseMsg.textContent = MSGS.somethingWrong;
             responseMsg.style.color = 'red';
           }
         });

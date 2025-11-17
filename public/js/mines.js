@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let tiles = [];
     
     // Initialize balance, prioritizing the raw data attribute
-    let balance = parseFloat(balanceDisplay.dataset.rawChips) || parseFloat(balanceDisplay.textContent) || 1000;
+    let balance = parseFloat(balanceDisplay.dataset.rawBalance) || parseFloat(balanceDisplay.textContent) || 1000;
     
     // Set initial display using the formatter
     balanceDisplay.textContent = formatChips(balance);

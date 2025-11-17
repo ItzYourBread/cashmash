@@ -1,26 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
   // ====================== UTILITY FUNCTION (K/M FORMAT) ======================
-  /**
-   * Formats the chip amount for display using K (thousands) or M (millions) notation.
-   * If the number is less than 1000, it defaults to two decimal places.
-   * @param {number} amount - The raw chip amount.
-   * @returns {string} The formatted compact string (e.g., 12345 -> 12.3K).
-   */
   const formatChips = (amount) => {
-    // If the number is small, just use standard fixed decimal format
-    if (Math.abs(amount) < 1000) {
-        return parseFloat(amount).toFixed(2);
-    }
-    
-    // Use Intl.NumberFormat for compact notation (K, M, etc.)
-    const formatter = new Intl.NumberFormat('en-US', {
-        notation: 'compact',
-        compactDisplay: 'short', 
-        minimumFractionDigits: 1, 
-        maximumFractionDigits: 1,
-    });
-
-    return formatter.format(amount);
+    if (Math.abs(amount) < 1000) return parseFloat(amount).toFixed(2);
+    return new Intl.NumberFormat('en-US', {
+      notation: 'compact',
+      compactDisplay: 'short',
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }).format(amount);
   };
   // ===========================================================================
 
@@ -36,8 +23,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const betBankerInput = document.getElementById("betBanker");
   const betTieInput = document.getElementById("betTie");
 
-  // Initialize balance and set initial display using formatChips
-  let balance = parseFloat(balanceSpan.dataset.rawChips) || parseFloat(balanceSpan.textContent) || 0;
+  // --- Bet limits ---
+  const MIN_BET = 0.1;
+  const MAX_BET = 100;
+
+  function addBlurCorrection(input) {
+    input.addEventListener("blur", () => {
+      let val = parseFloat(input.value);
+      if (isNaN(val) || val < MIN_BET) val = MIN_BET;
+      if (val > MAX_BET) val = MAX_BET;
+      input.value = val.toFixed(2);
+    });
+  }
+
+  [betPlayerInput, betBankerInput, betTieInput].forEach(addBlurCorrection);
+
+  // --- Initialize balance ---
+  let balance = parseFloat(balanceSpan.dataset.rawBalance) || parseFloat(balanceSpan.textContent) || 0;
   balanceSpan.textContent = formatChips(balance);
 
   // --- Card Helper Functions ---
@@ -45,14 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const img = document.createElement("img");
     img.classList.add("card", isBack ? "card-back" : "card-front");
     img.style.backfaceVisibility = "hidden";
-
     if (isBack) {
-      // Assuming card back image path
-      img.src = `/images/playing-cards/player_card_back_design_1_${color}.svg`; 
+      img.src = `/images/playing-cards/player_card_back_design_1_${color}.svg`;
       img.style.transform = "rotateY(0deg)";
     } else {
-      // Assuming card front image path is based on the file property from the controller
-      img.src = `/images/playing-cards/${card.file}`; 
+      img.src = `/images/playing-cards/${card.file}`;
       img.alt = `${card.rank} of ${card.suit}`;
       img.style.position = "absolute";
       img.style.top = "0";
@@ -67,8 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     slot.classList.add("card-slot");
     slot.style.transformStyle = "preserve-3d";
     slot.style.position = "relative";
-    const back = createCardFace(null, true, color);
-    slot.appendChild(back);
+    slot.appendChild(createCardFace(null, true, color));
     targetContainer.appendChild(slot);
     return slot;
   }
@@ -76,20 +74,13 @@ document.addEventListener("DOMContentLoaded", () => {
   async function flipCardAnimation(cardSlot, cardData, delay) {
     return new Promise((resolve) => {
       setTimeout(() => {
-        // Safety check: only proceed if there is card data to show
-        if (!cardData) return resolve(); 
-
+        if (!cardData) return resolve();
         const back = cardSlot.querySelector(".card-back");
         const front = createCardFace(cardData, false);
         cardSlot.appendChild(front);
-
         cardSlot.style.transition = "transform 0.6s ease";
         cardSlot.style.transform = "rotateY(180deg)";
-
-        setTimeout(() => {
-          if (back) back.remove();
-          resolve();
-        }, 400); // 400ms is halfway through the 600ms transition
+        setTimeout(() => { if (back) back.remove(); resolve(); }, 400);
       }, delay);
     });
   }
@@ -99,15 +90,10 @@ document.addEventListener("DOMContentLoaded", () => {
     bankerHandDiv.innerHTML = "";
     playerScoreDiv.textContent = "0";
     bankerScoreDiv.textContent = "0";
-
-    // Create 3 card slots for each hand (3rd card initially hidden)
     for (let i = 0; i < 3; i++) {
       const pSlot = placeInitialCard(playerHandDiv, "red");
       const bSlot = placeInitialCard(bankerHandDiv, "black");
-      if (i === 2) {
-        pSlot.style.display = "none";
-        bSlot.style.display = "none";
-      }
+      if (i === 2) { pSlot.style.display = "none"; bSlot.style.display = "none"; }
     }
   }
 
@@ -115,88 +101,74 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Deal Button Logic ---
   dealBtn.addEventListener("click", async () => {
-    const betPlayer = parseFloat(betPlayerInput.value) || 0;
-    const betBanker = parseFloat(betBankerInput.value) || 0;
-    const betTie = parseFloat(betTieInput.value) || 0;
+    let betPlayer = parseFloat(betPlayerInput.value) || 0;
+    let betBanker = parseFloat(betBankerInput.value) || 0;
+    let betTie = parseFloat(betTieInput.value) || 0;
 
-    if (betPlayer + betBanker + betTie <= 0) {
-      alert("Please place at least one bet.");
-      return;
-    }
+    // Auto-correct if user entered out-of-range values before dealing
+    [betPlayerInput, betBankerInput, betTieInput].forEach(input => {
+      let val = parseFloat(input.value);
+      if (isNaN(val) || val < MIN_BET) val = MIN_BET;
+      if (val > MAX_BET) val = MAX_BET;
+      input.value = val.toFixed(2);
+    });
+
+    betPlayer = parseFloat(betPlayerInput.value);
+    betBanker = parseFloat(betBankerInput.value);
+    betTie = parseFloat(betTieInput.value);
+
+    const totalBet = betPlayer + betBanker + betTie;
+
+    if (totalBet <= 0) { alert("Place at least one bet."); return; }
+    if (totalBet > balance) { alert(`Not enough balance! You have $${balance.toFixed(2)}`); return; }
 
     resultText.textContent = "Dealing cards...";
-    setupInitialHands(); // Reset hands to initial card backs
+    setupInitialHands();
     dealBtn.disabled = true;
 
     const playerSlots = Array.from(playerHandDiv.querySelectorAll(".card-slot"));
     const bankerSlots = Array.from(bankerHandDiv.querySelectorAll(".card-slot"));
 
     try {
-      // Deduct bet from local balance for immediate display update
-      const totalBet = betPlayer + betBanker + betTie;
       balance -= totalBet;
       balanceSpan.textContent = formatChips(balance);
 
-      // Call the Baccarat controller endpoint
       const response = await fetch("/baccarat/play", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ betPlayer, betBanker, betTie }),
       });
-
       const data = await response.json();
       if (!data.success) {
-        // Refund bet on server error
-        balance += totalBet;
-        balanceSpan.textContent = formatChips(balance);
+        balance += totalBet; balanceSpan.textContent = formatChips(balance);
         throw new Error(data.message || "Server error");
       }
 
       let delay = 200;
-
-      // 1. Animate the first two cards for Player and Banker
       for (let i = 0; i < 2; i++) {
         await flipCardAnimation(playerSlots[i], data.player.cards[i], delay);
         await flipCardAnimation(bankerSlots[i], data.banker.cards[i], delay);
         delay += 300;
       }
-      
-      // 2. Animate Player's third card (if it exists)
-      if (data.player.cards.length === 3) {
-        playerSlots[2].style.display = "block"; // Show the slot
-        await flipCardAnimation(playerSlots[2], data.player.cards[2], delay);
-        delay += 300;
-      } else {
-        playerSlots[2].style.display = "none"; // Ensure the slot is hidden if no 3rd card was drawn
-      }
 
-      // 3. Animate Banker's third card (if it exists)
-      if (data.banker.cards.length === 3) {
-        bankerSlots[2].style.display = "block"; // Show the slot
-        await flipCardAnimation(bankerSlots[2], data.banker.cards[2], delay);
-        delay += 300;
-      } else {
-        bankerSlots[2].style.display = "none"; // Ensure the slot is hidden if no 3rd card was drawn
-      }
-      
-      // 4. Update scores and final results after animations finish
+      if (data.player.cards.length === 3) { playerSlots[2].style.display = "block"; await flipCardAnimation(playerSlots[2], data.player.cards[2], delay); delay += 300; }
+      else playerSlots[2].style.display = "none";
+
+      if (data.banker.cards.length === 3) { bankerSlots[2].style.display = "block"; await flipCardAnimation(bankerSlots[2], data.banker.cards[2], delay); delay += 300; }
+      else bankerSlots[2].style.display = "none";
+
       setTimeout(() => {
         playerScoreDiv.textContent = data.player.points;
         bankerScoreDiv.textContent = data.banker.points;
-
         let winnerText = "";
         if (data.result === "player") winnerText = "Player Wins! (1:1)";
         else if (data.result === "banker") winnerText = "Banker Wins! (0.95:1)";
         else winnerText = "Tie! (8:1)";
-
-        // Display the profit
         resultText.textContent = `${winnerText} | Profit: ${formatChips(data.profit)}`;
-
-        // Update balance from server data
         balance = data.balance;
         balanceSpan.textContent = formatChips(balance);
         dealBtn.disabled = false;
-      }, delay + 150); // Small final pause
+      }, delay + 150);
 
     } catch (err) {
       console.error(err);
