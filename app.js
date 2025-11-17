@@ -23,7 +23,7 @@ require('./cron/rakebackJob');
 
 // --- i18n Configuration ---
 i18n.configure({
-    locales: ['en', 'bn', 'hi'],
+    locales: ['en'],
     directory: path.join(__dirname, 'locales'),
     defaultLocale: 'en',
     // setting cookie name to null to use session instead
@@ -71,8 +71,6 @@ app.use(passport.session());
 // --- Language Utilities ---
 const languageMap = {
     'en': 'English',
-    'bn': 'বাংলা',
-    'hi': 'हिन्दी'
 };
 
 function getLangName(langCode) {
