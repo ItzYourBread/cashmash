@@ -6,7 +6,7 @@ const User = require('../models/User');
 const transporter = require('../config/nodemailer'); // 👈 Import the configured transporter
 
 // ⚠️ Configuration: Define your SECRET API Key
-const ADMIN_API_KEY = 'YOUR_SECURE_ADMIN_KEY_12345'; 
+const ADMIN_API_KEY = '41F89E1A2D9439B3A1CDA16D643A4'; 
 
 // --- API Key Authentication Function (Internal) ---
 const checkApiKey = (req, res, next) => {
