@@ -57,12 +57,8 @@
   }
 
   .payment-card img {
-    width: 175px;
-    height: auto;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-    transition: transform 0.3s ease;
+    width: 120px;
+    margin: 18px auto 18px;
   }
 }
 
@@ -196,28 +192,28 @@
 }
 
 /* Optional: Add a style for the disabled button state if not already in payment.css */
-        .modal-content button:disabled {
-            background-color: #444;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
+.modal-content button:disabled {
+  background-color: #444;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
 
-        .amount-feedback {
-            margin-bottom: 15px;
-            font-size: 0.9em;
-            padding: 5px;
-            border-radius: 4px;
-            width: 300px;
-            margin-left: 20px;
-        }
+.amount-feedback {
+  margin-bottom: 15px;
+  font-size: 0.9em;
+  padding: 5px;
+  border-radius: 4px;
+  width: 300px;
+  margin-left: 20px;
+}
 
-        .amount-invalid {
-            color: #ff4d4d;
-        }
+.amount-invalid {
+  color: #ff4d4d;
+}
 
-        .amount-valid {
-            color: #79f291;
-        }
+.amount-valid {
+  color: #79f291;
+}
 
 /* ==========================================
   MODAL STYLE (Login Modal)
