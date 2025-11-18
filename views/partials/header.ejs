@@ -28,9 +28,6 @@
       <a href="/deposit" class="nav-item <%= currentPage === 'deposit' ? 'active-link' : '' %>">
         Deposit
       </a>
-      <a href="/withdraw" class="nav-item <%= currentPage === 'withdraw' ? 'active-link' : '' %>">
-        Withdraw
-      </a>
     </nav>
 
     <% if (user) { %>
@@ -72,9 +69,6 @@
     </a>
     <a href="/deposit" class="nav-item <%= currentPage === 'deposit' ? 'active-link' : '' %>">
       Deposit
-    </a>
-    <a href="/withdraw" class="nav-item <%= currentPage === 'withdraw' ? 'active-link' : '' %>">
-      Withdraw
     </a>
     <% if (user) { %>
       <a href="/dashboard" class="nav-item <%= currentPage === 'dashboard' ? 'active-link' : '' %>">

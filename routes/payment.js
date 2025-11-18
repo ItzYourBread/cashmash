@@ -18,6 +18,23 @@ function ensureAuth(req, res, next) {
     return res.redirect('/login');
   }
 }
+
+function formatCurrencyNetwork(cur) {
+  const c = cur.toLowerCase();
+
+  const mapping = {
+    usdttrc20: "USDT-TRC20",
+    usdterc20: "USDT-ERC20",
+    usdtbsc: "USDT-BSC",
+    usdtsol: "USDT-SOL",
+    usdtmatic: "USDT-MATIC",
+    usdtcelo: "USDT-CELO",
+    usdtarb: "USDT-ARB"
+  };
+
+  return mapping[c] || cur.toUpperCase();
+}
+
 // Load agent payments JSON
 const agentPaymentsPath = path.join(__dirname, '../agent-payments.json');
 const agentPayments = JSON.parse(fs.readFileSync(agentPaymentsPath, 'utf-8'));
@@ -206,10 +223,12 @@ router.post('/deposit/crypto', ensureAuth, async (req, res) => {
     const txnId = payment.id || payment.payment_id || payment.invoice_id;
     if (!txnId) return res.status(500).send("Failed to create payment ID.");
 
+    const formattedCurrency = formatCurrencyNetwork(currencyLower);
+
     const depositData = {
       user: req.user._id,
       amount: usdAmount, // USD only
-      method: `Crypto (${currency.toUpperCase()})`,
+      method: `Crypto (${formattedCurrency})`,
       txnId,
       status: "Pending"
     };

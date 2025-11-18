@@ -8,6 +8,61 @@
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/dashboard.css" />
+
+  <style>
+    .withdraw-container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .withdraw-box {
+      background: #111;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input,
+    select {
+      width: 50%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background: #222;
+      color: #fff;
+    }
+
+    button {
+      width: 50 %;
+      padding: 12px;
+      margin-top: 15px;
+      background: gold;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+
+    .withdraw-list {
+      margin-top: 20px;
+    }
+
+    .withdraw-item {
+      background: #1b1b1b;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 
 <body>
@@ -25,8 +80,8 @@
 
           <ul class="sidebar-menu">
             <li class="active" data-section="statistics">Statistics</li>
-            <li data-section="deposit">Deposits</li>
-            <li data-section="withdraw">Withdrawals</li>
+            <li data-section="deposit">Deposit</li>
+            <li data-section="withdraw">Withdraw</li>
             <li data-section="history">Game History</li>
             <li data-section="rakeback">Rakeback</li>
             <li data-section="account">Account Management</li>
@@ -121,8 +176,90 @@
                           <% } %>
                   </div>
 
-                  <div id="withdraw" class="content-section">
-                    <h2>Your Withdrawals</h2>
+                  <div id="withdraw" class="content-section active">
+
+                    <h2>Withdraw Funds</h2>
+
+                    <!-- =============================== -->
+                    <!--   SIMPLE SELECT (NO IMAGES)     -->
+                    <!-- =============================== -->
+
+                    <form id="withdrawSelectorForm">
+
+                      <label>Select Payment Method</label>
+                      <select id="withdrawMethodSelect" required>
+                        <option value="">-- Select Method --</option>
+
+                        <optgroup label="E-Wallets">
+                          <option value="bkash">Bkash</option>
+                          <option value="nagad">Nagad</option>
+                          <option value="upay">Upay</option>
+                          <option value="binance">BinancePay</option>
+                        </optgroup>
+
+                        <optgroup label="Crypto">
+                          <option value="crypto" disabled>Crypto Transfer (Coming Soon)</option>
+                        </optgroup>
+
+                        <optgroup label="Bank">
+                          <option value="bank" disabled>Bank Transfer (Coming Soon)</option>
+                        </optgroup>
+                      </select>
+
+                    </form>
+
+
+                    <!-- =============================== -->
+                    <!--     SHOWN ONLY AFTER SELECT     -->
+                    <!-- =============================== -->
+
+                    <!-- E-WALLET form -->
+                    <div id="walletFormWrap" class="withdraw-form hidden">
+                      <h3 id="walletTitle"></h3> <!-- ADD THIS -->
+
+                      <form id="walletForm" method="POST">
+                        <label>Full Name</label>
+                        <input type="text" name="fullName" required>
+
+                        <label id="walletNumberLabel">Wallet Number</label>
+                        <input type="text" name="contact" required>
+
+                        <label>Amount (USD)</label>
+                        <input type="number" name="amount" id="walletAmount" min="10" required>
+
+                        <div id="walletFeedback" class="amount-feedback"></div>
+
+                        <button id="walletConfirmBtn" type="submit" disabled>Confirm</button>
+                      </form>
+                    </div>
+
+                    <!-- Binance form -->
+                    <div id="binanceFormWrap" class="withdraw-form hidden">
+                      <h3>BinancePay Withdraw</h3>
+
+                      <form method="POST" action="/withdraw/binance">
+
+                        <label>Email or User ID</label>
+                        <input type="text" name="userIdOrEmail" required>
+
+                        <label>Amount (USD)</label>
+                        <input type="number" name="amount" id="binanceAmount" min="10" required>
+
+                        <div id="binanceFeedback" class="amount-feedback"></div>
+
+                        <button id="binanceConfirmBtn" type="submit" disabled>Confirm</button>
+
+                      </form>
+                    </div>
+
+
+
+                    <!-- ====================================== -->
+                    <!--     WITHDRAWAL LIST (unchanged)        -->
+                    <!-- ====================================== -->
+
+                    <h2 style="margin-top: 40px;">Your Withdrawals</h2>
+
                     <% if (withdrawals.length || withdrawalPages> 0) { %>
                       <table class="table">
                         <thead>
@@ -134,42 +271,48 @@
                             <th>Action</th>
                           </tr>
                         </thead>
+
                         <tbody>
-                          <% // ✅ CORRECTED: Loop forward to show newest first %>
-                            <% for(let i=0; i < withdrawals.length; i++) { %>
-                              <% const w=withdrawals[i]; %>
-                                <tr>
-                                  <td>
-                                    <%= new Date(w.createdAt).toLocaleDateString() %>
-                                  </td>
-                                  <td>
-                                    $<%= parseFloat(w.amount.toFixed(2)).toLocaleString('en-US', {
-                                      minimumFractionDigits: 2 }) %>
-                                  </td>
-                                  <td>
-                                    <%= w.method %>
-                                  </td>
-                                  <td>
-                                    <%= w.status %>
-                                  </td>
-                                  <td>
-                                    <% if (w.status==='Pending' ) { %>
-                                      <form action="/withdraw/cancel/<%= w._id %>" method="POST"
-                                        onsubmit="return confirm('Cancel this withdrawal?')">
-                                        <button type="submit" class="btn cancel">Cancel</button>
-                                      </form>
-                                      <% } else { %>
-                                        <span class="text-dim">—</span>
-                                        <% } %>
-                                  </td>
-                                </tr>
-                                <% } %>
+                          <% withdrawals.forEach(w=> { %>
+                            <tr>
+                              <td>
+                                <%= new Date(w.createdAt).toLocaleDateString() %>
+                              </td>
+
+                              <td>
+                                $<%= parseFloat(w.amount.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits: 2
+                                  }) %>
+                              </td>
+
+                              <td>
+                                <%= w.method %>
+                              </td>
+
+                              <td>
+                                <%= w.status %>
+                              </td>
+
+                              <td>
+                                <% if (w.status==='Pending' ) { %>
+                                  <form method="POST" action="/withdraw/cancel/<%= w._id %>"
+                                    onsubmit="return confirm('Cancel this withdrawal?')">
+                                    <button type="submit" class="btn cancel">Cancel</button>
+                                  </form>
+                                  <% } else { %>
+                                    <span class="text-dim">—</span>
+                                    <% } %>
+                              </td>
+                            </tr>
+                            <% }) %>
                         </tbody>
                       </table>
+
                       <%= renderPagination(withdrawalPage, withdrawalPages, 'withdraw' ) %>
+
                         <% } else { %>
                           <p>No withdrawals yet.</p>
                           <% } %>
+
                   </div>
 
                   <div id="history" class="content-section">
@@ -453,6 +596,7 @@
         // --- END Arrow Key Navigation ---
 
       </script>
+      <script src="/js/withdraw.js"></script>
 </body>
 
 </html>
