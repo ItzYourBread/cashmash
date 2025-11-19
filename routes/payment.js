@@ -77,9 +77,13 @@ router.get('/deposit', ensureAuth, async (req, res) => {
       console.log(`✅ Cached ${cachedCurrencies.length} stablecoin networks`);
     }
 
+
+
     // Render deposit page
     res.render('deposit', {
       user: req.user,
+      userCountry: req.user.country,
+      usdToBdtRate: 123,
       agentPayments,
       availableCryptos: cachedCurrencies || [],
       currentPage: 'deposit',
@@ -101,6 +105,10 @@ router.get('/deposit', ensureAuth, async (req, res) => {
 // Handle deposits for Bkash, Nagad, Upay
 ['Bkash', 'Nagad', 'Upay'].forEach(method => {
   router.post(`/deposit/${method}`, ensureAuth, async (req, res) => {
+    if (req.user.country !== 'BD') {
+      return res.status(403).send("Bkash deposit not available in your country.");
+    }
+
     try {
       const { amount, transactionId } = req.body;
       if (!amount || !transactionId) throw new Error('Invalid input');

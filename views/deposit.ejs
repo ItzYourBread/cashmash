@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,149 +14,164 @@
 <body>
     <%- include('partials/header') %>
 
-    <section class="dashboard">
-        <div class="dashboard-container">
-            <aside class="sidebar">
-                <div class="balance-box">
-                    <h3>Balance</h3>
-                    <% if (user) { %>
-                        <p>$<%= user.balance.toLocaleString() %></p>
-                    <% } else { %>
-                        <p>Login to see balance</p>
-                    <% } %>
-                </div>
-                <ul class="sidebar-menu">
-                    <li class="active" data-tab="ewallets">E-Wallets</li>
-                    <li data-tab="crypto">Crypto</li>
-                    <li data-tab="bank">Bank</li>
-                </ul>
-            </aside>
+        <section class="dashboard">
+            <div class="dashboard-container">
+                <aside class="sidebar">
+                    <div class="balance-box">
+                        <h3>Balance</h3>
+                        <% if (user) { %>
+                            <p>$<%= user.balance.toLocaleString() %>
+                            </p>
+                            <% } else { %>
+                                <p>Login to see balance</p>
+                                <% } %>
+                    </div>
+                    <ul class="sidebar-menu">
+                        <li class="active" data-tab="ewallets">E-Wallets</li>
+                        <li data-tab="crypto">Crypto</li>
+                        <li data-tab="bank">Bank</li>
+                    </ul>
+                </aside>
 
-            <div class="content-area">
-                <div id="ewallets" class="content-section active">
-                    <h2>E-Wallets</h2>
-                    <div class="payment-cards">
-                        <div class="payment-card" data-modal="modal-mobile-banking" data-provider="Bkash">
-                            <img src="/images/payments/bkash.jpg" alt="Bkash">
-                            <h4>Bkash</h4>
-                        </div>
-                        <div class="payment-card" data-modal="modal-mobile-banking" data-provider="Nagad">
-                            <img src="/images/payments/nagad.jpg" alt="Nagad">
-                            <h4>Nagad</h4>
-                        </div>
-                        <div class="payment-card" data-modal="modal-mobile-banking" data-provider="Upay">
-                            <img src="/images/payments/upay.jpg" alt="Upay">
-                            <h4>Upay</h4>
-                        </div>
-                        <div class="payment-card" data-modal="modal-binance">
-                            <img src="/images/payments/binance.jpg" alt="Binance">
-                            <h4>BinancePay</h4>
+                <div class="content-area">
+                    <div id="ewallets" class="content-section active">
+                        <h2>E-Wallets</h2>
+
+                        <div class="payment-cards">
+
+                            <% if (userCountry==='BD' ) { %>
+                                <!-- Bangladesh-only options -->
+                                <div class="payment-card" data-modal="modal-mobile-banking" data-provider="Bkash">
+                                    <img src="/images/payments/bkash.jpg" alt="Bkash">
+                                    <h4>Bkash</h4>
+                                </div>
+
+                                <div class="payment-card" data-modal="modal-mobile-banking" data-provider="Nagad">
+                                    <img src="/images/payments/nagad.jpg" alt="Nagad">
+                                    <h4>Nagad</h4>
+                                </div>
+
+                                <div class="payment-card" data-modal="modal-mobile-banking" data-provider="Upay">
+                                    <img src="/images/payments/upay.jpg" alt="Upay">
+                                    <h4>Upay</h4>
+                                </div>
+                            <% } %>
+                                <div class="payment-card" data-modal="modal-binance">
+                                    <img src="/images/payments/binance.jpg" alt="BinancePay">
+                                    <h4>BinancePay</h4>
+                                </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="crypto" class="content-section">
-                    <h2>Crypto</h2>
-                    <div class="payment-cards">
-                        <% if (availableCryptos && availableCryptos.length) { %>
-                            <% availableCryptos.forEach(c=> { 
-                                const currency = c.toLowerCase(); 
-                                const displayName = currency.toUpperCase().replace('USDT', 'USDT-'); 
-                            %>
-                            <div class="payment-card" data-modal="modal-crypto" data-currency="<%= currency %>">
-                                <img src="/images/payments/<%= currency %>.jpg" alt="<%= displayName %>">
-                                <h4><%= displayName %></h4>
-                            </div>
-                            <% }) %>
-                        <% } else { %>
-                            <p>No available cryptos.</p>
-                        <% } %>
+
+                    <div id="crypto" class="content-section">
+                        <h2>Crypto</h2>
+                        <div class="payment-cards">
+                            <% if (availableCryptos && availableCryptos.length) { %>
+                                <% availableCryptos.forEach(c=> {
+                                    const currency = c.toLowerCase();
+                                    const displayName = currency.toUpperCase().replace('USDT', 'USDT-');
+                                    %>
+                                    <div class="payment-card" data-modal="modal-crypto" data-currency="<%= currency %>">
+                                        <img src="/images/payments/<%= currency %>.jpg" alt="<%= displayName %>">
+                                        <h4>
+                                            <%= displayName %>
+                                        </h4>
+                                    </div>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <p>No available cryptos.</p>
+                                            <% } %>
+                        </div>
+                    </div>
+
+                    <div id="bank" class="content-section">
+                        <h2>Bank</h2>
+                        <h2 style="margin-top: 20px;">Coming Soon...</h2>
                     </div>
                 </div>
-                
-                <div id="bank" class="content-section">
-                    <h2>Bank</h2>
-                    <h2 style="margin-top: 20px;">Coming Soon...</h2>
+            </div>
+        </section>
+
+        <div id="modal-mobile-banking" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3 id="mb-title">Deposit</h3>
+                <h4>Send money to:</h4>
+                <p>
+                    <strong id="mb-agent-name">Loading...</strong>:
+                    <span id="mb-agent-number">...</span>
+                </p>
+
+                <form id="mb-form" method="POST" action="">
+                    <label>Amount (USD)</label>
+                    <input type="number" name="amount" id="mbAmount" required min="10" max="200">
+                    <div id="mbFeedback" class="amount-feedback"></div>
+
+                    <label>Transaction ID</label>
+                    <input type="text" name="transactionId" id="mbTrxId" required>
+
+                    <p>After sending money, enter the Transaction ID above. Deposits take up to 5 minutes.</p>
+
+                    <button type="submit" disabled>Confirm</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="modal-binance" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>BinancePay Deposit</h3>
+                <form method="POST" action="/deposit/binance" id="binanceForm">
+                    <label>Amount (USD)</label>
+                    <input type="number" name="amount" id="binanceAmount" required min="5" max="500" step="0.01">
+                    <div id="binanceFeedback" class="amount-feedback"></div>
+                    <input type="hidden" name="bdtAmount" id="binanceBdtAmount">
+
+                    <label>Order ID</label>
+                    <input type="text" name="txnId" id="binanceTxnId" required placeholder="Enter your Order ID" />
+                    <p>After sending money, enter the Order ID above.</p>
+                    <button type="submit" disabled>Confirm</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="modal-crypto" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3 id="cryptoTitle">Crypto Deposit</h3>
+                <form method="POST" action="/deposit/crypto">
+                    <input type="hidden" name="currency" id="cryptoCurrency" value="">
+                    <label>Amount (USD)</label>
+                    <input type="number" name="amount" id="cryptoAmount" required min="50" max="1000" />
+                    <div id="cryptoFeedback" class="amount-feedback"></div>
+                    <p>You will be redirected to a crypto payment page.</p>
+                    <button type="submit" disabled>Pay with Crypto</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="login-modal" id="loginModal">
+            <div class="login-modal-content">
+                <h2>Login Required</h2>
+                <p>You need to be logged in to deposit balance.</p>
+                <div class="login-modal-actions">
+                    <a href="/login" class="login-btn gold">Login</a>
+                    <button class="login-btn outline" id="closeLoginModal">Cancel</button>
                 </div>
             </div>
         </div>
-    </section>
 
-    <div id="modal-mobile-banking" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3 id="mb-title">Deposit</h3> <h4>Send money to:</h4>
-            <p>
-                <strong id="mb-agent-name">Loading...</strong>: 
-                <span id="mb-agent-number">...</span>
-            </p>
+        <%- include('partials/footer') %>
 
-            <form id="mb-form" method="POST" action="">
-                <label>Amount (USD)</label>
-                <input type="number" name="amount" id="mbAmount" required min="10" max="200">
-                <div id="mbFeedback" class="amount-feedback"></div>
+            <script>
+                const isLoggedIn = <%= user ? 'true' : 'false' %>;
+                const userCountry = "<%= userCountry %>";
+                const usdToBdt = <%= usdToBdtRate %>;
+                const agentData = <% - JSON.stringify(agentPayments || {}) %>;
+            </script>
 
-                <label>Transaction ID</label>
-                <input type="text" name="transactionId" id="mbTrxId" required>
-                
-                <p>After sending money, enter the Transaction ID above. Deposits take up to 5 minutes.</p>
-                
-                <button type="submit" disabled>Confirm</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="modal-binance" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3>BinancePay Deposit</h3>
-            <form method="POST" action="/deposit/binance" id="binanceForm">
-                <label>Amount (USD)</label>
-                <input type="number" name="amount" id="binanceAmount" required min="5" max="500" step="0.01">
-                <div id="binanceFeedback" class="amount-feedback"></div>
-                <input type="hidden" name="bdtAmount" id="binanceBdtAmount">
-
-                <label>Order ID</label>
-                <input type="text" name="txnId" id="binanceTxnId" required placeholder="Enter your Order ID" />
-                <p>After sending money, enter the Order ID above.</p>
-                <button type="submit" disabled>Confirm</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="modal-crypto" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3 id="cryptoTitle">Crypto Deposit</h3>
-            <form method="POST" action="/deposit/crypto">
-                <input type="hidden" name="currency" id="cryptoCurrency" value="">
-                <label>Amount (USD)</label>
-                <input type="number" name="amount" id="cryptoAmount" required min="50" max="1000" />
-                <div id="cryptoFeedback" class="amount-feedback"></div>
-                <p>You will be redirected to a crypto payment page.</p>
-                <button type="submit" disabled>Pay with Crypto</button>
-            </form>
-        </div>
-    </div>
-
-    <div class="login-modal" id="loginModal">
-        <div class="login-modal-content">
-            <h2>Login Required</h2>
-            <p>You need to be logged in to deposit balance.</p>
-            <div class="login-modal-actions">
-                <a href="/login" class="login-btn gold">Login</a>
-                <button class="login-btn outline" id="closeLoginModal">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <%- include('partials/footer') %>
-
-    <script>
-        const isLoggedIn = <%= user ? 'true' : 'false' %>;
-        // Pass the agent data from Server EJS to Client JS safely
-        const agentData = <%- JSON.stringify(agentPayments || {}) %>;
-    </script>
-    <script src="/js/deposit.js"></script>
+            <script src="/js/deposit.js"></script>
 </body>
+
 </html>
