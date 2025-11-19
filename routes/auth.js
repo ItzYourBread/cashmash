@@ -23,13 +23,13 @@ router.get('/register', isNotLoggedIn, async (req, res) => {
 
   let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   console.log(ip);
-  
+
   // If multiple IPs, take the first one
   if (ip && ip.includes(',')) ip = ip.split(',')[0].trim();
 
   // Lookup country
   const geo = geoip.lookup(ip);
-  let autoCountry = 'BD'; // fallback
+  let autoCountry = 'US'; // fallback
   if (geo && geo.country) autoCountry = geo.country;
 
   res.render('register', { currentPage: 'register', COUNTRY_CODES, autoCountry });
