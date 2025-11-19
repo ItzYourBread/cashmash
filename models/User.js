@@ -155,3 +155,4 @@ userSchema.methods.addRakeback = async function (amount, weekStart, weekEnd, not
 };
 
 module.exports = mongoose.model('User', userSchema);
+module.exports = { COUNTRY_CODES };

@@ -1,173 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>
-    Register | CashMash
-  </title>
+  <title>Register | CashMash</title>
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/auth.css" />
   <style>
-    .availability-msg {
-      font-size: 0.9em;
-      margin-top: -6px;
-      margin-bottom: 8px;
-      color: #ccc;
-    }
+    .availability-msg { font-size: 0.9em; margin-top: -6px; margin-bottom: 8px; color: #ccc; }
   </style>
 </head>
-
 <body>
   <%- include('partials/header') %>
 
-    <section class="auth-section">
-      <form id="registerForm" class="auth-form" novalidate>
-        <h2>
-          Create Your Account
-        </h2>
+  <section class="auth-section">
+    <form id="registerForm" class="auth-form" novalidate>
+      <h2>Create Your Account</h2>
 
-        <input type="text" name="username" id="username" placeholder="Username" required />
-        <p id="usernameMsg" class="availability-msg"></p>
+      <input type="text" name="username" id="username" placeholder="Username" required />
+      <p id="usernameMsg" class="availability-msg"></p>
 
-        <input type="email" name="email" id="email" placeholder="Email" required />
+      <input type="email" name="email" id="email" placeholder="Email" required />
 
-        <input type="password" name="password" id="password" placeholder="Password" required />
+      <input type="password" name="password" id="password" placeholder="Password" required />
 
-        <button type="submit" class="btn gold big">
-          Register
-        </button>
+      <label for="countrySelect">Country</label>
+      <select name="country" id="countrySelect" required>
+        <option value="">Select your country</option>
+        <% COUNTRY_CODES.forEach(code => { %>
+          <option value="<%= code %>" <%= autoCountry===code?'selected':'' %>><%= code %></option>
+        <% }) %>
+      </select>
 
-        <p>
-          Already have an account?
-            <a href="/login">
-              Login
-            </a>
-        </p>
-        <p id="responseMsg"></p>
-      </form>
-    </section>
+      <button type="submit" class="btn gold big">Register</button>
 
-    <%- include('partials/footer') %>
+      <p>Already have an account? <a href="/login">Login</a></p>
+      <p id="responseMsg"></p>
+    </form>
+  </section>
 
-      <script>
-        const registerForm = document.getElementById('registerForm');
-        const usernameInput = document.getElementById('username');
-        const usernameMsg = document.getElementById('usernameMsg');
-        const responseMsg = document.getElementById('responseMsg');
+  <%- include('partials/footer') %>
 
-        let usernameTimer = null;
+  <script>
+    const registerForm = document.getElementById('registerForm');
+    const usernameInput = document.getElementById('username');
+    const usernameMsg = document.getElementById('usernameMsg');
+    const responseMsg = document.getElementById('responseMsg');
+    let usernameTimer = null;
 
-        // Static Text for Availability Messages
-        const MSGS = {
-            usernameAvailable: 'Username available',
-            usernameTaken: 'Username already taken',
-            usernameErrorCheck: 'Error checking username',
-            usernameLength: 'Username must be at least 3 characters',
-            passwordLength: 'Password must be at least 6 characters long',
-            registrationSuccess: 'Registration successful!',
-            registrationFailed: 'Registration failed.',
-            somethingWrong: 'Something went wrong.'
-        };
+    usernameInput.addEventListener('input', () => {
+      const val = usernameInput.value.toLowerCase().trim();
+      usernameInput.value = val;
 
-        // 🔹 Auto-lowercase username and check availability
-        usernameInput.addEventListener('input', () => {
-          const val = usernameInput.value.toLowerCase().trim();
-          usernameInput.value = val;
+      if (val.length < 3) {
+        usernameMsg.textContent = '';
+        return;
+      }
 
-          if (val.length < 3) {
-            usernameMsg.textContent = '';
-            return;
-          }
+      clearTimeout(usernameTimer);
+      usernameTimer = setTimeout(async () => {
+        try {
+          const res = await fetch(`/check-username?username=${encodeURIComponent(val)}`);
+          const data = await res.json();
+          usernameMsg.textContent = data.available ? 'Username available' : 'Username already taken';
+          usernameMsg.style.color = data.available ? '#4CAF50' : 'red';
+        } catch (err) {
+          console.error(err);
+          usernameMsg.textContent = 'Error checking username';
+          usernameMsg.style.color = 'red';
+        }
+      }, 400);
+    });
 
-          clearTimeout(usernameTimer);
-          usernameTimer = setTimeout(async () => {
-            try {
-              const res = await fetch(`/check-username?username=${encodeURIComponent(val)}`);
-              const data = await res.json();
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      responseMsg.textContent = '';
 
-              if (data.available) {
-                // Replaced <%= __("Username available") %>
-                usernameMsg.textContent = MSGS.usernameAvailable; 
-                usernameMsg.style.color = '#4CAF50';
-                usernameMsg.style.marginTop = '5px';
-                usernameMsg.style.marginLeft = '5px';
-                usernameMsg.style.textAlign = 'left';
-              } else {
-                // Replaced <%= __("Username already taken") %>
-                usernameMsg.textContent = MSGS.usernameTaken;
-                usernameMsg.style.color = 'red';
-                usernameMsg.style.marginTop = '5px';
-                usernameMsg.style.marginLeft = '5px';
-                usernameMsg.style.textAlign = 'left';
-              }
-            } catch (err) {
-              console.error(err);
-              // Replaced <%= __("Error checking username") %>
-              usernameMsg.textContent = MSGS.usernameErrorCheck; 
-              usernameMsg.style.color = 'red';
-              usernameMsg.style.marginTop = '5px';
-              usernameMsg.style.marginLeft = '5px';
-              usernameMsg.style.textAlign = 'left';
-            }
-          }, 400); // wait for user to stop typing
+      const username = usernameInput.value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const country = document.getElementById('countrySelect').value;
+
+      if (username.length < 3) return responseMsg.textContent = 'Username must be at least 3 characters';
+      if (password.length < 6) return responseMsg.textContent = 'Password must be at least 6 characters';
+
+      try {
+        const res = await fetch('/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password, country })
         });
 
-        // 🔹 Form submit
-        registerForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          responseMsg.textContent = '';
-
-          const username = usernameInput.value.trim();
-          const email = document.getElementById('email').value.trim();
-          const password = document.getElementById('password').value.trim();
-
-          // Validation: username
-          if (username.length < 3) {
-            // Replaced <%= __("Username must be at least 3 characters") %>
-            responseMsg.textContent = MSGS.usernameLength;
-            responseMsg.style.color = 'red';
-            return;
-          }
-
-          // Validation: password length
-          if (password.length < 6) {
-            // Replaced <%= __("Password must be at least 6 characters long") %>
-            responseMsg.textContent = MSGS.passwordLength;
-            responseMsg.style.color = 'red';
-            return;
-          }
-
-          try {
-            const res = await fetch('/register', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ username, email, password })
-            });
-
-            const data = await res.json().catch(() => ({}));
-
-            if (res.ok) {
-              // Replaced <%= __("Registration successful!") %>
-              responseMsg.textContent = data.message || MSGS.registrationSuccess;
-              responseMsg.style.color = '#f5c542';
-              setTimeout(() => { window.location.href = '/login'; }, 1200);
-            } else {
-              // Replaced <%= __("Registration failed.") %>
-              responseMsg.textContent = data.message || MSGS.registrationFailed;
-              responseMsg.style.color = 'red';
-            }
-          } catch (err) {
-            console.error(err);
-            // Replaced <%= __("Something went wrong.") %>
-            responseMsg.textContent = MSGS.somethingWrong;
-            responseMsg.style.color = 'red';
-          }
-        });
-      </script>
+        const data = await res.json().catch(() => ({}));
+        responseMsg.textContent = data.message || 'Something went wrong';
+        responseMsg.style.color = res.ok ? '#f5c542' : 'red';
+        if (res.ok) setTimeout(() => window.location.href='/login', 1200);
+      } catch (err) {
+        console.error(err);
+        responseMsg.textContent = 'Something went wrong';
+        responseMsg.style.color = 'red';
+      }
+    });
+  </script>
 </body>
-
 </html>

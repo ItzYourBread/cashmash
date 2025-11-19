@@ -1,7 +1,9 @@
 const express = require('express');
 const User = require('../models/User');
+const { COUNTRY_CODES } = require('../models/User')
 const { generateOTP, otpExpired } = require('../utils/otp');
 const transporter = require('../config/nodemailer');
+const geoip = require('geoip-lite');
 const router = express.Router();
 
 const otpEnable = false; // ⬅️ Set to true if you want OTP login enabled
@@ -17,8 +19,20 @@ const isNotLoggedIn = (req, res, next) => {
 /* =====================================
    🔹 GET ROUTES
    ===================================== */
-router.get('/register', isNotLoggedIn, (req, res) => {
-  res.render('register', { currentPage: 'register' });
+router.get('/register', isNotLoggedIn, async (req, res) => {
+
+  let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  console.log(ip);
+  
+  // If multiple IPs, take the first one
+  if (ip && ip.includes(',')) ip = ip.split(',')[0].trim();
+
+  // Lookup country
+  const geo = geoip.lookup(ip);
+  let autoCountry = 'BD'; // fallback
+  if (geo && geo.country) autoCountry = geo.country;
+
+  res.render('register', { currentPage: 'register', COUNTRY_CODES, autoCountry });
 });
 
 router.get('/login', isNotLoggedIn, (req, res) => {
@@ -43,36 +57,27 @@ router.get('/check-username', async (req, res) => {
 /* =====================================
    🔹 REGISTER (POST)
    ===================================== */
+// POST Register
 router.post('/register', async (req, res) => {
   try {
-    let { username, email, password } = req.body;
-
-    // Clean input
+    let { username, email, password, country } = req.body;
     username = username.trim().toLowerCase();
     email = email.trim().toLowerCase();
 
-    // Validate password length
+    if (!COUNTRY_CODES.includes(country))
+      return res.status(400).json({ message: 'Invalid country selection.' });
     if (password.length < 6)
-      return res.status(400).json({ message: 'Password must be at least 6 characters long.' });
+      return res.status(400).json({ message: 'Password must be at least 6 characters.' });
 
-    // Check username availability
     const existingUsername = await User.findOne({ username });
-    if (existingUsername)
-      return res.status(400).json({ message: 'Username already taken. Please choose another.' });
+    if (existingUsername) return res.status(400).json({ message: 'Username already taken.' });
 
-    // Check email availability
     const existingEmail = await User.findOne({ email });
-    if (existingEmail)
-      return res.status(400).json({ message: 'Email already registered. Please log in.' });
+    if (existingEmail) return res.status(400).json({ message: 'Email already registered.' });
 
-    // Create user
-    const newUser = new User({
-      username,
-      email,
-      password,
-    });
-
+    const newUser = new User({ username, email, password, country });
     await newUser.save();
+
     res.status(200).json({ message: 'Registration successful! You can now log in.' });
   } catch (err) {
     console.error('Register Error:', err);
