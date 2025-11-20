@@ -190,23 +190,45 @@
                       <select id="withdrawMethodSelect" required>
                         <option value="">-- Select Method --</option>
 
+                        <!-- E-WALLETS -->
                         <optgroup label="E-Wallets">
-                          <option value="bkash">Bkash</option>
-                          <option value="nagad">Nagad</option>
-                          <option value="upay">Upay</option>
-                          <option value="binance">BinancePay</option>
+
+                          <% if (availableMethods.includes("Bkash")) { %>
+                            <option value="bkash">Bkash</option>
+                            <% } %>
+
+                              <% if (availableMethods.includes("Nagad")) { %>
+                                <option value="nagad">Nagad</option>
+                                <% } %>
+
+                                  <% if (availableMethods.includes("Upay")) { %>
+                                    <option value="upay">Upay</option>
+                                    <% } %>
+
+                                      <% if (availableMethods.includes("BinancePay")) { %>
+                                        <option value="binance">BinancePay</option>
+                                        <% } %>
+
                         </optgroup>
 
+                        <!-- CRYPTO -->
                         <optgroup label="Crypto">
-                          <option value="crypto" disabled>Crypto Transfer (Coming Soon)</option>
+                          <% if (availableMethods.includes("Crypto")) { %>
+                            <option value="crypto">Crypto Transfer</option>
+                            <% } else { %>
+                              <option value="crypto" disabled>Crypto Transfer (Coming Soon)</option>
+                              <% } %>
                         </optgroup>
 
+                        <!-- BANK TRANSFER -->
                         <optgroup label="Bank">
                           <option value="bank" disabled>Bank Transfer (Coming Soon)</option>
                         </optgroup>
+
                       </select>
 
                     </form>
+
 
 
                     <!-- =============================== -->

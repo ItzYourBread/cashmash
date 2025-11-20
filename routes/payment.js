@@ -5,6 +5,7 @@ const path = require('path');
 const axios = require('axios');
 const Deposit = require('../models/Deposit');
 const Withdraw = require('../models/Withdraw');
+const withdrawMethods = require('../config/withdrawMethods');
 const NowPaymentsApi = require('@nowpaymentsio/nowpayments-api-js');
 const npApi = new NowPaymentsApi({ apiKey: process.env.NOWPAYMENTS_API_KEY });
 const mongoose = require('mongoose'); // Mongoose is correctly imported
@@ -24,7 +25,7 @@ function formatCurrencyNetwork(cur) {
 
   const mapping = {
     usdttrc20: "USDT-TRC20",
-    usdterc20: "USDT-ERC20",
+    // usdterc20: "USDT-ERC20",
     usdtbsc: "USDT-BSC",
     usdtsol: "USDT-SOL",
     usdtmatic: "USDT-MATIC",
@@ -61,7 +62,7 @@ router.get('/deposit', ensureAuth, async (req, res) => {
 
       const allowedStablecoins = [
         'usdttrc20',
-        'usdterc20',
+        // 'usdterc20',
         'usdtbsc',
         'usdtsol',
         'usdtmatic',
@@ -206,7 +207,7 @@ router.post('/deposit/crypto', ensureAuth, async (req, res) => {
 
     const allowedCurrencies = [
       'usdttrc20',
-      'usdterc20',
+      // 'usdterc20',
       'usdtbsc',
       'usdtsol',
       'usdtmatic',
@@ -252,8 +253,6 @@ router.post('/deposit/crypto', ensureAuth, async (req, res) => {
     return res.status(500).send("Failed to create crypto payment.");
   }
 });
-
-
 
 // ✅ WEBHOOK: Handle NOWPayments notifications
 router.post(
@@ -357,11 +356,6 @@ router.post(
 );
 
 
-// ----------------- WITHDRAW ROUTES -----------------
-router.get('/withdraw', (req, res) => {
-  res.render('withdraw', { user: req.user, currentPage: 'withdraw', agentPayments });
-});
-
 // Handle withdrawals for Bkash, Nagad, Upay
 ['bkash', 'nagad', 'upay'].forEach(method => {
   router.post(`/withdraw/${method}`, ensureAuth, async (req, res) => {
@@ -444,71 +438,49 @@ router.post('/withdraw/binance', ensureAuth, async (req, res) => {
   }
 });
 
-// Handle Withdrawal Cancellation (with Debugging Logs) 
+// Handle Withdrawal Cancellation
 router.post('/withdraw/cancel/:id', ensureAuth, async (req, res) => {
   const withdrawId = req.params.id;
   const userId = req.user._id;
 
-  console.log(`--- CANCELLATION DEBUG START ---`);
-  console.log(`1. Incoming Withdraw ID (from URL): ${withdrawId}`);
-  console.log(`2. User ID (logged in user): ${userId}`);
-
   try {
-    // 1. Find the withdrawal record in the main Withdraw collection
+    // 1. Find withdrawal in main Withdraw collection
     const withdrawal = await Withdraw.findOne({
       _id: withdrawId,
       user: userId
     });
 
     if (!withdrawal) {
-      console.log(`3. Query failed for _id: ${withdrawId} and user: ${userId}`);
-
-      const userOwned = await Withdraw.findById(withdrawId);
-      if (userOwned) {
-        console.warn(`4. Withdrawal ID ${withdrawId} exists but is owned by ${userOwned.user}.`);
-      } else {
-        console.log(`4. Withdrawal ID ${withdrawId} does NOT exist in the main Withdraw collection.`);
-      }
-
-      console.log(`--- CANCELLATION DEBUG END ---`);
       return res.status(404).send('Withdrawal record not found or does not belong to you.');
     }
 
-    // --- SUCCESS PATH ---
-    console.log(`3. Withdrawal found. Status: ${withdrawal.status}`);
-
-    // 2. Check if the withdrawal is pending
+    // 2. Only pending withdrawals can be cancelled
     if (withdrawal.status !== 'Pending') {
-      console.log(`--- CANCELLATION DEBUG END ---`);
       return res.status(403).send(`Withdrawal is ${withdrawal.status} and cannot be cancelled.`);
     }
 
-    // 3. Mark the withdrawal as Cancelled in the main collection
+    // 3. Update main withdrawal record
     withdrawal.status = 'Cancelled';
     await withdrawal.save();
 
-    // 4. Update the embedded withdrawal record in the User document AND refund balance
-    const userWithdrawalIndex = req.user.withdrawals.findIndex(w => w._id.toString() === withdrawId);
+    // 4. Update embedded withdrawal record + refund balance
+    const userWithdrawalIndex = req.user.withdrawals.findIndex(
+      w => w._id.toString() === withdrawId
+    );
 
     if (userWithdrawalIndex !== -1) {
       req.user.withdrawals[userWithdrawalIndex].status = 'Cancelled';
-      const amountToRefund = withdrawal.amount;
-      req.user.balance += amountToRefund;
+      req.user.balance += withdrawal.amount;
       await req.user.save();
-      console.log(`5. Successfully cancelled and refunded $${amountToRefund}.`);
     } else {
-      console.error(`5. [INCONSISTENCY] Embedded record ${withdrawId} not found in user subdocument. Refunding anyway.`);
-      // Ensure refund still happens even if the subdocument is missing
+      // If embedded record missing, still refund to avoid user loss
       req.user.balance += withdrawal.amount;
       await req.user.save();
     }
 
-    console.log(`--- CANCELLATION DEBUG END ---`);
     res.redirect('/dashboard?section=withdraw');
 
   } catch (err) {
-    console.error('Withdrawal cancellation failed:', err);
-    console.log(`--- CANCELLATION DEBUG END ---`);
     if (err.name === 'CastError') {
       return res.status(400).send('Invalid Withdrawal ID format.');
     }

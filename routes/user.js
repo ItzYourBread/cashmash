@@ -20,6 +20,16 @@ function ensureAuth(req, res, next) {
 // Dashboard Route
 router.get('/dashboard', ensureAuth, async (req, res) => {
   try {
+
+    const country = req.user?.country || "Unknown";
+
+    // Logic to determine withdraw methods based on country
+    let availableMethods = ["BinancePay", "Crypto"]; // universal ones
+
+    if (country === "BD") {
+      availableMethods.push("Bkash", "Nagad", "Upay");
+    }
+
     const PAGE_SIZE = 10;
     const user = await User.findById(req.user._id)
       .populate('deposits')
@@ -78,7 +88,8 @@ router.get('/dashboard', ensureAuth, async (req, res) => {
 
       rakebackHistory: rakebackDisplay,
       rakePages,
-      rakePage: currentPage
+      rakePage: currentPage,
+      availableMethods
     });
 
   } catch (err) {
