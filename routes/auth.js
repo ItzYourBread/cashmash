@@ -19,20 +19,16 @@ const isNotLoggedIn = (req, res, next) => {
 /* =====================================
    🔹 GET ROUTES
    ===================================== */
-router.get('/register', isNotLoggedIn, async (req, res) => {
 
+router.get('/register', isNotLoggedIn, (req, res) => {
   let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  console.log(ip);
 
-  // If multiple IPs, take the first one
   if (ip && ip.includes(',')) ip = ip.split(',')[0].trim();
 
-  // Lookup country
   const geo = geoip.lookup(ip);
-  let autoCountry = 'US'; // fallback
-  if (geo && geo.country) autoCountry = geo.country;
+  const autoCountry = geo?.country || '';
 
-  res.render('register', { currentPage: 'register', COUNTRY_CODES, autoCountry });
+  res.render('register', { currentPage: 'register', autoCountry });
 });
 
 router.get('/login', isNotLoggedIn, (req, res) => {

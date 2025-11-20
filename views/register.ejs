@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,100 +10,155 @@
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/auth.css" />
   <style>
-    .availability-msg { font-size: 0.9em; margin-top: -6px; margin-bottom: 8px; color: #ccc; }
+    .availability-msg {
+      font-size: 0.9em;
+      margin-top: -6px;
+      margin-bottom: 8px;
+      color: #ccc;
+    }
   </style>
 </head>
+
 <body>
   <%- include('partials/header') %>
 
-  <section class="auth-section">
-    <form id="registerForm" class="auth-form" novalidate>
-      <h2>Create Your Account</h2>
+    <section class="auth-section">
+      <form id="registerForm" class="auth-form" novalidate>
+        <h2>Create Your Account</h2>
 
-      <input type="text" name="username" id="username" placeholder="Username" required />
-      <p id="usernameMsg" class="availability-msg"></p>
+        <select id="countrySelect" name="country" required>
+          <option value="" disabled <%=!autoCountry ? 'selected' : '' %>>Select your country</option>
 
-      <input type="email" name="email" id="email" placeholder="Email" required />
+          <optgroup label="Popular">
+            <option value="US" <%=autoCountry==='US' ?'selected':'' %>>United States</option>
+            <option value="CA" <%=autoCountry==='CA' ?'selected':'' %>>Canada</option>
+            <option value="GB" <%=autoCountry==='GB' ?'selected':'' %>>United Kingdom</option>
+            <option value="AU" <%=autoCountry==='AU' ?'selected':'' %>>Australia</option>
+            <option value="IN" <%=autoCountry==='IN' ?'selected':'' %>>India</option>
+            <option value="BD" <%=autoCountry==='BD' ?'selected':'' %>>Bangladesh</option>
+            <option value="DE" <%=autoCountry==='DE' ?'selected':'' %>>Germany</option>
+            <option value="BR" <%=autoCountry==='BR' ?'selected':'' %>>Brazil</option>
+          </optgroup>
 
-      <input type="password" name="password" id="password" placeholder="Password" required />
+          <optgroup label="Europe">
+            <option value="FR" <%=autoCountry==='FR' ?'selected':'' %>>France</option>
+            <option value="ES" <%=autoCountry==='ES' ?'selected':'' %>>Spain</option>
+            <option value="IT" <%=autoCountry==='IT' ?'selected':'' %>>Italy</option>
+            <option value="PL" <%=autoCountry==='PL' ?'selected':'' %>>Poland</option>
+            <option value="NL" <%=autoCountry==='NL' ?'selected':'' %>>Netherlands</option>
+            <option value="SE" <%=autoCountry==='SE' ?'selected':'' %>>Sweden</option>
+            <option value="CH" <%=autoCountry==='CH' ?'selected':'' %>>Switzerland</option>
+            <option value="IE" <%=autoCountry==='IE' ?'selected':'' %>>Ireland</option>
+            <option value="GR" <%=autoCountry==='GR' ?'selected':'' %>>Greece</option>
+          </optgroup>
 
-      <label for="countrySelect">Country</label>
-      <select name="country" id="countrySelect" required>
-        <option value="">Select your country</option>
-        <% COUNTRY_CODES.forEach(code => { %>
-          <option value="<%= code %>" <%= autoCountry===code?'selected':'' %>><%= code %></option>
-        <% }) %>
-      </select>
+          <optgroup label="North & South America">
+            <option value="MX" <%=autoCountry==='MX' ?'selected':'' %>>Mexico</option>
+            <option value="AR" <%=autoCountry==='AR' ?'selected':'' %>>Argentina</option>
+            <option value="CO" <%=autoCountry==='CO' ?'selected':'' %>>Colombia</option>
+            <option value="PE" <%=autoCountry==='PE' ?'selected':'' %>>Peru</option>
+            <option value="CL" <%=autoCountry==='CL' ?'selected':'' %>>Chile</option>
+            <option value="EC" <%=autoCountry==='EC' ?'selected':'' %>>Ecuador</option>
+          </optgroup>
 
-      <button type="submit" class="btn gold big">Register</button>
+          <optgroup label="Asia & Oceania">
+            <option value="CN" <%=autoCountry==='CN' ?'selected':'' %>>China</option>
+            <option value="JP" <%=autoCountry==='JP' ?'selected':'' %>>Japan</option>
+            <option value="KR" <%=autoCountry==='KR' ?'selected':'' %>>South Korea</option>
+            <option value="ID" <%=autoCountry==='ID' ?'selected':'' %>>Indonesia</option>
+            <option value="PK" <%=autoCountry==='PK' ?'selected':'' %>>Pakistan</option>
+            <option value="PH" <%=autoCountry==='PH' ?'selected':'' %>>Philippines</option>
+            <option value="VN" <%=autoCountry==='VN' ?'selected':'' %>>Vietnam</option>
+            <option value="NZ" <%=autoCountry==='NZ' ?'selected':'' %>>New Zealand</option>
+          </optgroup>
 
-      <p>Already have an account? <a href="/login">Login</a></p>
-      <p id="responseMsg"></p>
-    </form>
-  </section>
+          <optgroup label="Africa & Middle East">
+            <option value="NG" <%=autoCountry==='NG' ?'selected':'' %>>Nigeria</option>
+            <option value="ZA" <%=autoCountry==='ZA' ?'selected':'' %>>South Africa</option>
+            <option value="EG" <%=autoCountry==='EG' ?'selected':'' %>>Egypt</option>
+            <option value="SA" <%=autoCountry==='SA' ?'selected':'' %>>Saudi Arabia</option>
+            <option value="TR" <%=autoCountry==='TR' ?'selected':'' %>>Turkey</option>
+          </optgroup>
+        </select>
 
-  <%- include('partials/footer') %>
 
-  <script>
-    const registerForm = document.getElementById('registerForm');
-    const usernameInput = document.getElementById('username');
-    const usernameMsg = document.getElementById('usernameMsg');
-    const responseMsg = document.getElementById('responseMsg');
-    let usernameTimer = null;
+        <input type="text" name="username" id="username" placeholder="Username" required />
+        <p id="usernameMsg" class="availability-msg"></p>
 
-    usernameInput.addEventListener('input', () => {
-      const val = usernameInput.value.toLowerCase().trim();
-      usernameInput.value = val;
+        <input type="email" name="email" id="email" placeholder="Email" required />
 
-      if (val.length < 3) {
-        usernameMsg.textContent = '';
-        return;
-      }
+        <input type="password" name="password" id="password" placeholder="Password" required />
 
-      clearTimeout(usernameTimer);
-      usernameTimer = setTimeout(async () => {
-        try {
-          const res = await fetch(`/check-username?username=${encodeURIComponent(val)}`);
-          const data = await res.json();
-          usernameMsg.textContent = data.available ? 'Username available' : 'Username already taken';
-          usernameMsg.style.color = data.available ? '#4CAF50' : 'red';
-        } catch (err) {
-          console.error(err);
-          usernameMsg.textContent = 'Error checking username';
-          usernameMsg.style.color = 'red';
-        }
-      }, 400);
-    });
+        <button type="submit" class="btn gold big">Register</button>
 
-    registerForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      responseMsg.textContent = '';
+        <p>Already have an account? <a href="/login">Login</a></p>
+        <p id="responseMsg"></p>
+      </form>
+    </section>
 
-      const username = usernameInput.value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const country = document.getElementById('countrySelect').value;
+    <%- include('partials/footer') %>
 
-      if (username.length < 3) return responseMsg.textContent = 'Username must be at least 3 characters';
-      if (password.length < 6) return responseMsg.textContent = 'Password must be at least 6 characters';
+      <script>
+        const registerForm = document.getElementById('registerForm');
+        const usernameInput = document.getElementById('username');
+        const usernameMsg = document.getElementById('usernameMsg');
+        const responseMsg = document.getElementById('responseMsg');
+        let usernameTimer = null;
 
-      try {
-        const res = await fetch('/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, email, password, country })
+        usernameInput.addEventListener('input', () => {
+          const val = usernameInput.value.toLowerCase().trim();
+          usernameInput.value = val;
+
+          if (val.length < 3) {
+            usernameMsg.textContent = '';
+            return;
+          }
+
+          clearTimeout(usernameTimer);
+          usernameTimer = setTimeout(async () => {
+            try {
+              const res = await fetch(`/check-username?username=${encodeURIComponent(val)}`);
+              const data = await res.json();
+              usernameMsg.textContent = data.available ? 'Username available' : 'Username already taken';
+              usernameMsg.style.color = data.available ? '#4CAF50' : 'red';
+            } catch (err) {
+              console.error(err);
+              usernameMsg.textContent = 'Error checking username';
+              usernameMsg.style.color = 'red';
+            }
+          }, 400);
         });
 
-        const data = await res.json().catch(() => ({}));
-        responseMsg.textContent = data.message || 'Something went wrong';
-        responseMsg.style.color = res.ok ? '#f5c542' : 'red';
-        if (res.ok) setTimeout(() => window.location.href='/login', 1200);
-      } catch (err) {
-        console.error(err);
-        responseMsg.textContent = 'Something went wrong';
-        responseMsg.style.color = 'red';
-      }
-    });
-  </script>
+        registerForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          responseMsg.textContent = '';
+
+          const username = usernameInput.value.trim();
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value.trim();
+          const country = document.getElementById('countrySelect').value;
+
+          if (username.length < 3) return responseMsg.textContent = 'Username must be at least 3 characters';
+          if (password.length < 6) return responseMsg.textContent = 'Password must be at least 6 characters';
+
+          try {
+            const res = await fetch('/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username, email, password, country })
+            });
+
+            const data = await res.json().catch(() => ({}));
+            responseMsg.textContent = data.message || 'Something went wrong';
+            responseMsg.style.color = res.ok ? '#f5c542' : 'red';
+            if (res.ok) setTimeout(() => window.location.href = '/login', 1200);
+          } catch (err) {
+            console.error(err);
+            responseMsg.textContent = 'Something went wrong';
+            responseMsg.style.color = 'red';
+          }
+        });
+      </script>
 </body>
+
 </html>
