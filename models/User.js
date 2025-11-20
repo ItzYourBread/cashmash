@@ -1,20 +1,7 @@
 // models/User.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-
-// Add this definition to your Mongoose schema file if you want to use Enum:
-const COUNTRY_CODES = [
-  // Popular
-  'US', 'CA', 'GB', 'AU', 'IN', 'BD', 'DE', 'BR', 
-  // Europe
-  'FR', 'ES', 'IT', 'PL', 'NL', 'SE', 'CH', 'IE', 'GR',
-  // North & South America
-  'MX', 'AR', 'CO', 'PE', 'CL', 'EC',
-  // Asia & Oceania
-  'CN', 'JP', 'KR', 'ID', 'PK', 'PH', 'VN', 'NZ',
-  // Africa & Middle East
-  'NG', 'ZA', 'EG', 'SA', 'TR',
-];
+const { COUNTRY_CODES } = require('../config/countries')
 
 // ----------------- SUBSCHEMAS -----------------
 const depositSchema = new mongoose.Schema({
@@ -155,4 +142,3 @@ userSchema.methods.addRakeback = async function (amount, weekStart, weekEnd, not
 };
 
 module.exports = mongoose.model('User', userSchema);
-module.exports = { COUNTRY_CODES };

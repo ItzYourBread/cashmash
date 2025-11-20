@@ -1,6 +1,6 @@
 const express = require('express');
 const User = require('../models/User');
-const { COUNTRY_CODES } = require('../models/User')
+const { COUNTRY_CODES } = require('../config/countries')
 const { generateOTP, otpExpired } = require('../utils/otp');
 const transporter = require('../config/nodemailer');
 const geoip = require('geoip-lite');
@@ -42,13 +42,16 @@ router.get('/check-username', async (req, res) => {
   try {
     const username = req.query.username?.trim().toLowerCase();
     if (!username) return res.json({ available: false });
+
     const existing = await User.findOne({ username });
+
     res.json({ available: !existing });
   } catch (err) {
     console.error('Username Check Error:', err);
     res.status(500).json({ available: false });
   }
 });
+
 
 /* =====================================
    🔹 REGISTER (POST)
