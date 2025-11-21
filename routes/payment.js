@@ -438,6 +438,52 @@ router.post('/withdraw/binance', ensureAuth, async (req, res) => {
   }
 });
 
+// ========================================
+// Crypto Withdrawal (USDT Any Network)
+// ========================================
+router.post('/withdraw/crypto', ensureAuth, async (req, res) => {
+  try {
+    const { WalletAddress, network, amount } = req.body;
+
+    if (!WalletAddress || !network || !amount) {
+      throw new Error("Invalid input");
+    }
+
+    // Deduct user balance first
+    await req.user.deductChips(Number(amount));
+
+    // Generate consistent Mongo ID
+    const newWithdrawalId = new mongoose.Types.ObjectId();
+
+    // Construct withdraw object
+    const withdrawData = {
+      _id: newWithdrawalId,
+      amount: Number(amount),
+      method: 'Crypto',
+      WalletAddress,
+      note: `USDT Network: ${network}`, // ⭐ Add selected network to note
+      status: 'Pending'
+    };
+
+    // Store inside user document
+    req.user.withdrawals.push(withdrawData);
+    await req.user.save();
+
+    // Store inside Withdraw model
+    await Withdraw.create({
+      _id: newWithdrawalId,
+      user: req.user._id,
+      ...withdrawData
+    });
+
+    res.redirect('/dashboard?section=withdraw&page=1');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Crypto withdrawal failed");
+  }
+});
+
+
 // Handle Withdrawal Cancellation
 router.post('/withdraw/cancel/:id', ensureAuth, async (req, res) => {
   const withdrawId = req.params.id;

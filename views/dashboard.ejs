@@ -274,7 +274,40 @@
                       </form>
                     </div>
 
+                    <!-- Crypto form -->
+                    <div id="cryptoFormWrap" class="withdraw-form hidden">
+                      <h3 id="cryptoWalletTitle">Crypto Withdrawal</h3>
 
+                      <form id="cryptoForm" method="POST" action="/withdraw/crypto">
+
+                        <label>Wallet Address</label>
+                        <input type="text" name="WalletAddress" id="cryptoWalletAddress" required />
+
+                        <label>Select Network</label>
+                        <select name="network" id="cryptoNetwork" required>
+                          <option value="">-- Choose Network --</option>
+
+                          <option value="TRC20">USDT TRC20 (TRON)</option>
+                          <option value="ERC20">USDT ERC20 (Ethereum)</option>
+                          <option value="BEP20">USDT BEP20 (BNB Chain)</option>
+                          <option value="SOL">USDT SOL (Solana)</option>
+                          <option value="MATIC">USDT MATIC (Polygon)</option>
+                          <option value="CELO">USDT CELO (Celo Network)</option>
+                          <option value="ARB">USDT ARB (Arbitrum)</option>
+                        </select>
+
+
+                        <label>Amount (USD)</label>
+                        <input type="number" name="amount" id="cryptoAmount" min="50" required />
+
+                        <!-- hidden note for storing network -->
+                        <input type="hidden" name="note" id="cryptoNote" value="Nothing for Note" />
+
+                        <div id="cryptoFeedback" class="amount-feedback"></div>
+
+                        <button id="cryptoConfirmBtn" type="submit" disabled>Confirm</button>
+                      </form>
+                    </div>
 
                     <!-- ====================================== -->
                     <!--     WITHDRAWAL LIST (unchanged)        -->

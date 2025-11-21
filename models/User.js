@@ -19,20 +19,20 @@ const depositSchema = new mongoose.Schema({
 
 const withdrawSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
-  method: { type: String, enum: ['Bkash', 'Nagad', 'Upay', 'BinancePay'], required: true },
+  method: { type: String, enum: ['Bkash', 'Nagad', 'Upay', 'BinancePay', 'Crypto'], required: true },
   
   // Fields needed to match the main Withdraw model (made them optional in the subschema)
   fullName: { type: String },
   contact: { type: String },
   userIdOrEmail: { type: String }, 
+  WalletAddress: { type: String },
   
   status: { 
     type: String, 
     enum: ['Pending', 'Completed', 'Failed', 'Cancelled'], 
     default: 'Pending' 
   },
-  // NOTE: You previously had 'walletAddress' here, changed it to match new fields
-  // walletAddress: { type: String }, 
+  note: { type: String, default: "Nothing for Note" },
   createdAt: { type: Date, default: Date.now }
 });
 
