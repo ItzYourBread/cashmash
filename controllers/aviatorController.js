@@ -19,7 +19,7 @@ const config = {
   maxMultiplier: 200,          // hard cap for multiplier (safety)
   minMultiplier: 1.0,          // min multiplier
   houseEdge: 0.04,             // 0.04 = 4% house edge (96% RTP)
-  volatility: 1.0,             
+  volatility: 2.0,             
   revealHashAlgorithm: 'sha256',
   // ADJUSTED FOR SLOW GROWTH: 0.5 is a noticeably slower, steady climb.
   growthRatePerSecond: 0.5,    
@@ -224,12 +224,11 @@ function beginFlightTicks() {
   }, tickMs);
 }
 
-async function endRound() {
+function endRound() {
   cleanupTimers();
   roundActive = false;
   roundPhase = 'ended';
 
-  // Mark uncaught bets as lost (resolved at crash)
   for (const [uid, bet] of Object.entries(roundState.bets)) {
     if (!bet.cashedOut) {
       bet.cashedOut = true;
@@ -238,10 +237,9 @@ async function endRound() {
     }
   }
 
-  // Emit crash event. Reveal serverSeed.
   safeEmit('roundCrashed', {
     crashAt: roundState.crashAt,
-    serverSeed: roundState.serverSeed, 
+    serverSeed: roundState.serverSeed,
   });
 
   pushRoundHistory({
@@ -251,7 +249,12 @@ async function endRound() {
     bets: Object.keys(roundState.bets).length,
   });
 
-  // After a short pause, start next round automatically
+  // ******** FIX HERE ********
+  safeEmit('historyUpdate', {
+    history: roundHistory
+  });
+  // **************************
+
   setTimeout(() => {
     startNewRound(ioInstance);
   }, config.interRoundDelayMs);

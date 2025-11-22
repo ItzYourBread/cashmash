@@ -114,30 +114,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Function to update history ribbon
-function updateHistory(historyArray) {
-    if (!historyRibbon) return;
-    historyRibbon.innerHTML = '';
-    const recent = (historyArray || []).slice(-10).reverse();
-    if (recent.length === 0) {
-        const ph = document.createElement('span');
-        ph.className = 'badge placeholder';
-        ph.textContent = '--';
-        historyRibbon.appendChild(ph);
-        return;
-    }
-    recent.forEach(mult => {
-        const span = document.createElement('span');
-        span.classList.add('badge');
-        if (mult >= 10) span.classList.add('high');
-        else if (mult >= 2) span.classList.add('med');
-        else span.classList.add('low');
-        span.textContent = Number(mult).toFixed(2) + 'x';
-        historyRibbon.appendChild(span);
+  // ====================== FIXED HISTORY FUNCTION ======================
+  function updateHistory(arr) {
+    const historyArray = Array.isArray(arr) ? arr : [];
+
+    // Always take latest 10 (or less)
+    const recent = historyArray.slice(0, 7);
+
+    historyRibbon.innerHTML = "";
+
+    recent.forEach(h => {
+      const crash = Number(h.crashAt) || 0;
+
+      const span = document.createElement("span");
+      span.classList.add("badge");
+
+      // Coloring rules
+      if (crash >= 10) span.classList.add("high");
+      else if (crash >= 2) span.classList.add("med");
+      else span.classList.add("low");
+
+      span.textContent = crash.toFixed(2) + "x";
+      historyRibbon.appendChild(span);
     });
-}
+  }
 
   // ====================== SOCKET EVENTS ======================
+
+  // Server sends history → SAFE handler
+  socket.on("historyUpdate", (data) => {
+    if (!data || !Array.isArray(data.history)) return;
+    updateHistory(data.history);
+  });
 
   socket.on('betTimer', ({ timeLeft }) => {
 
@@ -169,10 +177,9 @@ function updateHistory(historyArray) {
   });
 
   // 2. Round Start / State Sync
-  socket.on('roundState', ({ state, multiplier, history, flightOngoing }) => {
+  socket.on('roundState', ({ state, multiplier, flightOngoing }) => {
     currentMultiplier = multiplier;
     multiplierDisplay.textContent = multiplier.toFixed(2) + 'x';
-    updateHistory(history || []);
 
     if (state === 'betting') {
       gameState = 'BETTING';
@@ -251,9 +258,8 @@ function updateHistory(historyArray) {
     hasActiveBet = false;
     hasCashedOut = false;
     updateActionButton('WAITING'); // Briefly waiting before next bet timer
-    updateHistory(history || []);
+    updateHistory(history);   // FIXED
   });
-  
 
   // 5. Bet Confirmation
   socket.on('betPlaced', ({ userId: bidderId, amount }) => {
