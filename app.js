@@ -133,11 +133,14 @@ io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);
 });
 
-// Socket.IO connection
 io.on('connection', (socket) => {
-  const userId = socket.handshake.query.userId || (socket.request.session.passport && socket.request.session.passport.user);
-  if (userId) socket.join(userId);
-  console.log('🟢 User connected:', userId);
+    socket.on('placeBet', (data, ack) => {
+        aviatorController.socketPlaceBet(socket, data, ack);
+    });
+
+    socket.on('cashOut', (data, ack) => {
+        aviatorController.socketCashOut(socket, data, ack);
+    });
 });
 
 // Start Aviator loop

@@ -1,291 +1,240 @@
-/* =======================================================
-   CASHMASH - AVIATOR
-   ======================================================= */
-
-/* ===================== BASE ===================== */
-html,
-body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at center, #000000 35%, #000000 100%);
-  font-family: 'Poppins', sans-serif;
-  color: #fff;
-  overflow-x: hidden;
+/* ===================== BASE & VARS ===================== */
+:root {
+    --gold: #f5c542;
+    --gold-glow: rgba(245, 197, 66, 0.4);
+    --cashout-orange: #ff9f43;
+    --crash-red: #ff4757;
+    --fly-blue: #3498db;
+    --dark-bg: #0a0f1f;
+    --panel-bg: rgba(20, 27, 47, 0.95);
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
 }
 
-.balance-container {
-  font-size: 1.1em;
-  font-weight: 600;
-  color: #f5c542;
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 30px;
-  box-shadow: inset 0 0 10px rgba(245, 197, 66, 0.3);
-  min-width: 130px;
-  text-align: center;
-}
-
-/* ===================== AVIATOR SECTION ===================== */
-.aviator-section {
-    text-align: center;
-    padding: 40px 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+html, body {
+    background: radial-gradient(circle at center, #000000 35%, #1a1a1a 100%);
+    font-family: 'Poppins', sans-serif;
     color: #fff;
+    overflow-x: hidden;
 }
 
-.neon-title {
-    font-size: 2.6em;
-    font-weight: 700;
-    color: #f5c542;
-    text-shadow: 0 0 10px #f5c542, 0 0 20px #ffd966;
-    margin-bottom: 18px;
-    animation: pulseGlow 3s infinite;
+.aviator-section {
+    min-height: 85vh;
+    display: flex; justify-content: center; padding: 20px 10px;
 }
 
-@keyframes pulseGlow {
-    0%, 100% { opacity: 1; text-shadow: 0 0 20px #f5c542, 0 0 40px #ffd966; }
-    50% { opacity: 0.85; text-shadow: 0 0 6px #f5c542; }
+.game-container {
+    width: 100%; max-width: 500px;
+    display: flex; flex-direction: column; gap: 15px; position: relative;
 }
 
-/* ===================== GAME TABLE ===================== */
-.aviator-table {
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 14px;
-    max-width: 700px;
-    width: 100%;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
-    padding: 20px;
+/* ===================== HEADER ===================== */
+.game-header {
+    display: flex; justify-content: space-between; align-items: center; padding: 0 10px;
+}
+.neon-title { margin: 0; font-size: 1.6em; color: var(--gold); text-shadow: 0 0 15px var(--gold-glow); }
+
+.balance-pill {
+    background: var(--glass); border: 1px solid var(--glass-border);
+    padding: 8px 16px; border-radius: 20px; font-weight: 600;
+    color: var(--gold); display: flex; align-items: center; gap: 8px;
 }
 
-/* ===================== FLIGHT AREA ===================== */
+/* ===================== STAGE WRAPPER ===================== */
+.stage-wrapper {
+    background: var(--panel-bg);
+    border-radius: 20px;
+    border: 2px solid #2a3b4c;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+}
+
+/* ===================== FLIGHT AREA (THE GRAPH) ===================== */
 .flight-area {
     position: relative;
-    width: 100%;
-    height: 400px;
-    background-color: #111;
-    border-radius: 12px;
+    width: 100%; height: 320px;
+    background: #111;
     overflow: hidden;
-    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-.flight-info {
-    position: absolute;
-    top: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    z-index: 30;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    pointer-events: none;
+/* Background Grid */
+.grid-lines {
+    position: absolute; inset: 0;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
 }
 
-.multiplier-display {
-    font-size: 3.2em;
-    font-weight: 900;
-    color: #f5c542;
-    margin-bottom: 2px;
-    text-shadow: 0 0 18px #f5c542, 0 0 32px #ffd966;
-    transition: color 0.2s linear;
-    letter-spacing: 1px;
-}
-
-.small-result {
-    font-size: 1em;
-    color: #fff;
-    opacity: 0.85;
-    margin-top: 2px;
-    min-height: 18px;
-    text-shadow: 0 0 4px #000b38;
-}
-
-/* ===================== SUNBURST ===================== */
-.sunburst-container {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 2;
-}
-
+/* Sunburst FX */
+.sunburst-container { position: absolute; inset: -50%; opacity: 0.3; animation: rotateSun 60s linear infinite; }
 .sunburst {
-    position: absolute;
-    top: -100%;
-    left: 0%;
-    transform: translateX(-50%) rotate(0deg);
-    width: 400%;
-    height: 400%;
+    width: 100%; height: 100%;
+    background: repeating-conic-gradient(#000 0deg 10deg, #222 10deg 20deg);
     border-radius: 50%;
-    background: repeating-conic-gradient(from 0deg,
-        #000 0deg 2deg,
-        transparent 2deg 6deg
-    );
-    transform-origin: center center;
-    background-color: #0c0c0c;
 }
+@keyframes rotateSun { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-@keyframes rotateSunburst {
-    from { transform: translateX(-50%) rotate(0deg); }
-    to { transform: translateX(-50%) rotate(360deg); }
-}
-
-.flight-area.flight-active .sunburst {
-    animation: rotateSunburst 50s linear infinite;
-}
-
-/* ===================== GRAPH ===================== */
-.graph-svg {
-    position: absolute;
-    top: 0;
-    left: 0;
+/* Central Display (Multiplier) */
+.center-display {
+    position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
+    z-index: 20; text-align: center; pointer-events: none;
     width: 100%;
-    height: 100%;
-    z-index: 12;
+}
+.multiplier-huge {
+    font-size: 4em; font-weight: 900; color: #fff;
+    text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+.status-text {
+    font-size: 0.9em; color: var(--gold); font-weight: 600;
+    margin-top: 5px; letter-spacing: 1px; text-shadow: 0 0 10px #000;
 }
 
-.flight-path {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background-color: #484848;
-    z-index: 1;
-}
+/* Dynamic Colors based on state */
+.flight-area.flying .multiplier-huge { color: #fff; text-shadow: 0 0 20px var(--fly-blue); }
+.flight-area.crashed .multiplier-huge { color: var(--crash-red); text-shadow: 0 0 20px var(--crash-red); }
+.flight-area.crashed .status-text { color: var(--crash-red); }
 
-#flight-path {
-    fill: none;
-    stroke: #3c3c3c;
-    stroke-width: 4;
-    transition: stroke-dasharray 0.05s linear;
-}
+/* Plane & Graph */
+.graph-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 10; }
+.flight-line { fill: none; stroke: var(--crash-red); stroke-width: 3; filter: drop-shadow(0 0 5px var(--crash-red)); }
 
-/* ===================== PLANE ===================== */
 .plane {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 80px;
-    height: 40px;
-    background: url('../images/Aviator/plane.png') no-repeat center center;
-    background-size: contain;
-    transform-origin: center;
-    transition: transform 0.1s linear;
-    z-index: 20;
-    pointer-events: none;
+    position: absolute; width: 60px; height: 30px;
+    z-index: 15; pointer-events: none;
+    transform: translate(0, 0); /* Updated by JS */
+}
+.plane-img {
+    width: 100%; height: 100%;
+    background: url('../images/Aviator/plane.png') no-repeat center/contain;
+    filter: drop-shadow(0 0 10px var(--crash-red));
+}
+.flight-area.flying .plane-img { filter: drop-shadow(0 0 10px var(--fly-blue)); }
+
+/* Progress Bar (Loading) */
+.progress-bar-container {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: #000;
+    z-index: 30; display: none;
+}
+.progress-bar-container.active { display: block; }
+.progress-bar {
+    height: 100%; background: var(--gold); width: 100%;
+    box-shadow: 0 0 10px var(--gold);
+    animation: loadProgress 5s linear forwards; /* Adjust duration in JS if needed */
+}
+@keyframes loadProgress { from { width: 100%; } to { width: 0%; } }
+
+/* ===================== HUD (HISTORY) ===================== */
+.hud-bar {
+    background: rgba(0,0,0,0.6);
+    padding: 8px 15px;
+    display: flex; align-items: center; gap: 10px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+.history-label { font-size: 0.7em; color: #888; font-weight: bold; letter-spacing: 1px; }
+.history-ribbon {
+    display: flex; gap: 6px; overflow: hidden; flex: 1;
+    mask-image: linear-gradient(to right, black 80%, transparent 100%);
+}
+.badge {
+    font-size: 0.8em; font-weight: bold; padding: 2px 8px; border-radius: 4px;
+    background: rgba(255,255,255,0.1); color: #aaa; min-width: 45px; text-align: center;
+}
+.badge.high { color: #000; background: var(--gold); box-shadow: 0 0 5px var(--gold-glow); }
+.badge.med { color: #fff; background: var(--fly-blue); }
+.badge.low { color: #fff; background: #555; }
+
+/* ===================== CONTROL DOCK ===================== */
+.control-dock { display: flex; flex-direction: column; gap: 12px; }
+.settings-group { display: flex; gap: 12px; }
+
+.setting-trigger {
+    flex: 1; background: var(--glass); border: 1px solid var(--glass-border);
+    border-radius: 12px; padding: 12px; cursor: pointer; color: #fff;
+    display: flex; flex-direction: column; align-items: center;
+    transition: 0.2s;
+}
+.setting-trigger:hover { background: rgba(255,255,255,0.1); border-color: var(--gold); }
+.trigger-label { font-size: 0.75em; color: #888; margin-bottom: 4px; }
+.trigger-value { font-size: 1.1em; font-weight: bold; color: var(--gold); }
+
+/* Main Action Button States */
+.btn-action {
+    width: 100%; padding: 16px; border-radius: 15px; border: none; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: all 0.2s;
+}
+.btn-content { display: flex; flex-direction: column; align-items: center; }
+.btn-text { font-size: 1.4em; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+.btn-subtext { font-size: 0.85em; font-weight: 500; opacity: 0.9; }
+
+/* State: BET (Green/Gold) */
+.btn-action.bet {
+    background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff;
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.4);
+}
+/* State: CANCEL (Red - Waiting for next round) */
+.btn-action.cancel {
+    background: linear-gradient(135deg, #ff4757, #c0392b); color: #fff;
+}
+/* State: CASHOUT (Orange - Active flight) */
+.btn-action.cashout {
+    background: linear-gradient(135deg, #ff9f43, #e67e22); color: #fff;
+    transform: scale(1.02);
+    box-shadow: 0 0 25px rgba(255, 159, 67, 0.6);
+    animation: pulseBtn 1s infinite;
+}
+/* State: WAITING (Grey - Bet placed, waiting for start) */
+.btn-action.waiting {
+    background: #444; color: #aaa; cursor: not-allowed;
 }
 
-.trail {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    animation: fadeTrail 0.7s linear forwards;
+@keyframes pulseBtn { 0% { transform: scale(1.02); } 50% { transform: scale(1.04); } 100% { transform: scale(1.02); } }
+
+/* ===================== MODALS ===================== */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+    z-index: 1000; display: none; align-items: center; justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal-content {
+    background: #141b2f; border: 1px solid var(--gold);
+    width: 90%; max-width: 350px; border-radius: 20px; padding: 20px;
+}
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.close-modal { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
+.modal-desc { color: #aaa; font-size: 0.9em; margin-bottom: 15px; text-align: center; }
+
+.input-wrapper {
+    background: rgba(255,255,255,0.1); border-radius: 10px; padding: 10px;
+    display: flex; align-items: center; margin-bottom: 15px;
+}
+.currency-symbol { color: var(--gold); font-weight: bold; margin-right: 10px; }
+input[type="number"] { background: none; border: none; color: #fff; width: 100%; font-size: 1.2em; outline: none; }
+
+.chip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+.chip-grid.three-col { grid-template-columns: repeat(3, 1fr); }
+
+.chip-btn, .auto-btn {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: #fff; padding: 8px; border-radius: 8px; cursor: pointer;
+}
+.chip-btn.action, .auto-btn.action { border-color: var(--gold); color: var(--gold); }
+.btn-confirm {
+    width: 100%; padding: 12px; background: var(--gold);
+    border: none; border-radius: 10px; font-weight: bold; cursor: pointer;
 }
 
-@keyframes fadeTrail {
-    from { opacity: 0.5; }
-    to { opacity: 0; transform: scale(0.5); }
+/* Popup */
+.popup-message {
+    position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.9); border: 1px solid var(--gold); color: var(--gold);
+    padding: 15px 30px; border-radius: 30px; font-weight: bold;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 2000;
 }
-
-/* ===================== CONTROLS (BALANCE + BET + BUTTONS) ===================== */
-.controls {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.control-line {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-}
-
-#betAmount {
-    height: 45px;
-    width: 130px;
-    text-align: center;
-    font-size: 1.1em;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#betAmount {
-    background: rgba(255,255,255,0.08);
-    border: none;
-    color: #fff;
-    outline: none;
-}
-
-.btn.gold {
-    height: 45px;
-    min-width: 60px;
-    text-align: center;
-    font-size: 1.1em;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #000;
-}
-
-.btn.gold {
-    background: linear-gradient(135deg, #f5c542, #dca000);
-    border: none;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 6px 18px rgba(245,197,66,0.3);
-    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
-}
-
-.btn.gold:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(245,197,66,0.5);
-}
-
-.btn.gold:disabled {
-    filter: grayscale(0.7) brightness(0.6);
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
-.btn.cashout {
-  background: linear-gradient(135deg, #ff5555, #d40000);
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(255, 85, 85, 0.4);
-}
-
-
-/* ===================== MOBILE RESPONSIVE ===================== */
-@media (max-width: 700px) {
-    .aviator-section { padding: 20px 10px; }
-
-    .neon-title { font-size: 2em; }
-
-    .flight-area { height: 300px; }
-
-    .multiplier-display { font-size: 2.2em; }
-
-    .control-line {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    #balance, #betAmount, .btn.gold {
-        height: 40px;
-        min-width: 80px;
-        font-size: 0.95em;
-    }
-}
+.popup-message.show { opacity: 1; }

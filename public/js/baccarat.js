@@ -1,179 +1,273 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // ====================== UTILITY FUNCTION (K/M FORMAT) ======================
-  const formatChips = (amount) => {
-    if (Math.abs(amount) < 1000) return parseFloat(amount).toFixed(2);
-    return new Intl.NumberFormat('en-US', {
-      notation: 'compact',
-      compactDisplay: 'short',
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-    }).format(amount);
-  };
-  // ===========================================================================
+    
+    // ================= DOM ELEMENTS =================
+    // Game Areas
+    const playerHand = document.getElementById('playerHand');
+    const bankerHand = document.getElementById('bankerHand');
+    const playerScoreEl = document.getElementById('playerScoreDisplay');
+    const bankerScoreEl = document.getElementById('bankerScoreDisplay');
+    const balanceEl = document.getElementById('balance');
+    const popupMessage = document.getElementById('popupMessage');
+    
+    // Message Element (Restored)
+    const resultText = document.getElementById('resultText');
 
-  // --- DOM Elements ---
-  const dealBtn = document.getElementById("dealBtn");
-  const resultText = document.getElementById("resultText");
-  const playerHandDiv = document.getElementById("playerHand");
-  const bankerHandDiv = document.getElementById("bankerHand");
-  const playerScoreDiv = document.getElementById("playerScore");
-  const bankerScoreDiv = document.getElementById("bankerScore");
-  const balanceSpan = document.getElementById("balance");
-  const betPlayerInput = document.getElementById("betPlayer");
-  const betBankerInput = document.getElementById("betBanker");
-  const betTieInput = document.getElementById("betTie");
+    // Controls
+    const btnDeal = document.getElementById('btnDeal');
+    const totalBetDisplay = document.getElementById('totalBetDisplay');
+    const openBetModalBtn = document.getElementById('openBetModalBtn');
+    
+    // Trigger Display Tags
+    const displayBetP = document.getElementById('displayBetP');
+    const displayBetB = document.getElementById('displayBetB');
+    const displayBetT = document.getElementById('displayBetT');
 
-  // --- Bet limits ---
-  const MIN_BET = 0.1;
-  const MAX_BET = 100;
+    // Modal
+    const betModal = document.getElementById('betModal');
+    const inputPlayer = document.getElementById('inputPlayer');
+    const inputBanker = document.getElementById('inputBanker');
+    const inputTie = document.getElementById('inputTie');
+    const modalTotal = document.getElementById('modalTotal');
+    const confirmBetBtn = document.getElementById('confirmBet');
+    const clearBetsBtn = document.getElementById('clearBets');
+    const chipBtns = document.querySelectorAll('.chip-btn');
+    const closeModalBtns = document.querySelectorAll('.close-modal');
 
-  function addBlurCorrection(input) {
-    input.addEventListener("blur", () => {
-      let val = parseFloat(input.value);
-      if (isNaN(val) || val < MIN_BET) val = MIN_BET;
-      if (val > MAX_BET) val = MAX_BET;
-      input.value = val.toFixed(2);
-    });
-  }
+    // ================= STATE =================
+    let balance = parseFloat(balanceEl.dataset.rawBalance) || 0;
+    let bets = { player: 0, banker: 0, tie: 0 };
+    let totalBet = 0;
+    let lastActiveInput = inputPlayer; // Default target for chips
 
-  [betPlayerInput, betBankerInput, betTieInput].forEach(addBlurCorrection);
+    // ================= UTILS =================
+    const formatChips = (amount) => {
+        if (Math.abs(amount) < 1000) return parseFloat(amount).toFixed(2);
+        return new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(amount);
+    };
 
-  // --- Initialize balance ---
-  let balance = parseFloat(balanceSpan.dataset.rawBalance) || parseFloat(balanceSpan.textContent) || 0;
-  balanceSpan.textContent = formatChips(balance);
+    const showPopup = (msg) => {
+        popupMessage.textContent = msg;
+        popupMessage.classList.add('show');
+        setTimeout(() => popupMessage.classList.remove('show'), 2000);
+    };
 
-  // --- Card Helper Functions ---
-  function createCardFace(card, isBack = false, color = "black") {
-    const img = document.createElement("img");
-    img.classList.add("card", isBack ? "card-back" : "card-front");
-    img.style.backfaceVisibility = "hidden";
-    if (isBack) {
-      img.src = `/images/playing-cards/player_card_back_design_1_${color}.svg`;
-      img.style.transform = "rotateY(0deg)";
-    } else {
-      img.src = `/images/playing-cards/${card.file}`;
-      img.alt = `${card.rank} of ${card.suit}`;
-      img.style.position = "absolute";
-      img.style.top = "0";
-      img.style.left = "0";
-      img.style.transform = "rotateY(180deg)";
-    }
-    return img;
-  }
+    const getCardFilename = (card) => {
+        const v = { J: 'jack', Q: 'queen', K: 'king', A: 'ace' }[card.rank] || card.rank;
+        const s = card.suit ? card.suit.toLowerCase() : 'spades';
+        return `${v}_of_${s}.svg`;
+    };
 
-  function placeInitialCard(targetContainer, color) {
-    const slot = document.createElement("div");
-    slot.classList.add("card-slot");
-    slot.style.transformStyle = "preserve-3d";
-    slot.style.position = "relative";
-    slot.appendChild(createCardFace(null, true, color));
-    targetContainer.appendChild(slot);
-    return slot;
-  }
-
-  async function flipCardAnimation(cardSlot, cardData, delay) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (!cardData) return resolve();
-        const back = cardSlot.querySelector(".card-back");
-        const front = createCardFace(cardData, false);
-        cardSlot.appendChild(front);
-        cardSlot.style.transition = "transform 0.6s ease";
-        cardSlot.style.transform = "rotateY(180deg)";
-        setTimeout(() => { if (back) back.remove(); resolve(); }, 400);
-      }, delay);
-    });
-  }
-
-  function setupInitialHands() {
-    playerHandDiv.innerHTML = "";
-    bankerHandDiv.innerHTML = "";
-    playerScoreDiv.textContent = "0";
-    bankerScoreDiv.textContent = "0";
-    for (let i = 0; i < 3; i++) {
-      const pSlot = placeInitialCard(playerHandDiv, "red");
-      const bSlot = placeInitialCard(bankerHandDiv, "black");
-      if (i === 2) { pSlot.style.display = "none"; bSlot.style.display = "none"; }
-    }
-  }
-
-  setupInitialHands();
-
-  // --- Deal Button Logic ---
-  dealBtn.addEventListener("click", async () => {
-    let betPlayer = parseFloat(betPlayerInput.value) || 0;
-    let betBanker = parseFloat(betBankerInput.value) || 0;
-    let betTie = parseFloat(betTieInput.value) || 0;
-
-    // Auto-correct if user entered out-of-range values before dealing
-    [betPlayerInput, betBankerInput, betTieInput].forEach(input => {
-      let val = parseFloat(input.value);
-      if (isNaN(val) || val < MIN_BET) val = MIN_BET;
-      if (val > MAX_BET) val = MAX_BET;
-      input.value = val.toFixed(2);
+    // ================= MESSAGE DISPLAY LOGIC (Restored) =================
+    
+    // Helper to set message and optional winner class for color
+    const setMessage = (message, winner = 'none') => {
+        resultText.textContent = message;
+        resultText.classList.remove('win-player', 'win-banker', 'tie-game');
+        if (winner === 'player') {
+            resultText.classList.add('win-player');
+        } else if (winner === 'banker') {
+            resultText.classList.add('win-banker');
+        } else if (winner === 'tie') {
+            resultText.classList.add('tie-game');
+        } else {
+            // Default color (gold)
+        }
+    };
+    
+    // ================= BETTING MODAL LOGIC =================
+    
+    // Track which input was last focused to apply chips there
+    [inputPlayer, inputBanker, inputTie].forEach(input => {
+        input.addEventListener('focus', () => lastActiveInput = input);
+        input.addEventListener('input', calculateModalTotal);
     });
 
-    betPlayer = parseFloat(betPlayerInput.value);
-    betBanker = parseFloat(betBankerInput.value);
-    betTie = parseFloat(betTieInput.value);
+    openBetModalBtn.addEventListener('click', () => {
+        // Sync modal with current bets
+        inputPlayer.value = bets.player;
+        inputBanker.value = bets.banker;
+        inputTie.value = bets.tie;
+        calculateModalTotal();
+        betModal.classList.add('active');
+    });
 
-    const totalBet = betPlayer + betBanker + betTie;
+    closeModalBtns.forEach(btn => btn.addEventListener('click', () => betModal.classList.remove('active')));
 
-    if (totalBet <= 0) { alert("Place at least one bet."); return; }
-    if (totalBet > balance) { alert(`Not enough balance! You have $${balance.toFixed(2)}`); return; }
+    chipBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if(btn.id === 'clearBets') {
+                inputPlayer.value = 0; inputBanker.value = 0; inputTie.value = 0;
+            } else {
+                const add = parseFloat(btn.dataset.add);
+                let cur = parseFloat(lastActiveInput.value) || 0;
+                lastActiveInput.value = cur + add;
+            }
+            calculateModalTotal();
+        });
+    });
 
-    resultText.textContent = "Dealing cards...";
-    setupInitialHands();
-    dealBtn.disabled = true;
-
-    const playerSlots = Array.from(playerHandDiv.querySelectorAll(".card-slot"));
-    const bankerSlots = Array.from(bankerHandDiv.querySelectorAll(".card-slot"));
-
-    try {
-      balance -= totalBet;
-      balanceSpan.textContent = formatChips(balance);
-
-      const response = await fetch("/baccarat/play", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ betPlayer, betBanker, betTie }),
-      });
-      const data = await response.json();
-      if (!data.success) {
-        balance += totalBet; balanceSpan.textContent = formatChips(balance);
-        throw new Error(data.message || "Server error");
-      }
-
-      let delay = 200;
-      for (let i = 0; i < 2; i++) {
-        await flipCardAnimation(playerSlots[i], data.player.cards[i], delay);
-        await flipCardAnimation(bankerSlots[i], data.banker.cards[i], delay);
-        delay += 300;
-      }
-
-      if (data.player.cards.length === 3) { playerSlots[2].style.display = "block"; await flipCardAnimation(playerSlots[2], data.player.cards[2], delay); delay += 300; }
-      else playerSlots[2].style.display = "none";
-
-      if (data.banker.cards.length === 3) { bankerSlots[2].style.display = "block"; await flipCardAnimation(bankerSlots[2], data.banker.cards[2], delay); delay += 300; }
-      else bankerSlots[2].style.display = "none";
-
-      setTimeout(() => {
-        playerScoreDiv.textContent = data.player.points;
-        bankerScoreDiv.textContent = data.banker.points;
-        let winnerText = "";
-        if (data.result === "player") winnerText = "Player Wins! (1:1)";
-        else if (data.result === "banker") winnerText = "Banker Wins! (0.95:1)";
-        else winnerText = "Tie! (8:1)";
-        resultText.textContent = `${winnerText} | Profit: ${formatChips(data.profit)}`;
-        balance = data.balance;
-        balanceSpan.textContent = formatChips(balance);
-        dealBtn.disabled = false;
-      }, delay + 150);
-
-    } catch (err) {
-      console.error(err);
-      resultText.textContent = "Error: " + (err.message || "Server error");
-      dealBtn.disabled = false;
+    function calculateModalTotal() {
+        const p = parseFloat(inputPlayer.value) || 0;
+        const b = parseFloat(inputBanker.value) || 0;
+        const t = parseFloat(inputTie.value) || 0;
+        const sum = p + b + t;
+        
+        modalTotal.textContent = `$${formatChips(sum)}`;
+        if (sum > balance) modalTotal.style.color = '#ff4b4b'; // Danger red
+        else modalTotal.style.color = '#fff';
     }
-  });
+
+    confirmBetBtn.addEventListener('click', () => {
+        const p = parseFloat(inputPlayer.value) || 0;
+        const b = parseFloat(inputBanker.value) || 0;
+        const t = parseFloat(inputTie.value) || 0;
+        const sum = p + b + t;
+
+        if (sum > balance) return showPopup("Insufficient Balance");
+
+        bets = { player: p, banker: b, tie: t };
+        totalBet = sum;
+
+        // Update Dock Display
+        displayBetP.textContent = `P: $${formatChips(p)}`;
+        displayBetB.textContent = `B: $${formatChips(b)}`;
+        displayBetT.textContent = `T: $${formatChips(t)}`;
+        totalBetDisplay.textContent = `Total Bet: $${formatChips(sum)}`;
+        
+        // Dim zero bets
+        displayBetP.style.opacity = p > 0 ? 1 : 0.3;
+        displayBetB.style.opacity = b > 0 ? 1 : 0.3;
+        displayBetT.style.opacity = t > 0 ? 1 : 0.3;
+
+        betModal.classList.remove('active');
+        if(sum > 0) setMessage(`Ready to Deal. Total Bet: $${formatChips(sum)}`);
+    });
+
+
+    // ================= GAME LOGIC =================
+
+    function renderCard(card, container, delay) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                const div = document.createElement('div');
+                div.classList.add('card');
+                
+                const inner = document.createElement('div');
+                inner.classList.add('card-inner');
+                div.appendChild(inner);
+
+                const back = document.createElement('div');
+                back.classList.add('card-back');
+                inner.appendChild(back);
+
+                const front = document.createElement('div');
+                front.classList.add('card-front');
+                if(card) {
+                    const fname = getCardFilename(card);
+                    front.innerHTML = `<img src="/images/playing-cards/${fname}" alt="${card.rank}">`;
+                }
+                inner.appendChild(front);
+
+                container.appendChild(div);
+
+                // Trigger Flip
+                requestAnimationFrame(() => div.classList.add('flipped'));
+                
+                resolve();
+            }, delay);
+        });
+    }
+
+    btnDeal.addEventListener('click', async () => {
+        if (totalBet <= 0) return showPopup("Place a bet first!");
+        if (totalBet > balance) return showPopup("Insufficient Balance");
+
+        // UI Reset
+        playerHand.innerHTML = '';
+        bankerHand.innerHTML = '';
+        playerScoreEl.textContent = '0';
+        bankerScoreEl.textContent = '0';
+        btnDeal.disabled = true;
+        setMessage('Dealing cards...');
+
+        try {
+            // Optimistic Balance Update
+            balance -= totalBet;
+            balanceEl.textContent = formatChips(balance);
+
+            const res = await fetch("/baccarat/play", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    betPlayer: bets.player, 
+                    betBanker: bets.banker, 
+                    betTie: bets.tie 
+                }),
+            });
+            const data = await res.json();
+            
+            if (!data.success) throw new Error(data.message);
+
+            // Animation Sequence
+            let delay = 0;
+            const step = 200;
+
+            await renderCard(data.player.cards[0], playerHand, delay += step);
+            await renderCard(data.banker.cards[0], bankerHand, delay += step);
+            await renderCard(data.player.cards[1], playerHand, delay += step);
+            await renderCard(data.banker.cards[1], bankerHand, delay += step);
+
+            // 3rd Card Rules
+            if (data.player.cards[2]) {
+                await renderCard(data.player.cards[2], playerHand, delay += step);
+            }
+            if (data.banker.cards[2]) {
+                await renderCard(data.banker.cards[2], bankerHand, delay += step);
+            }
+
+            setTimeout(() => {
+                // Show Scores
+                playerScoreEl.textContent = data.player.points;
+                bankerScoreEl.textContent = data.banker.points;
+                
+                // Finalize
+                balance = data.balance;
+                balanceEl.textContent = formatChips(balance);
+                
+                let winAmt = data.profit;
+                let finalMessage = "";
+                let winnerClass = "none";
+
+                if (data.result === 'player') {
+                    winnerClass = 'player';
+                    finalMessage = `PLAYER WINS! | Profit: $${formatChips(winAmt)}`;
+                } else if (data.result === 'banker') {
+                    winnerClass = 'banker';
+                    finalMessage = `BANKER WINS! | Profit: $${formatChips(winAmt)}`;
+                } else {
+                    winnerClass = 'tie';
+                    finalMessage = `TIE GAME! | Profit: $${formatChips(winAmt)}`;
+                }
+                
+                if (winAmt <= 0 && data.result !== 'tie') { // If no profit, show loss/return message
+                    finalMessage = `${finalMessage.split(' | ')[0]} | Lost: $${formatChips(totalBet)}`;
+                }
+
+                setMessage(finalMessage, winnerClass);
+                btnDeal.disabled = false;
+
+            }, delay + 300);
+
+        } catch (err) {
+            console.error(err);
+            showPopup("Error: " + err.message);
+            balance += totalBet; // Refund on crash
+            balanceEl.textContent = formatChips(balance);
+            btnDeal.disabled = false;
+            setMessage('Place your bets and deal.');
+        }
+    });
+
+    // Init
+    balanceEl.textContent = formatChips(balance);
 });

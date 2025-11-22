@@ -1,78 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Classic Mines | CashMash</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/header.css" />
     <link rel="stylesheet" href="/css/footer.css" />
     <link rel="stylesheet" href="/css/mines.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-
 <body>
     <%- include('partials/header') %>
+    <%- include('partials/gameLoader') %>
 
-      <%- include('partials/gameLoader') %>
-
-
-        <section class="mines-section">
-            <div class="mines-game">
+    <section class="mines-section">
+        <div class="game-container">
+            
+            <div class="game-header">
                 <h2 class="neon-title">Mines</h2>
-
-
-                <!-- 🧩 Grid -->
-                <div id="grid" class="grid locked"></div>
-
-                <!-- Status -->
-                <div class="status">
-                    Multiplier: <span id="multiplierDisplay">1.00x</span> |
-                    Profit: <span id="profitDisplay">0</span>
+                <div class="balance-pill">
+                    <i class="fas fa-wallet"></i>
+                    <span id="balance" data-raw-balance="<%= user.balance %>">
+                        <%= formatBalance(user.balance) %>
+                    </span>
                 </div>
-
-                <!-- ✅ Controls at the bottom -->
-                <div class="game-controls">
-                    <div class="controls-line1">
-                        <div class="balance-container">
-                            Balance: $<strong id="balance" data-raw-balance="<%= user.balance %>">
-                            <%= formatBalance(user.balance) %>
-                            </strong>
-                        </div>
-                        <input type="number" id="betInput" min="10" max="1000" value="10" placeholder="Bet" />
-                        <select id="mineRate">
-                            <option value="3">3 Mines</option>
-                            <option value="5">5 Mines</option>
-                            <option value="8">8 Mines</option>
-                            <option value="10">10 Mines</option>
-                            <option value="18">18 Mines</option>
-                            <option value="24">24 Mines</option>
-                        </select>
-                    </div>
-                    <div class="controls-line2">
-                        <button id="newGameBtn" class="btn gold">Start</button>
-                        <button id="cashOutBtn" class="btn gold" disabled>Cash Out</button>
-                    </div>
-                </div>
-
-                <!-- Popup -->
-                <div id="popupMessage" class="popup-message"></div>
-
             </div>
-        </section>
 
-        <%- include('partials/footer') %>
-            <script src="/js/formatBalance.js"></script>
-            <script src="/js/mines.js"></script>
-            <script>
-                const betInput = document.getElementById("betInput");
-                betInput.addEventListener("input", () => {
-                    let val = parseInt(betInput.value);
-                    if (!val) return;
-                    if (val < 10) betInput.value = 10;
-                    if (val > 1000) betInput.value = 1000;
-                });
-            </script>
+            <div class="grid-wrapper">
+                <div id="grid" class="grid locked"></div>
+                
+                <div class="hud-bar">
+                    <div class="hud-item">
+                        <span class="label">Multiplier</span>
+                        <span class="value" id="multiplierDisplay">1.00x</span>
+                    </div>
+                    <div class="hud-divider"></div>
+                    <div class="hud-item">
+                        <span class="label">Profit</span>
+                        <span class="value highlight" id="profitDisplay">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-dock">
+                <div class="settings-group">
+                    <button id="openBetModalBtn" class="setting-trigger">
+                        <span class="trigger-label">Bet Amount</span>
+                        <span class="trigger-value" id="displayBetValue">10</span>
+                    </button>
+                    
+                    <button id="openMinesModalBtn" class="setting-trigger">
+                        <span class="trigger-label">Mines</span>
+                        <span class="trigger-value" id="displayMineCount">3</span>
+                    </button>
+                </div>
+
+                <button id="actionBtn" class="btn-action start">
+                    <span class="btn-text">Start Game</span>
+                    <span class="btn-subtext" id="btnSubtext">Press to Play</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <div id="betModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Set Bet Amount</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-wrapper">
+                    <span class="currency-symbol">$</span>
+                    <input type="number" id="modalBetInput" value="10" min="1" max="1000">
+                </div>
+                <div class="chip-grid">
+                    <button class="chip-btn" data-add="10">+10</button>
+                    <button class="chip-btn" data-add="50">+50</button>
+                    <button class="chip-btn" data-add="100">+100</button>
+                    <button class="chip-btn" data-add="500">+500</button>
+                    <button class="chip-btn action" id="halfBet">1/2</button>
+                    <button class="chip-btn action" id="doubleBet">2x</button>
+                    <button class="chip-btn action" id="maxBet">Max</button>
+                </div>
+                <button class="btn-confirm" id="confirmBet">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="minesModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Number of Mines</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="mines-grid">
+                    <button class="mine-option" data-val="1">1</button>
+                    <button class="mine-option active" data-val="3">3</button>
+                    <button class="mine-option" data-val="5">5</button>
+                    <button class="mine-option" data-val="10">10</button>
+                    <button class="mine-option" data-val="15">15</button>
+                    <button class="mine-option" data-val="20">20</button>
+                    <button class="mine-option" data-val="24">24</button>
+                </div>
+                <button class="btn-confirm" id="confirmMines">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="popupMessage" class="popup-message"></div>
+
+    <%- include('partials/footer') %>
+    <script src="/js/formatBalance.js"></script>
+    <script src="/js/mines.js"></script>
 </body>
-
 </html>

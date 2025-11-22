@@ -1,582 +1,504 @@
-const socket = io();
+document.addEventListener("DOMContentLoaded", () => {
+  const socket = io();
 
-// ====================== UTILITY FUNCTION (K/M FORMAT) ======================
-/**
- * Formats the chip amount for display using K (thousands) or M (millions) notation.
- * If the number is less than 1000, it defaults to two decimal places.
- * @param {number} amount - The raw chip amount.
- * @returns {string} The formatted compact string (e.g., 12345 -> 12.3K).
- */
-const formatChips = (amount) => {
-    // If the number is small, just use standard fixed decimal format
-    if (Math.abs(amount) < 1000) {
-        return parseFloat(amount).toFixed(2);
+  // ====================== UTILITY ======================
+  const formatChips = (amount) => {
+    if (Math.abs(amount) < 1000) return parseFloat(amount).toFixed(2);
+    return new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(amount);
+  };
+
+  // ====================== DOM ELEMENTS ======================
+  // Main UI
+  const balanceEl = document.getElementById('balance');
+  const flightArea = document.getElementById('flightArea');
+  const multiplierDisplay = document.getElementById('multiplierDisplay');
+  const gameStatusText = document.getElementById('gameStatusText');
+  const progressBarContainer = document.getElementById('progressBarContainer');
+  const progressBar = document.getElementById('progressBar');
+  const historyRibbon = document.getElementById('historyRibbon');
+  const popupMessage = document.getElementById('popupMessage');
+
+  // Graph Elements
+  const graphSvgEl = document.getElementById('graph-svg');
+  const planeEl = document.getElementById('plane');
+  const graphPathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+  // Control Dock
+  const actionBtn = document.getElementById('actionBtn');
+  const btnText = document.getElementById('btnText');
+  const btnSubtext = document.getElementById('btnSubtext');
+  const openBetModalBtn = document.getElementById('openBetModalBtn');
+  const openAutoModalBtn = document.getElementById('openAutoModalBtn');
+  const displayBetValue = document.getElementById('displayBetValue');
+  const displayAutoValue = document.getElementById('displayAutoValue');
+
+  // Modals
+  const betModal = document.getElementById('betModal');
+  const autoModal = document.getElementById('autoModal');
+  const modalBetInput = document.getElementById('modalBetInput');
+  const modalAutoInput = document.getElementById('modalAutoInput');
+  const confirmBetBtn = document.getElementById('confirmBet');
+  const confirmAutoBtn = document.getElementById('confirmAuto');
+  const disableAutoBtn = document.getElementById('disableAuto');
+  const chipBtns = document.querySelectorAll('.chip-btn');
+  const autoBtns = document.querySelectorAll('.auto-btn');
+  const closeModalBtns = document.querySelectorAll('.close-modal');
+
+  // ====================== STATE ======================
+  let userBalance = parseFloat(balanceEl.dataset.rawBalance) || 0;
+  let userId = null;
+  if (window.user && window.user._id) userId = String(window.user._id);
+
+  // Game State
+  let currentMultiplier = 1.0;
+  let gameState = 'WAITING'; // WAITING, BETTING, FLYING, CRASHED
+  let flightAnimInterval = null;
+  let points = [];
+
+  // User State
+  let currentBetAmount = 5;
+  let nextRoundBet = false; // If user clicks bet during flight
+  let hasActiveBet = false; // Bet accepted by server for CURRENT round
+  let hasCashedOut = false;
+
+  // Auto Cashout
+  let autoCashoutEnabled = false;
+  let autoCashoutValue = 2.00;
+
+  // Initialize Balance
+  balanceEl.textContent = formatChips(userBalance);
+
+  // Setup SVG
+  if (graphSvgEl) {
+    graphPathEl.setAttribute('class', 'flight-line');
+    graphSvgEl.appendChild(graphPathEl);
+  }
+
+  // ====================== UI HELPERS ======================
+
+  const showPopup = (msg) => {
+    popupMessage.textContent = msg;
+    popupMessage.classList.add('show');
+    setTimeout(() => popupMessage.classList.remove('show'), 2500);
+  };
+
+  const updateActionButton = (state, subtextOverride = null) => {
+    // Reset classes
+    actionBtn.className = 'btn-action';
+    actionBtn.disabled = false;
+
+    if (state === 'BET') {
+      actionBtn.classList.add('bet');
+      btnText.textContent = "PLACE BET";
+      btnSubtext.textContent = subtextOverride || "Next Round";
     }
-    
-    // Use Intl.NumberFormat for compact notation (K, M, etc.)
-    const formatter = new Intl.NumberFormat('en-US', {
-        notation: 'compact',
-        compactDisplay: 'short', 
-        minimumFractionDigits: 1, 
-        maximumFractionDigits: 1,
+    else if (state === 'CASHOUT') {
+      actionBtn.classList.add('cashout');
+      btnText.textContent = "CASH OUT";
+      // Calculate potential win
+      const win = currentBetAmount * currentMultiplier;
+      btnSubtext.textContent = subtextOverride || `Win: $${formatChips(win)}`;
+      actionBtn.disabled = false;
+    }
+    else if (state === 'WAITING') {
+      actionBtn.classList.add('waiting');
+      btnText.textContent = "WAITING";
+      btnSubtext.textContent = "Round in progress";
+      actionBtn.disabled = true;
+    }
+    else if (state === 'BET_PLACED') {
+      actionBtn.classList.add('cancel'); // Red button to denote waiting
+      btnText.textContent = "BET PLACED";
+      btnSubtext.textContent = "Waiting for flight...";
+      actionBtn.disabled = true; // Or allow cancel if API supports it
+    }
+  };
+
+  // Function to update history ribbon
+function updateHistory(historyArray) {
+    if (!historyRibbon) return;
+    historyRibbon.innerHTML = '';
+    const recent = (historyArray || []).slice(-10).reverse();
+    if (recent.length === 0) {
+        const ph = document.createElement('span');
+        ph.className = 'badge placeholder';
+        ph.textContent = '--';
+        historyRibbon.appendChild(ph);
+        return;
+    }
+    recent.forEach(mult => {
+        const span = document.createElement('span');
+        span.classList.add('badge');
+        if (mult >= 10) span.classList.add('high');
+        else if (mult >= 2) span.classList.add('med');
+        else span.classList.add('low');
+        span.textContent = Number(mult).toFixed(2) + 'x';
+        historyRibbon.appendChild(span);
     });
-
-    return formatter.format(amount);
-};
-// ===========================================================================
-
-
-const multiplierEl = document.getElementById('multiplier');
-const resultText = document.getElementById('resultText');
-const placeBetBtn = document.getElementById('placeBetBtn');
-const cashOutBtn = document.getElementById('cashOutBtn');
-const betAmountInput = document.getElementById('betAmount');
-const planeEl = document.getElementById('plane');
-const flightArea = document.querySelector('.flight-area');
-const timeBarEl = document.getElementById('timeBar');
-const graphSvgEl = document.getElementById('graph-svg'); // The SVG container
-const graphPathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path'); // The path element
-const balanceEl = document.getElementById('balance');
-
-// FIX: Initial balance formatting
-if (balanceEl) {
-    let initialBalance = parseFloat(balanceEl.textContent) || 0;
-    // Check for a data attribute containing the raw balance first
-    if (balanceEl.dataset.rawBalance) {
-        initialBalance = parseFloat(balanceEl.dataset.rawBalance);
-    }
-    balanceEl.textContent = formatChips(initialBalance);
 }
 
-// A DOM container for small fading trail dots
-const trailContainer = document.createElement('div');
+  // ====================== SOCKET EVENTS ======================
 
-// Assume 'window.user' exists and has a unique ID
-const userId = window.user?._id;
+  socket.on('betTimer', ({ timeLeft }) => {
 
-let hasBet = false;
-let hasCashedOut = false;
-let currentMultiplier = 1.0;
-let isFlying = false;
-let flightAnimInterval = null;
-let showOverlay = false;
-let points = []; // Array to store path coordinates
-let lastPlanePos = { x: 0, y: 0 };
-let trails = []; // DOM elements for trailing dots
+    // Do NOT override if flight already started
+    if (gameState === 'FLYING') return;
 
-// Prevents SVG path from being redrawn after fly-away until next round
-let pathClearedAfterFlyAway = false;
+    gameState = 'BETTING';
 
-// Setup the SVG path element
-if (graphSvgEl) {
-  graphPathEl.setAttribute('id', 'flight-path');
-  graphPathEl.setAttribute('fill', 'none');
-  graphPathEl.setAttribute('stroke', '#00ff66');
-  graphPathEl.setAttribute('stroke-width', '3');
-  graphPathEl.setAttribute('stroke-linecap', 'round');
-  graphPathEl.setAttribute('stroke-linejoin', 'round');
-  graphSvgEl.appendChild(graphPathEl);
+    progressBarContainer.classList.add('active');
+    const percentage = (timeLeft / 5) * 100;
+    progressBar.style.width = `${percentage}%`;
 
-  // Place a trail container inside flightArea to hold fading dots
-  trailContainer.className = 'trail-container';
-  trailContainer.style.position = 'absolute';
-  trailContainer.style.top = 0;
-  trailContainer.style.left = 0;
-  trailContainer.style.width = '100%';
-  trailContainer.style.height = '100%';
-  trailContainer.style.pointerEvents = 'none';
-  trailContainer.style.overflow = 'hidden';
-  if (flightArea) flightArea.appendChild(trailContainer);
-}
+    gameStatusText.textContent = `STARTING IN ${timeLeft.toFixed(1)}s`;
+    gameStatusText.style.color = 'var(--gold)';
 
-// ---------------- SOCKET EVENTS ----------------
-socket.on('connect', () => { });
+    multiplierDisplay.classList.remove('crashed');
+    multiplierDisplay.style.color = '#fff';
 
-// Betting countdown
-socket.on('betTimer', ({ timeLeft }) => {
-  if (timeBarEl) timeBarEl.style.width = (timeLeft / 5) * 100 + '%';
-  // Show cooldown in result/status text
-  if (resultText) {
-    if (timeLeft > 0) {
-      resultText.textContent = `Flight in ${timeLeft}s`;
+    resetGraph();
+
+    // FIXED LOGIC:
+    if (hasActiveBet) {
+      // Bet accepted, waiting for flight to begin
+      updateActionButton('BET_PLACED');
     } else {
-      resultText.textContent = 'Place your bet!';
+      // No bet yet
+      updateActionButton('BET');
     }
-  }
-});
-
-// Round state
-socket.on('roundState', ({ round, state, multiplier, history, flightOngoing }) => {
-  currentMultiplier = multiplier;
-  if (multiplierEl) multiplierEl.textContent = multiplier.toFixed(2) + 'x';
-
-  if (state === 'betting') {
-    // Normal betting phase
-    resultText.textContent = `Place your bet!`;
-    resetPlane();
-    stopFlightAnimation();
-    isFlying = false;
-    showOverlay = false;
-
-    hasBet = false;
-    hasCashedOut = false;
-
-    // Reset button text and enable for current round
-    placeBetBtn.textContent = 'Place Bet';
-    toggleButton(placeBetBtn, true);
-    toggleButton(cashOutBtn, false);
-    betAmountInput.disabled = false;
-    // ensure sunburst overlay is off when not flying
-    if (flightArea) flightArea.classList.remove('flight-active');
-
-  } else if (state === 'flying') {
-    // Flight started
-    isFlying = true;
-
-    toggleButton(placeBetBtn, false);
-    betAmountInput.disabled = false;
-
-    if (flightOngoing) {
-      if (!hasBet) {
-        resultText.textContent = 'Flight in progress, wait for next round';
-        toggleButton(cashOutBtn, false);
-      }
-      // Show the plane flying for everyone, even non-betters
-      showOverlay = false;
-      isFlying = true; // Mark as flying to prevent reset
-      planeEl.style.display = 'block';
-
-      // Calculate current position based on multiplier
-      const progress = Math.min(currentMultiplier / 25, 1);
-      const x = Math.min(0.75 * progress, 0.75); // Keep within bounds
-      const y = Math.min(0.75 * progress, 0.75);
-
-      // Immediately position plane without animation
-      const areaWidth = flightArea.offsetWidth;
-      const areaHeight = flightArea.offsetHeight;
-      const left = x * areaWidth;
-      const bottom = y * areaHeight;
-      const tilt = -15 + 25 * progress;
-      const scale = 1.4 + x * 0.8;
-
-      // Force plane position
-      planeEl.style.transition = 'none';
-      planeEl.style.left = `${left}px`;
-      planeEl.style.bottom = `${bottom}px`;
-      planeEl.style.transform = `scale(${scale}) rotate(${tilt}deg)`;
-
-      // Update path immediately
-      updateSVGPath(progress);
-
-      // Enable betting for next round
-      placeBetBtn.textContent = 'Betting for Next Round...';
-      toggleButton(placeBetBtn, false);
-      toggleButton(cashOutBtn, hasBet && !hasCashedOut);
-      if (flightArea) flightArea.classList.add('flight-active');
-    } else {
-      showOverlay = false;
-      planeEl.style.display = 'block';
-      startFlightAnimation();
-      toggleButton(cashOutBtn, hasBet && !hasCashedOut);
-      if (flightArea) flightArea.classList.add('flight-active');
-      resultText.textContent = `Flight started!`;
-    }
-  }
-
-});
-
-// Multiplier update
-socket.on('multiplierUpdate', ({ multiplier }) => {
-  currentMultiplier = multiplier;
-  if (multiplierEl) {
-    multiplierEl.textContent = multiplier.toFixed(2) + 'x';
-    // Rainbow color effect based on multiplier value
-    const display = document.getElementById('multiplierDisplay');
-    if (display) {
-      let color = '#f5c542';
-      if (multiplier >= 2 && multiplier < 3) color = '#42f554'; // green
-      else if (multiplier >= 3 && multiplier < 5) color = '#42d4f5'; // blue
-      else if (multiplier >= 5 && multiplier < 10) color = '#a142f5'; // purple
-      else if (multiplier >= 10 && multiplier < 20) color = '#f542e9'; // pink
-      else if (multiplier >= 20 && multiplier < 50) color = '#f54242'; // red
-      else if (multiplier >= 50) color = '#f5e142'; // yellow
-      display.style.color = color;
-      display.style.textShadow = `0 0 18px ${color}, 0 0 32px #fff`;
-    }
-  }
-  if (!showOverlay) {
-    const progress = Math.min(currentMultiplier / 25, 1);
-    updatePlanePosition(progress);
-  }
-});
-
-// Round crashed
-socket.on('roundCrashed', ({ crashAt }) => {
-  currentMultiplier = crashAt;
-  isFlying = false;
-  stopFlightAnimation();
-  planeEl.style.display = 'block';
-  showOverlay = false;
-
-  resultText.textContent = `Flew away!`;
-  placeBetBtn.textContent = 'Place Bet';
-  toggleButton(placeBetBtn, true);
-  toggleButton(cashOutBtn, false);
-  betAmountInput.disabled = false;
-
-  flyAwayPlaneAnimation();
-  // Final update to draw the line to the end point
-  updateSVGPath();
-  // stop sunburst overlay when round ends
-  if (flightArea) flightArea.classList.remove('flight-active');
-});
-
-// Small client-side handlers for placing bets and cashing out
-socket.on('betPlaced', ({ userId: bidderId, amount, username }) => {
-  // Show small UI notification in the result area
-  if (bidderId === window.user?._id) {
-    // FIX: Format the displayed bet amount
-    resultText.textContent = `Bet placed $${formatChips(amount)}`;
-    hasBet = true;
-    placeBetBtn.textContent = 'Bet Placed';
-    toggleButton(placeBetBtn, false);
-    toggleButton(cashOutBtn, true);
-    betAmountInput.disabled = true;
-  } else {
-    // You can optionally show other player's bet
-    // resultText.textContent = `${username} placed ${amount}`;
-  }
-});
-
-socket.on('cashedOut', ({ userId: casherId, username, win, multiplier }) => {
-  // Update UI for cashouts
-  if (casherId === window.user?._id) {
-    // FIX: Format the win amount
-    resultText.textContent = `Cashed out ${formatChips(win)} (${multiplier.toFixed(2)}x)`;
-    hasCashedOut = true;
-    toggleButton(cashOutBtn, false);
-    toggleButton(placeBetBtn, false);
-    // Update balance if provided elsewhere; safe to fetch live balance from server if needed
-    if (typeof balanceEl !== 'undefined' && balanceEl) {
-      // If server emitted a personal update you can use it; otherwise fetch the current balance from the page or response
-      // We don't have the balance in this socket event in all cases, so leave as-is unless server returns it.
-    }
-  }
-});
-
-// Place bet action
-placeBetBtn.addEventListener('click', async () => {
-  const amount = Number(betAmountInput.value);
-  if (!amount || amount <= 0) {
-    resultText.textContent = 'Enter a valid bet amount';
-    return;
-  }
-
-  // disable while pending
-  toggleButton(placeBetBtn, false);
-  resultText.textContent = 'Placing bet...';
-
-  try {
-    const res = await fetch('/aviator/bet', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount })
-    });
-
-    let data;
-    try { data = await res.json(); } catch (e) { data = null; }
-
-    if (!res.ok) {
-      // show server-provided message when possible
-      const errMsg = data && (data.error || data.message) ? (data.error || data.message) : `HTTP ${res.status}`;
-      resultText.textContent = errMsg;
-      // re-enable if betting is allowed (depending on server state)
-      toggleButton(placeBetBtn, true);
-      return;
-    }
-
-    if (!data || !data.ok) {
-      resultText.textContent = (data && data.error) ? data.error : 'Bet failed';
-      toggleButton(placeBetBtn, true);
-      return;
-    }
-
-    // Success: server returns new balance
-    // FIX: Format the balance update
-    if (data.balance !== undefined && balanceEl) balanceEl.textContent = formatChips(data.balance);
-    hasBet = true;
-    placeBetBtn.textContent = 'Bet Placed';
-    toggleButton(placeBetBtn, false);
-    toggleButton(cashOutBtn, true);
-    betAmountInput.disabled = true;
-    // FIX: Format the displayed bet amount
-    resultText.textContent = `Bet placed ${formatChips(amount)}`;
-  } catch (err) {
-    resultText.textContent = 'Server error placing bet';
-    toggleButton(placeBetBtn, true);
-  }
-});
-
-// Cash out action
-cashOutBtn.addEventListener('click', async () => {
-  // disable UI while request in-flight
-  toggleButton(cashOutBtn, false);
-  resultText.textContent = 'Cashing out...';
-
-  try {
-    const res = await fetch('/aviator/cashout', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' }
-    });
-
-    let data;
-    try { data = await res.json(); } catch (e) { data = null; }
-
-    if (!res.ok) {
-      const errMsg = data && (data.error || data.message) ? (data.error || data.message) : `HTTP ${res.status}`;
-      resultText.textContent = errMsg;
-      toggleButton(cashOutBtn, true);
-      return;
-    }
-
-    if (!data || !data.ok) {
-      resultText.textContent = (data && data.error) ? data.error : 'Cashout failed';
-      toggleButton(cashOutBtn, true);
-      return;
-    }
-
-    // Update balance and UI
-    // FIX: Format the balance update
-    if (data.balance !== undefined && balanceEl) balanceEl.textContent = formatChips(data.balance);
-    hasCashedOut = true;
-    toggleButton(cashOutBtn, false);
-    // FIX: Format the winnings
-    resultText.textContent = `Cashed out ${formatChips(data.winnings)} (${data.multiplier.toFixed(2)}x)`;
-  } catch (err) {
-    resultText.textContent = 'Server error cashing out';
-    toggleButton(cashOutBtn, true);
-  }
-});
-
-// --------------- BUTTON HANDLERS ---------------
-placeBetBtn.addEventListener('click', () => {
-  if (hasBet || isFlying) return;
-  const betAmount = parseFloat(betAmountInput.value);
-  if (isNaN(betAmount) || betAmount <= 0) {
-    alert('Invalid bet amount');
-    return;
-  }
-  socket.emit('placeBet', { userId, amount: betAmount });
-});
-
-cashOutBtn.addEventListener('click', () => {
-  if (!hasBet || hasCashedOut || showOverlay) return;
-  socket.emit('cashOut', { userId });
-});
-
-// ---------------- FLIGHT ANIMATION ----------------
-function startFlightAnimation() {
-  stopFlightAnimation();
-  // Delayed upward arc: stays low, then rises steeply at the end
-  points = [];
-  planeEl.style.left = '0px';
-  planeEl.style.bottom = '0px';
-  planeEl.style.transform = 'scale(1.3) rotate(0deg)';
-  lastPlanePos = { x: 0, y: 0 };
-  updateSVGPath(0); // Initialize graph
-
-  let animStart = Date.now();
-  let duration = 1400; // ms, total flight duration
-  // Start: (0,0), End: (0.75,0.75) - reduced path but keeps curve shape
-  const p0 = { x: 0, y: 0 };
-  const p1 = { x: 0.2, y: 0.05 };
-  const p2 = { x: 0.5, y: 0.15 };
-  const p3 = { x: 0.75, y: 0.75 };
-  function cubicBezier(t, p0, p1, p2, p3) {
-    const x = Math.pow(1 - t, 3) * p0.x + 3 * Math.pow(1 - t, 2) * t * p1.x + 3 * (1 - t) * t * t * p2.x + t * t * t * p3.x;
-    const y = Math.pow(1 - t, 3) * p0.y + 3 * Math.pow(1 - t, 2) * t * p1.y + 3 * (1 - t) * t * t * p2.y + t * t * t * p3.y;
-    return { x, y };
-  }
-  function animate() {
-    if (!isFlying || showOverlay) return;
-    let t = (Date.now() - animStart) / duration;
-    if (t > 1) t = 1;
-    const pt = cubicBezier(t, p0, p1, p2, p3);
-    updatePlanePositionCustom(pt.x, pt.y, t);
-    updateSVGPath(t, p0, p1, p2, p3);
-    if (t < 1) {
-      flightAnimInterval = requestAnimationFrame(animate);
-    } else {
-      // Hold plane at final position
-      updatePlanePositionCustom(p3.x, p3.y, 1);
-      updateSVGPath(1, p0, p1, p2, p3);
-    }
-  }
-  flightAnimInterval = requestAnimationFrame(animate);
-}
-
-// Custom plane position for simple upward curve
-function updatePlanePositionCustom(nx, ny, t) {
-  const areaWidth = flightArea.offsetWidth;
-  const areaHeight = flightArea.offsetHeight;
-  // nx, ny are 0..1 (left to right, bottom to top)
-  const left = nx * areaWidth;
-  const bottom = ny * areaHeight;
-  // Gentle tilt upward
-  let tilt = -15 + 25 * t;  // original tilt range
-  const scale = 1.2 + nx * 0.7;  // restored original scaling
-  planeEl.style.left = `${left}px`;
-  planeEl.style.bottom = `${bottom}px`;
-  planeEl.style.transform = `scale(${scale}) rotate(${tilt}deg)`;
-  lastPlanePos.x = left;
-  lastPlanePos.y = bottom;
-  points.push({ x: left, y: areaHeight - bottom });
-  spawnTrailDot(left, bottom);
-}
-
-// Draws a simple cubic Bezier SVG path matching the flight
-function updateSVGPath(t = 1, p0, p1, p2, p3) {
-  if (!graphPathEl || pathClearedAfterFlyAway) return;
-  const areaWidth = flightArea.offsetWidth;
-  const areaHeight = flightArea.offsetHeight;
-  // Use the same delayed upward arc control points as the animation
-  p0 = p0 || { x: 0, y: 0 };
-  p1 = p1 || { x: 0.25, y: 0.05 };
-  p2 = p2 || { x: 0.7, y: 0.15 };
-  p3 = p3 || { x: 0.95, y: 0.95 };
-  // For partial path, interpolate up to t
-  function bezier(tt, p0, p1, p2, p3) {
-    const x = Math.pow(1 - tt, 3) * p0.x + 3 * Math.pow(1 - tt, 2) * tt * p1.x + 3 * (1 - tt) * tt * tt * p2.x + tt * tt * tt * p3.x;
-    const y = Math.pow(1 - tt, 3) * p0.y + 3 * Math.pow(1 - tt, 2) * tt * p1.y + 3 * (1 - tt) * tt * tt * p2.y + tt * tt * tt * p3.y;
-    return { x, y };
-  }
-  let samples = Math.max(8, Math.floor(40 * t));
-  let pts = [];
-  for (let i = 0; i <= samples; i++) {
-    let tt = (i / samples) * t;
-    let pt = bezier(tt, p0, p1, p2, p3);
-    pts.push({ x: pt.x * areaWidth, y: areaHeight - pt.y * areaHeight });
-  }
-  let pathData = `M ${pts[0].x} ${pts[0].y}`;
-  for (let i = 1; i < pts.length; i++) {
-    pathData += ` L ${pts[i].x} ${pts[i].y}`;
-  }
-  graphPathEl.setAttribute('d', pathData);
-  // Animate stroke draw
-  try {
-    const pathLength = graphPathEl.getTotalLength();
-    graphPathEl.style.transition = 'stroke-dashoffset 0.15s linear';
-    graphPathEl.style.strokeDasharray = pathLength + ' ' + pathLength;
-    graphPathEl.style.strokeDashoffset = Math.max(0, pathLength - pathLength * t);
-  } catch (e) { }
-}
-
-function stopFlightAnimation() {
-  if (flightAnimInterval) {
-    clearInterval(flightAnimInterval);
-    flightAnimInterval = null;
-  }
-
-  // Don't clear trails if flight is ongoing (for refresh cases)
-  if (!isFlying) {
-    setTimeout(() => {
-      trails.forEach(t => t.remove());
-      trails = [];
-    }, 1000);
-  }
-}
-
-function resetPlane() {
-  // Don't reset if we're in an ongoing flight
-  if (isFlying) return;
-
-  planeEl.style.display = 'block';
-  planeEl.style.left = '0px';
-  planeEl.style.bottom = '0px';
-  planeEl.style.transform = 'scale(1) rotate(0deg)';
-
-  // Clear the path array and SVG path only at round start, not after fly-away
-  points = [];
-  if (graphPathEl) {
-    // Only clear the path, do not reset to a downward line
-    graphPathEl.setAttribute('d', '');
-    graphPathEl.style.strokeDasharray = '';
-    graphPathEl.style.strokeDashoffset = '';
-  }
-  pathClearedAfterFlyAway = false;
-
-  // Remove trails
-  trails.forEach(t => t.remove());
-  trails = [];
-}
-
-
-// Animate the plane flying away (up/right and fading out)
-function flyAwayPlaneAnimation(immediate = false) {
-  // If immediate, fly out instantly after reaching top-right
-  planeEl.style.transition = 'transform 1s cubic-bezier(0.4,1,0.7,1), opacity 1s linear';
-  // Move further up/right and fade out (negative Y for upward)
-  planeEl.style.transform += ' translate(250px, -500px) scale(2.30) rotate(65deg)';
-  planeEl.style.opacity = '0';
-  planeEl.style.transition = '';
-  planeEl.style.opacity = '1';
-  // Clear the SVG flight path after flying away
-  if (graphPathEl) {
-    graphPathEl.setAttribute('d', '');
-    graphPathEl.style.strokeDasharray = '';
-    graphPathEl.style.strokeDashoffset = '';
-  }
-  pathClearedAfterFlyAway = true;
-}
-
-/**
- * Spawn a small DOM dot at (left, bottom) relative to flightArea that fades and scales.
- * duration in ms optional.
- */
-function spawnTrailDot(left, bottom, duration = 700) {
-  if (!trailContainer) return;
-  const dot = document.createElement('div');
-  dot.className = 'trail';
-  dot.style.position = 'absolute';
-  dot.style.left = `${left}px`;
-  // convert bottom to top for absolutely positioned element
-  dot.style.top = `${flightArea.offsetHeight - bottom}px`;
-  dot.style.width = '6px';
-  dot.style.height = '6px';
-  dot.style.borderRadius = '50%';
-  dot.style.background = 'rgba(86, 86, 86, 0.9)';
-  dot.style.boxShadow = '0 0 6px rgba(72, 72, 72, 0.9)';
-  dot.style.pointerEvents = 'none';
-  dot.style.transform = 'translate(-50%, -50%) scale(1)';
-  dot.style.opacity = '1';
-  dot.style.transition = `opacity ${duration}ms linear, transform ${duration}ms ease-out`;
-
-  trailContainer.appendChild(dot);
-  trails.push(dot);
-
-  // cap number of trails to avoid DOM growth
-  if (trails.length > 80) {
-    const rem = trails.splice(0, trails.length - 80);
-    rem.forEach(r => r.remove());
-  }
-
-  // trigger fade/scale
-  requestAnimationFrame(() => {
-    dot.style.opacity = '0';
-    dot.style.transform = 'translate(-50%, -50%) scale(0.4)';
   });
 
-  setTimeout(() => {
-    dot.remove();
-    const idx = trails.indexOf(dot);
-    if (idx >= 0) trails.splice(idx, 1);
-  }, duration + 50);
-}
+  // 2. Round Start / State Sync
+  socket.on('roundState', ({ state, multiplier, history, flightOngoing }) => {
+    currentMultiplier = multiplier;
+    multiplierDisplay.textContent = multiplier.toFixed(2) + 'x';
+    updateHistory(history || []);
 
-// ---------------- UI Helper ----------------
-function toggleButton(btn, enable) {
-  btn.disabled = !enable;
-  btn.classList.toggle('disabled', !enable);
-}
+    if (state === 'betting') {
+      gameState = 'BETTING';
+      flightArea.classList.remove('flying', 'crashed');
+      hasCashedOut = false;
+      // hasActiveBet is handled by 'betPlaced' event
+    }
+    else if (state === 'flying') {
+      gameState = 'FLYING';
+      progressBarContainer.classList.remove('active');
+      flightArea.classList.add('flying');
+
+      if (flightOngoing) {
+        // We joined late
+        startFlightAnimation(true); // true = sync mode (simplified)
+        if (hasActiveBet && !hasCashedOut) {
+          updateActionButton('CASHOUT');
+        } else {
+          updateActionButton('WAITING');
+          gameStatusText.textContent = "WAIT FOR NEXT ROUND";
+        }
+      } else {
+        // Fresh start
+        startFlightAnimation(false);
+
+        if (hasActiveBet && !hasCashedOut) {
+          updateActionButton('CASHOUT');
+        } else {
+          updateActionButton('WAITING');
+          gameStatusText.textContent = "FLIGHT IN PROGRESS";
+
+        }
+      }
+    }
+  });
+
+  // 3. Multiplier Update (The Loop)
+  socket.on('multiplierUpdate', ({ multiplier }) => {
+    currentMultiplier = multiplier;
+    multiplierDisplay.textContent = multiplier.toFixed(2) + 'x';
+
+    // Client-side Auto Cashout Trigger
+    if (autoCashoutEnabled && hasActiveBet && !hasCashedOut && currentMultiplier >= autoCashoutValue) {
+      handleCashOut();
+    }
+
+    // Update Cashout Button Text dynamically
+    if (hasActiveBet && !hasCashedOut) {
+      const currentWin = currentBetAmount * currentMultiplier;
+      btnSubtext.textContent = `Win: $${formatChips(currentWin)}`;
+    }
+
+    // Update Plane Graphics
+    // Calculate 't' based on multiplier (logarithmic scale usually feels better for Aviator)
+    // Simple Linear Mapping for visual demo: 1x to 100x
+    // Use time-based animation in startFlightAnimation, this creates the data points
+  });
+
+  // 4. Crash
+  socket.on('roundCrashed', ({ crashAt }) => {
+    gameState = 'CRASHED';
+    currentMultiplier = crashAt;
+    multiplierDisplay.textContent = crashAt.toFixed(2) + 'x';
+
+    // Visuals
+    flightArea.classList.remove('flying');
+    flightArea.classList.add('crashed');
+    multiplierDisplay.style.color = 'var(--crash-red)';
+    gameStatusText.textContent = "FLEW AWAY!";
+    gameStatusText.style.color = 'var(--crash-red)';
+
+    stopFlightAnimation();
+    flyAwayPlaneAnimation();
+
+    // Reset User State
+    hasActiveBet = false;
+    hasCashedOut = false;
+    updateActionButton('WAITING'); // Briefly waiting before next bet timer
+    updateHistory(history || []);
+  });
+  
+
+  // 5. Bet Confirmation
+  socket.on('betPlaced', ({ userId: bidderId, amount }) => {
+    // Normalize incoming bidderId too
+    if (!bidderId) return;
+    bidderId = String(bidderId);
+
+    // If we don't have a known current user id, bail (or handle differently)
+    if (!userId) {
+      console.warn('betPlaced received but local userId is not set');
+      return;
+    }
+
+    if (bidderId === userId) {
+      // Update balance and state
+      userBalance -= amount;
+      balanceEl.textContent = formatChips(userBalance);
+      hasActiveBet = true;
+      hasCashedOut = false;
+
+      // If the flight is already in progress, offer CASH OUT immediately.
+      // Otherwise show BET_PLACED (waiting for flight to start)
+      if (gameState === 'FLYING') {
+        updateActionButton('CASHOUT');
+        // ensure subtext shows the current potential win
+        const win = currentBetAmount * currentMultiplier;
+        btnSubtext.textContent = `Win: $${formatChips(win)}`;
+      } else {
+        updateActionButton('BET_PLACED');
+      }
+
+      showPopup(`Bet Placed: $${formatChips(amount)}`);
+    }
+  });
+
+
+  // 6. Cashout Confirmation
+  socket.on('cashedOut', ({ userId: casherId, win, multiplier }) => {
+    if (casherId === userId) {
+      userBalance += win;
+      balanceEl.textContent = formatChips(userBalance);
+      hasCashedOut = true;
+      updateActionButton('WAITING');
+      btnSubtext.textContent = `Won $${formatChips(win)}`;
+      showPopup(`Cashed Out: $${formatChips(win)}`);
+    }
+  });
+
+  // ====================== ACTION HANDLERS ======================
+
+  actionBtn.addEventListener('click', () => {
+    if (actionBtn.classList.contains('bet')) {
+      handlePlaceBet();
+    } else if (actionBtn.classList.contains('cashout')) {
+      handleCashOut();
+    }
+  });
+
+  function handlePlaceBet() {
+    const amount = currentBetAmount;
+    if (amount > userBalance) return showPopup("Insufficient Balance");
+
+    // Emit Socket
+    socket.emit('placeBet', { userId, amount });
+    // Optimistic UI update happens in 'betPlaced' listener
+  }
+
+  function handleCashOut() {
+    if (hasCashedOut || !hasActiveBet) return;
+    // Disable immediately to prevent double clicks
+    actionBtn.disabled = true;
+    socket.emit('cashOut', { userId });
+  }
+
+  // ====================== MODAL LOGIC ======================
+
+  // Bet Modal
+  openBetModalBtn.addEventListener('click', () => {
+    if (hasActiveBet) return showPopup("Bet already placed for this round");
+    modalBetInput.value = currentBetAmount;
+    betModal.classList.add('active');
+  });
+
+  chipBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      let current = parseFloat(modalBetInput.value) || 0;
+      if (btn.dataset.add) current += parseFloat(btn.dataset.add);
+      else if (btn.id === 'halfBet') current = Math.max(1, Math.floor(current / 2));
+      else if (btn.id === 'doubleBet') current *= 2;
+      else if (btn.id === 'maxBet') current = userBalance;
+
+      if (current > userBalance) current = userBalance;
+      modalBetInput.value = current;
+    });
+  });
+
+  confirmBetBtn.addEventListener('click', () => {
+    let val = parseFloat(modalBetInput.value);
+    if (val < 1) val = 1;
+    if (val > userBalance) val = userBalance;
+
+    currentBetAmount = val;
+    displayBetValue.textContent = `$${formatChips(currentBetAmount)}`;
+    betModal.classList.remove('active');
+  });
+
+  // Auto Modal
+  openAutoModalBtn.addEventListener('click', () => {
+    modalAutoInput.value = autoCashoutValue;
+    autoModal.classList.add('active');
+  });
+
+  autoBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.id === 'disableAuto') {
+        modalAutoInput.value = '';
+      } else {
+        modalAutoInput.value = btn.dataset.val;
+      }
+    });
+  });
+
+  confirmAutoBtn.addEventListener('click', () => {
+    const val = parseFloat(modalAutoInput.value);
+    if (!val || isNaN(val)) {
+      autoCashoutEnabled = false;
+      displayAutoValue.textContent = "OFF";
+    } else {
+      autoCashoutEnabled = true;
+      autoCashoutValue = val;
+      displayAutoValue.textContent = `${val.toFixed(2)}x`;
+    }
+    autoModal.classList.remove('active');
+  });
+
+  closeModalBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      betModal.classList.remove('active');
+      autoModal.classList.remove('active');
+    });
+  });
+
+  // ====================== GRAPH ANIMATION (BEZIER) ======================
+
+  function resetGraph() {
+    stopFlightAnimation();
+    points = [];
+    planeEl.style.left = '0px';
+    planeEl.style.bottom = '0px';
+    planeEl.style.transform = 'scale(1) rotate(0deg)';
+    planeEl.style.opacity = '1';
+    graphPathEl.setAttribute('d', '');
+    graphPathEl.style.strokeDasharray = '';
+    graphPathEl.style.strokeDashoffset = '';
+  }
+
+  function flyAwayPlaneAnimation() {
+    planeEl.style.transition = 'transform 0.8s ease-in, opacity 0.8s ease-out';
+    // Fly off top right
+    planeEl.style.transform = `translate(${flightArea.offsetWidth}px, -${flightArea.offsetHeight}px) rotate(-45deg) scale(0.5)`;
+    planeEl.style.opacity = '0';
+  }
+
+  function startFlightAnimation(lateJoin) {
+    stopFlightAnimation();
+    points = [];
+
+    // Reset plane styling for flight
+    planeEl.style.transition = 'none';
+    planeEl.style.opacity = '1';
+
+    let animStart = Date.now();
+    // Adjust duration to match average crash curve or socket sync
+    let duration = 10000; // This controls the "speed" of the curve visually
+
+    // Bezier Control Points (Classic Aviator curve)
+    const p0 = { x: 0, y: 0 };
+    const p1 = { x: 0.2, y: 0.05 };
+    const p2 = { x: 0.5, y: 0.15 };
+    const p3 = { x: 0.95, y: 0.9 };
+
+    function cubicBezier(t, p0, p1, p2, p3) {
+      const x = Math.pow(1 - t, 3) * p0.x + 3 * Math.pow(1 - t, 2) * t * p1.x + 3 * (1 - t) * t * t * p2.x + t * t * t * p3.x;
+      const y = Math.pow(1 - t, 3) * p0.y + 3 * Math.pow(1 - t, 2) * t * p1.y + 3 * (1 - t) * t * t * p2.y + t * t * t * p3.y;
+      return { x, y };
+    }
+
+    function animate() {
+      if (gameState !== 'FLYING') return;
+
+      // Determine 't' based on elapsed time or log of multiplier
+      // Here we use time for smoothness
+      let t = (Date.now() - animStart) / duration;
+      if (t > 1) t = 1;
+
+      // Calculate Position
+      const pt = cubicBezier(t, p0, p1, p2, p3);
+
+      const areaWidth = flightArea.offsetWidth;
+      const areaHeight = flightArea.offsetHeight;
+
+      const px = pt.x * areaWidth;
+      const py = pt.y * areaHeight; // from bottom
+
+      // Update Plane
+      const tilt = 5 + (30 * t); // Tilt up as it goes
+      const scale = 1 + (0.5 * t);
+
+      planeEl.style.left = `${px}px`;
+      planeEl.style.bottom = `${py}px`;
+      planeEl.style.transform = `scale(${scale}) rotate(-${tilt}deg)`;
+
+      // Update Path
+      // We redraw the curve from 0 to current t
+      drawPath(t, p0, p1, p2, p3);
+
+      if (t < 1) {
+        flightAnimInterval = requestAnimationFrame(animate);
+      }
+    }
+    flightAnimInterval = requestAnimationFrame(animate);
+  }
+
+  function drawPath(t, p0, p1, p2, p3) {
+    const areaWidth = flightArea.offsetWidth;
+    const areaHeight = flightArea.offsetHeight;
+
+    // Calculate bezier points
+    function bezier(tt) {
+      const x = Math.pow(1 - tt, 3) * p0.x + 3 * Math.pow(1 - tt, 2) * tt * p1.x + 3 * (1 - tt) * tt * tt * p2.x + tt * tt * tt * p3.x;
+      const y = Math.pow(1 - tt, 3) * p0.y + 3 * Math.pow(1 - tt, 2) * tt * p1.y + 3 * (1 - tt) * tt * tt * p2.y + tt * tt * tt * p3.y;
+      return { x: x * areaWidth, y: areaHeight - (y * areaHeight) }; // SVG Y is top-down
+    }
+
+    // Create SVG path string
+    let d = `M ${0} ${areaHeight}`; // Start bottom-left
+    const steps = 20;
+    for (let i = 1; i <= steps; i++) {
+      const pt = bezier((i / steps) * t);
+      d += ` L ${pt.x} ${pt.y}`;
+    }
+    graphPathEl.setAttribute('d', d);
+  }
+
+  function stopFlightAnimation() {
+    if (flightAnimInterval) cancelAnimationFrame(flightAnimInterval);
+  }
+});

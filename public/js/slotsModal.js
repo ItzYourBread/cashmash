@@ -1,175 +1,182 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const slotsConfig = window.slotsConfig;
-  const type = window.currentSlot;
-  if (!slotsConfig || !type || !slotsConfig[type]) return;
+    // ================= CONFIG & STATE =================
+    const slotsConfig = window.slotsConfig;
+    const type = window.currentSlot;
+    if (!slotsConfig || !type || !slotsConfig[type]) return;
 
-  const slot = slotsConfig[type];
-  const { minBet, maxBet } = slot;
-  let currentBet = minBet;
+    const slot = slotsConfig[type];
+    const { minBet, maxBet } = slot;
+    
+    // Current user balance (grabbed from DOM)
+    const balanceEl = document.getElementById("balance");
+    let userBalance = parseFloat(balanceEl.dataset.rawBalance) || 0;
+    let currentBet = minBet;
 
-  // === ELEMENTS ===
-  const liveBet = document.getElementById("liveBet");
-  const betPlus = document.getElementById("betPlus");
-  const betMinus = document.getElementById("betMinus");
-  const betSpinBtn = document.getElementById("betSpinBtn");
-  const betModal = document.getElementById("betModal");
-  const manualBetInput = document.getElementById("manualBetInput");
-  const betOptionsContainer = document.querySelector(".bet-options");
-  const betTextContainer = document.querySelector(".bet-text");
+    // ================= DOM ELEMENTS =================
+    // Display Elements
+    const displayBetValue = document.getElementById("displayBetValue");
+    const resultAmountDisplay = document.getElementById("resultAmount");
+    const statusTextDisplay = document.getElementById("statusText");
+    
+    // Main Action
+    const actionBtn = document.getElementById("actionBtn");
+    const btnText = actionBtn.querySelector(".btn-text");
+    const btnSubtext = actionBtn.querySelector(".btn-subtext");
+    
+    // Hidden Engine Elements (Bridge to your engine)
+    const hiddenBetInput = document.getElementById("betAmount");
+    const hiddenSpinBtn = document.getElementById("spinBtn");
 
-  // === INFO MODAL ===
-  const infoBtn = document.getElementById("infoBtn");
-  const infoModal = document.getElementById("infoModal");
+    // Modals & Triggers
+    const betModal = document.getElementById("betModal");
+    const infoModal = document.getElementById("infoModal");
+    const openBetModalBtn = document.getElementById("openBetModalBtn");
+    const openInfoModalBtn = document.getElementById("openInfoModalBtn");
+    const closeButtons = document.querySelectorAll(".close-modal");
+    
+    // Bet Modal Logic
+    const modalBetInput = document.getElementById("modalBetInput");
+    const confirmBetBtn = document.getElementById("confirmBet");
+    const chipBtns = document.querySelectorAll(".chip-btn");
 
-  const STEP = 0.5;
+    // ================= INITIALIZATION =================
+    updateBetDisplay();
 
-  /* ----------------------------------------------------
-     BET SYSTEM (Updated Modal System)
-  ---------------------------------------------------- */
-
-  const updateBetDisplay = () => {
-    liveBet.textContent = currentBet.toLocaleString();
-    manualBetInput.value = currentBet;
-  };
-
-  const validateAndUpdate = () => {
-    let value = parseInt(manualBetInput.value, 10);
-    if (isNaN(value)) {
-      manualBetInput.value = currentBet;
-      return;
+    // ================= BETTING LOGIC =================
+    function updateBetDisplay() {
+        displayBetValue.textContent = `$${currentBet.toFixed(2)}`;
+        hiddenBetInput.value = currentBet; // Sync with engine
+        modalBetInput.value = currentBet;
     }
-    if (value < minBet) value = minBet;
-    if (value > maxBet) value = maxBet;
-    currentBet = value;
-    updateBetDisplay();
-  };
 
-  betTextContainer.addEventListener("click", () => {
-    betModal.classList.add("active");
-  });
+    openBetModalBtn.addEventListener("click", () => {
+        if(actionBtn.disabled) return; // Prevent change during spin
+        modalBetInput.value = currentBet;
+        betModal.classList.add("active");
+    });
 
-  betPlus.addEventListener("click", () => {
-    currentBet = Math.min(currentBet + STEP, maxBet);
-    updateBetDisplay();
-    betModal.classList.add("active");
-  });
+    // Chip Buttons in Modal
+    chipBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            let val = parseFloat(modalBetInput.value) || minBet;
+            
+            if (btn.dataset.set) {
+                val = parseFloat(btn.dataset.set);
+            } else if (btn.id === "halfBet") {
+                val = Math.floor(val / 2);
+            } else if (btn.id === "doubleBet") {
+                val = val * 2;
+            } else if (btn.id === "maxBet") {
+                val = userBalance > maxBet ? maxBet : userBalance;
+            }
 
-  betMinus.addEventListener("click", () => {
-    currentBet = Math.max(currentBet - STEP, minBet);
-    updateBetDisplay();
-    betModal.classList.add("active");
-  });
+            // Clamping
+            if (val < minBet) val = minBet;
+            if (val > maxBet) val = maxBet;
 
-  manualBetInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      validateAndUpdate();
-      betModal.classList.remove("active");
-    }
-  });
+            modalBetInput.value = val;
+        });
+    });
 
-  manualBetInput.addEventListener("blur", () => {
-    validateAndUpdate();
-  });
-
-  betOptionsContainer.innerHTML = "";
-  const betValues = [1, 5, 10, 15, 25, 50, 100];
-  betValues.forEach((value) => {
-    if (value <= maxBet) {
-      const button = document.createElement("button");
-      button.className = "bet-option";
-      button.textContent = "$" + value.toLocaleString();
-      button.addEventListener("click", () => {
-        currentBet = value;
+    confirmBetBtn.addEventListener("click", () => {
+        let val = parseFloat(modalBetInput.value);
+        if (isNaN(val) || val < minBet) val = minBet;
+        if (val > maxBet) val = maxBet;
+        
+        currentBet = val;
         updateBetDisplay();
         betModal.classList.remove("active");
-      });
-      betOptionsContainer.appendChild(button);
+    });
+
+    // ================= SPIN LOGIC =================
+    actionBtn.addEventListener("click", () => {
+        if (currentBet > userBalance) {
+            statusTextDisplay.textContent = "Insufficient Funds!";
+            statusTextDisplay.style.color = "#ff4b4b";
+
+            return;
+        }
+
+        // Visual State Update
+        actionBtn.disabled = true;
+        btnText.textContent = "SPINNING...";
+        btnSubtext.textContent = "Good Luck!";
+        statusTextDisplay.textContent = "Rolling...";
+        statusTextDisplay.style.color = "#fff";
+        resultAmountDisplay.textContent = "$0.00";
+        resultAmountDisplay.classList.remove("highlight");
+
+        // Trigger the hidden engine button
+        hiddenSpinBtn.click();
+
+        // We observe the engine's behavior via an event or timeout 
+        // (Assuming your engine resets the button state, or we simulate it)
+        // Since I don't see the engine code, I will add a listener to the canvas 
+        // or rely on the engine to re-enable interaction. 
+        
+        // If your engine doesn't emit an event, we can reset UI after a timeout 
+        // based on standard spin time (e.g., 3 seconds)
+        setTimeout(() => {
+            actionBtn.disabled = false;
+            btnText.textContent = "SPIN";
+            btnSubtext.textContent = "Press to Roll";
+        }, 2500); 
+    });
+
+    // Monitor Balance Changes (Optional: if engine updates the hidden balance span)
+    const observer = new MutationObserver(() => {
+        userBalance = parseFloat(balanceEl.innerText.replace(/[^0-9.-]+/g,"")) || 0;
+    });
+    observer.observe(balanceEl, { childList: true, subtree: true });
+
+    // ================= INFO / PAYTABLE LOGIC =================
+    openInfoModalBtn.addEventListener("click", () => {
+        populateInfoModal();
+        infoModal.classList.add("active");
+    });
+
+    function populateInfoModal() {
+        const container = document.getElementById("infoContent");
+        
+        const symbolList = slot.symbols.map(s => `
+            <li class="paytable-item">
+                <img src="${s.file}" class="mini-symbol" alt="${s.name}">
+                <div class="paytable-info">
+                    <span class="paytable-name">${formatSymbolName(s.name)}</span>
+                    <span class="paytable-multi">Multiplier: x${s.multiplier} ${s.bonus ? '(Bonus)' : ''}</span>
+                </div>
+            </li>
+        `).join("");
+
+        container.innerHTML = `
+            <p class="game-desc">${slot.description}</p>
+            <h4 style="color:var(--gold); margin:10px 0;">Symbols & Payouts</h4>
+            <ul class="paytable-list">
+                ${symbolList}
+            </ul>
+            <div style="margin-top:15px; padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;">
+                <small style="color:#aaa;">${slot.bonusInfo}</small>
+            </div>
+        `;
     }
-  });
 
-  const maxBetButton = document.createElement("button");
-  maxBetButton.className = "bet-option";
-  maxBetButton.textContent = "Max Bet";
-  maxBetButton.addEventListener("click", () => {
-    currentBet = maxBet;
-    updateBetDisplay();
-    betModal.classList.remove("active");
-  });
-  betOptionsContainer.appendChild(maxBetButton);
-
-  betModal.addEventListener("click", (e) => {
-    if (e.target === betModal) {
-      validateAndUpdate();
-      betModal.classList.remove("active");
+    function formatSymbolName(name) {
+        return name.replace(/([A-Z])/g, " $1")
+                   .replace(/[_-]+/g, " ")
+                   .trim()
+                   .replace(/\b\w/g, c => c.toUpperCase());
     }
-  });
 
-  betSpinBtn.addEventListener("click", () => {
-    const betInput = document.getElementById("betAmount");
-    const spinBtn = document.getElementById("spinBtn");
-    if (betInput) betInput.value = currentBet;
-    if (spinBtn) spinBtn.click();
-  });
-
-  /* ----------------------------------------------------
-     INFO MODAL (GAME DETAILS / SYMBOLS / BONUS)
-  ---------------------------------------------------- */
-
-  if (infoBtn && infoModal) {
-    const symbolList = slot.symbols
-      .map(
-        (s) => `
-        <li>
-          <img src="${s.file}" class="mini-symbol" />
-          <strong>${formatSymbolName(s.name)}:</strong> x${s.multiplier}
-          ${s.bonus ? `<em>(${s.bonus})</em>` : ""}
-        </li>
-      `
-      )
-      .join("");
-
-    infoModal.innerHTML = `
-      <div class="modal-content">
-        <span class="close-btn">&times;</span>
-        <h2>${slot.title} — Game Info</h2>
-        <p>${slot.description}</p>
-        <h3>Symbol Multipliers</h3>
-        <ul>${symbolList}</ul>
-        <h3>Bonus Info</h3>
-        <p>${slot.bonusInfo}</p>
-      </div>
-    `;
-
-    const closeBtn = infoModal.querySelector(".close-btn");
-
-    infoBtn.addEventListener("click", () => {
-      infoModal.classList.add("active");
+    // ================= GLOBAL CLOSE =================
+    closeButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            betModal.classList.remove("active");
+            infoModal.classList.remove("active");
+        });
     });
 
-    closeBtn.addEventListener("click", () => {
-      infoModal.classList.remove("active");
+    window.addEventListener("click", (e) => {
+        if (e.target === betModal) betModal.classList.remove("active");
+        if (e.target === infoModal) infoModal.classList.remove("active");
     });
-
-    infoModal.addEventListener("click", (e) => {
-      if (e.target === infoModal) infoModal.classList.remove("active");
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") infoModal.classList.remove("active");
-    });
-  }
-
-  /* ----------------------------------------------------
-     INITIALIZE
-  ---------------------------------------------------- */
-  updateBetDisplay();
 });
-
-function formatSymbolName(name) {
-  return name
-    .replace(/([A-Z])/g, " $1")    // camelCase → words
-    .replace(/[_-]+/g, " ")        // snake_case or dash-case → space
-    .replace(/\s+/g, " ")          // remove double spaces
-    .trim()
-    .replace(/\b\w/g, c => c.toUpperCase()); // capitalize words
-}

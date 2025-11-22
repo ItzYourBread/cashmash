@@ -47,7 +47,7 @@ let roundState = {
 };
 
 const roundHistory = []; 
-const MAX_HISTORY_LENGTH = 50;
+const MAX_HISTORY_LENGTH = 10;
 
 // ----------------- HELPERS ----------------
 function now() {
