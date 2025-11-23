@@ -129,21 +129,25 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateHistory(arr) {
     const historyArray = Array.isArray(arr) ? arr : [];
 
-    // Always take latest 10 (or less)
+    // latest 7
     const recent = historyArray.slice(0, 7);
 
     historyRibbon.innerHTML = "";
 
     recent.forEach(h => {
       const crash = Number(h.crashAt) || 0;
-
       const span = document.createElement("span");
       span.classList.add("badge");
 
-      // Coloring rules2
-      if (crash >= 10) span.classList.add("high");
-      else if (crash >= 2) span.classList.add("med");
-      else span.classList.add("low");
+      // Multi-color tier system
+      if (crash >= 100) span.classList.add("badge-diamond");    // VERY RARE
+      else if (crash >= 50) span.classList.add("badge-legend");
+      else if (crash >= 20) span.classList.add("badge-ultra");
+      else if (crash >= 10) span.classList.add("badge-high");
+      else if (crash >= 5) span.classList.add("badge-midhigh");
+      else if (crash >= 2) span.classList.add("badge-med");
+      else if (crash >= 1.20) span.classList.add("badge-safe");
+      else span.classList.add("badge-low");
 
       span.textContent = crash.toFixed(2) + "x";
       historyRibbon.appendChild(span);

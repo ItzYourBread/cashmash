@@ -140,13 +140,87 @@ html, body {
     display: flex; gap: 6px; overflow: hidden; flex: 1;
     mask-image: linear-gradient(to right, black 80%, transparent 100%);
 }
+
+/* Base badge style — matches your look */
 .badge {
-    font-size: 0.8em; font-weight: bold; padding: 2px 8px; border-radius: 4px;
-    background: rgba(255,255,255,0.1); color: #aaa; min-width: 45px; text-align: center;
+    font-size: 0.8em;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+    color: #aaa;
+    min-width: 45px;
+    text-align: center;
+    display: inline-block;
+    margin-right: 4px;
+
+    /* Animation */
+    animation: badgePop 0.25s ease-out;
 }
-.badge.high { color: #000; background: var(--gold); box-shadow: 0 0 5px var(--gold-glow); }
-.badge.med { color: #fff; background: var(--fly-blue); }
-.badge.low { color: #fff; background: #555; }
+
+/* Pop animation */
+@keyframes badgePop {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ================================
+   BADGE COLOR TIERS
+   ================================ */
+
+/* 100x+ — Diamond Blue */
+.badge-diamond {
+    color: #fff;
+    background: linear-gradient(90deg, #00eaff, #008cff);
+    box-shadow: 0 0 6px rgba(0, 153, 255, 0.7);
+}
+
+/* 50x+ — Legendary Purple/Pink */
+.badge-legend {
+    color: #fff;
+    background: linear-gradient(90deg, #ff8df4, #d600c0);
+    box-shadow: 0 0 6px rgba(255, 0, 200, 0.6);
+}
+
+/* 20x+ — Ultra Red */
+.badge-ultra {
+    color: #fff;
+    background: #ff3535;
+    box-shadow: 0 0 6px rgba(255, 60, 60, 0.6);
+}
+
+/* 10x+ — High (your gold) */
+.badge-high {
+    color: #000;
+    background: var(--gold);
+    box-shadow: 0 0 5px var(--gold-glow);
+}
+
+/* 5x+ — Mid-high Yellow */
+.badge-midhigh {
+    color: #000;
+    background: #ffe600;
+    box-shadow: 0 0 6px rgba(255, 230, 0, 0.5);
+}
+
+/* 2x+ — Medium (your fly-blue) */
+.badge-med {
+    color: #fff;
+    background: var(--fly-blue);
+}
+
+/* 1.20x+ — Safe Light Green */
+.badge-safe {
+    color: #fff;
+    background: #8bc34a;
+    box-shadow: 0 0 6px rgba(140, 195, 75, 0.5);
+}
+
+/* <1.20x — Low Grey */
+.badge-low {
+    color: #fff;
+    background: #555;
+}
 
 /* ===================== CONTROL DOCK ===================== */
 .control-dock { display: flex; flex-direction: column; gap: 12px; }

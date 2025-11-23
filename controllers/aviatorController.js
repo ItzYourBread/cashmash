@@ -19,7 +19,7 @@ const config = {
   maxMultiplier: 200,          // hard cap for multiplier (safety)
   minMultiplier: 1.0,          // min multiplier
   houseEdge: 0.04,             // 0.04 = 4% house edge (96% RTP)
-  volatility: 1.0,             
+  volatility: 5.0,             
   revealHashAlgorithm: 'sha256',
   // ADJUSTED FOR SLOW GROWTH: 0.5 is a noticeably slower, steady climb.
   growthRatePerSecond: 0.5,    
