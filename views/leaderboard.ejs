@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,46 +9,64 @@
   <link rel="stylesheet" href="/css/footer.css">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/leaderboard.css">
+
+
+  <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
+  <link rel="shortcut icon" href="/favicons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="CashMash" />
+  <link rel="manifest" href="/favicons/site.webmanifest" />
 </head>
+
 <body>
 
   <%- include('partials/header') %>
 
-  <section class="leaderboard-section">
-    <div class="leaderboard-header">
-      <h1>Cash<span class="mash">Mash</span> Leaderboard</h1>
-      <p>Top Players Dominating the Charts</p>
-    </div>
-
-    <% if (user) { %>
-      <div class="user-rank">
-        <h3>Your Ranking</h3>
-        <p>
-          Position: <span><%= userRank ? userRank : 'Unranked' %></span><br>
-          Balance: <span>$<%= user.balance ? user.balance.toLocaleString() : 0 %></span>
-        </p>
+    <section class="leaderboard-section">
+      <div class="leaderboard-header">
+        <h1>Cash<span class="mash">Mash</span> Leaderboard</h1>
+        <p>Top Players Dominating the Charts</p>
       </div>
-    <% } %>
 
-    <div class="leaderboard-grid">
-      <% if (topUsers && topUsers.length > 0) { %>
-        <% topUsers.forEach((u, index) => { %>
-          <div class="leaderboard-card <%= user && user._id.toString() === u._id.toString() ? 'current-user' : '' %>">
-            <div class="rank">#<%= index + 1 %></div>
-            <div class="info">
-              <h3><%= u.username || (u.email ? u.email.split('@')[0] : 'Unknown') %></h3>
-              <p>ID: <%= u._id.toString().slice(-5) %></p>
-              <p class="balance">$<%= u.balance ? u.balance.toLocaleString() : 0 %></p>
-            </div>
+      <% if (user) { %>
+        <div class="user-rank">
+          <h3>Your Ranking</h3>
+          <p>
+            Position: <span>
+              <%= userRank ? userRank : 'Unranked' %>
+            </span><br>
+            Balance: <span>$<%= user.balance ? user.balance.toLocaleString() : 0 %></span>
+          </p>
+        </div>
+        <% } %>
+
+          <div class="leaderboard-grid">
+            <% if (topUsers && topUsers.length> 0) { %>
+              <% topUsers.forEach((u, index)=> { %>
+                <div
+                  class="leaderboard-card <%= user && user._id.toString() === u._id.toString() ? 'current-user' : '' %>">
+                  <div class="rank">#<%= index + 1 %>
+                  </div>
+                  <div class="info">
+                    <h3>
+                      <%= u.username || (u.email ? u.email.split('@')[0] : 'Unknown' ) %>
+                    </h3>
+                    <p>ID: <%= u._id.toString().slice(-5) %>
+                    </p>
+                    <p class="balance">$<%= u.balance ? u.balance.toLocaleString() : 0 %>
+                    </p>
+                  </div>
+                </div>
+                <% }) %>
+                  <% } else { %>
+                    <p style="color: var(--text-dim); margin-top: 40px;">No leaderboard data yet.</p>
+                    <% } %>
           </div>
-        <% }) %>
-      <% } else { %>
-        <p style="color: var(--text-dim); margin-top: 40px;">No leaderboard data yet.</p>
-      <% } %>
-    </div>
-  </section>
+    </section>
 
-  <%- include('partials/footer') %>
+    <%- include('partials/footer') %>
 
 </body>
+
 </html>
