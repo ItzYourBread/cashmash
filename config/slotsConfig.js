@@ -63,6 +63,14 @@ const slotsConfig = {
         overflow-x: hidden;
       }
 
+      /* Pharaoh’s Riches grid wrapper override */
+.grid-wrapper {
+    background: linear-gradient(145deg, #4d2c00, #1a0d00);
+    border: 1px solid rgba(255, 215, 120, 0.5);
+    box-shadow: 0 10px 30px rgba(255, 200, 80, 0.35);
+}
+
+
       .modal-content {
         background: linear-gradient(145deg, rgba(60,40,10,0.97), rgba(30,20,5,0.95));
         border: 2px solid rgba(255,215,120,0.6);
@@ -159,6 +167,14 @@ const slotsConfig = {
         color: #f9e8c3;
         overflow-x: hidden;
       }
+
+      /* Dragon Blaze grid wrapper override */
+.grid-wrapper {
+    background: linear-gradient(145deg, #2a0000, #0a0000);
+    border: 1px solid rgba(255, 80, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(255, 80, 0, 0.4);
+}
+
 
       .modal-content {
         background: linear-gradient(145deg, rgba(30,0,0,0.98), rgba(10,0,0,0.96));

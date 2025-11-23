@@ -26,9 +26,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ================= UTILS =================
     const formatChips = (amount) => {
-        if (Math.abs(amount) < 1000) return parseFloat(amount).toFixed(2);
-        return new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short', minimumFractionDigits: 1 }).format(amount);
+        if (amount === null || amount === undefined) return '0.00';
+
+        const num = Number(amount);
+        if (isNaN(num)) return '0.00';
+
+        return num.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
     };
+
 
     const API_URL = '/blackjack';
     const ENDPOINTS = { start: `${API_URL}/start`, hit: `${API_URL}/hit`, stand: `${API_URL}/stand` };
@@ -38,8 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let dealerCards = [];
     let gameActive = false;
     let currentBet = 10;
-    let balance = parseFloat(balanceEl.dataset.rawBalance) || 1000;
-    
+    let balance = parseFloat(balanceEl.dataset.rawBalance) || 0;
+
     balanceEl.textContent = formatChips(balance);
 
     // ================= MODAL LOGIC =================
@@ -48,21 +56,46 @@ document.addEventListener("DOMContentLoaded", () => {
         betModal.classList.add("active");
     });
 
+    modalBetInput.addEventListener("blur", () => {
+        let val = parseFloat(modalBetInput.value);
+
+        if (isNaN(val)) val = 0;
+
+        if (val < 0.1) val = 0.1;
+        if (val > 100) val = 100;
+
+        modalBetInput.value = val;
+    });
+
     closeModalBtns.forEach(btn => btn.addEventListener("click", () => betModal.classList.remove("active")));
 
     chipBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             let currentVal = parseFloat(modalBetInput.value) || 0;
-            if (btn.dataset.add) modalBetInput.value = currentVal + parseFloat(btn.dataset.add);
-            else if (btn.id === "halfBet") modalBetInput.value = Math.max(10, Math.floor(currentVal / 2));
-            else if (btn.id === "doubleBet") modalBetInput.value = currentVal * 2;
-            else if (btn.id === "maxBet") modalBetInput.value = balance;
+
+            if (btn.dataset.add) {
+                currentVal += parseFloat(btn.dataset.add);
+            } else if (btn.id === "halfBet") {
+                currentVal = Math.max(0.1, Math.floor(currentVal / 2 * 100) / 100);
+            } else if (btn.id === "doubleBet") {
+                currentVal = currentVal * 2;
+            } else if (btn.id === "maxBet") {
+                currentVal = 100;
+            }
+
+            // apply global limits
+            if (currentVal < 0.1) currentVal = 0.1;
+            if (currentVal > 100) currentVal = 100;
+            modalBetInput.value = currentVal;
         });
     });
 
+
     confirmBetBtn.addEventListener("click", () => {
         let val = parseFloat(modalBetInput.value);
-        if (val < 10) val = 10; // Min bet
+        // Enforce 0.10 – 100 range
+        if (val < 0.1) val = 0.1;
+        if (val > 100) val = 100;
         if (val > balance) val = balance;
         currentBet = val;
         displayBetValue.textContent = `$${formatChips(currentBet)}`;
@@ -145,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         playerScoreEl.textContent = calcScore(playerCards);
         if (hideDealer) {
             // Assumes 2nd card is hidden
-            const visible = dealerCards[0]; 
+            const visible = dealerCards[0];
             dealerScoreEl.textContent = visible ? cardValue(visible) : 0;
         } else {
             dealerScoreEl.textContent = calcScore(dealerCards);
@@ -153,17 +186,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ================= GAME ACTIONS =================
-    
+
     // --- DEAL ---
     btnDeal.addEventListener('click', async () => {
         if (currentBet > balance) return showPopup("Insufficient Balance");
-        
+
         // Reset UI
         dealerHand.innerHTML = '';
         playerHand.innerHTML = '';
         tableMessage.textContent = 'Dealing...';
         setControlsState('PLAYING'); // Lock controls immediately
-        
+
         // Disable buttons temporarily
         btnHit.disabled = true;
         btnStand.disabled = true;
@@ -189,9 +222,9 @@ document.addEventListener("DOMContentLoaded", () => {
             renderCard(playerCards[0], playerHand, false, 100);
             renderCard(dealerCards[0], dealerHand, false, 400);
             renderCard(playerCards[1], playerHand, false, 700);
-            
+
             // Render Dealer Hidden Card
-            const hiddenDiv = renderCard(dealerCards[1], dealerHand, true, 1000); 
+            const hiddenDiv = renderCard(dealerCards[1], dealerHand, true, 1000);
             // Manually inject image into hidden card front for later reveal
             const front = hiddenDiv.querySelector('.card-front');
             front.innerHTML = `<img src="/images/playing-cards/${getCardFilename(dealerCards[1])}">`;
@@ -218,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- HIT ---
     btnHit.addEventListener('click', async () => {
         if (!gameActive) return;
-        btnHit.disabled = true; 
+        btnHit.disabled = true;
         btnStand.disabled = true;
 
         try {
@@ -228,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             playerCards = data.playerHand;
             const newCard = playerCards[playerCards.length - 1];
-            
+
             renderCard(newCard, playerHand, false, 50);
             updateScores(true);
 
@@ -263,13 +296,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 hiddenCard.classList.remove('hidden-card');
                 hiddenCard.classList.add('flipped');
             }
-            
+
             // 2. Play out dealer sequence
             dealerCards = data.dealerHand;
-            
+
             // We already rendered the first 2 dealer cards. Start from index 2.
             const newCards = dealerCards.slice(2);
-            
+
             const playSequence = async () => {
                 // Update score for the first 2 cards first
                 dealerScoreEl.textContent = calcScore(dealerCards.slice(0, 2));
@@ -281,18 +314,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     dealerScoreEl.textContent = calcScore(dealerCards.slice(0, 2 + i + 1));
                     await new Promise(r => setTimeout(r, 800));
                 }
-                
+
                 // Finalize
                 gameActive = false;
                 balance = data.balance;
                 balanceEl.textContent = formatChips(balance);
-                
+
                 const win = data.result.toLowerCase().includes('win');
                 const push = data.result.toLowerCase().includes('push');
-                
+
                 tableMessage.textContent = data.result;
                 tableMessage.style.color = win ? '#00ff90' : (push ? '#ffd700' : '#ff4b4b');
-                                
+
                 setTimeout(() => setControlsState('IDLE'), 2000);
             };
 
@@ -310,16 +343,16 @@ document.addEventListener("DOMContentLoaded", () => {
             hiddenCard.classList.remove('hidden-card');
             hiddenCard.classList.add('flipped');
         }
-        
+
         updateScores(false); // Show real dealer score
-        
+
         balance = data.balance;
         balanceEl.textContent = formatChips(balance);
         gameActive = false;
 
         const win = data.result.toLowerCase().includes('win');
         const push = data.result.toLowerCase().includes('push');
-        
+
         tableMessage.textContent = data.result;
         tableMessage.style.color = win ? '#00ff90' : (push ? '#ffd700' : '#ff4b4b');
 
@@ -327,8 +360,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Initial dummy setup for looks
-    renderCard({placeholder:true}, playerHand);
-    renderCard({placeholder:true}, playerHand);
-    renderCard({placeholder:true}, dealerHand);
-    renderCard({placeholder:true}, dealerHand);
+    renderCard({ placeholder: true }, playerHand);
+    renderCard({ placeholder: true }, playerHand);
+    renderCard({ placeholder: true }, dealerHand);
+    renderCard({ placeholder: true }, dealerHand);
 });

@@ -1,128 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title><%= slotsConfig[slotType].title %> | CashMash</title>
-    
+    <title>
+        <%= slotsConfig[slotType].title %> | CashMash
+    </title>
+
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/header.css" />
     <link rel="stylesheet" href="/css/footer.css" />
     <link rel="stylesheet" href="/css/slots.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <%- include('partials/header') %>
-    <%- include('partials/gameLoader') %>
+        <%- include('partials/gameLoader') %>
 
-    <section class="slots-section">
-        <div class="game-container">
-            
-            <div class="game-header">
-                <h2 class="neon-title"><%= slotsConfig[slotType].title %></h2>
-                <div class="balance-pill">
-                    <i class="fas fa-wallet"></i>
-                    <span id="balance" data-raw-balance="<%= user.balance %>">
-                        <%= formatBalance(user.balance) %>
-                    </span>
-                </div>
-            </div>
+            <section class="slots-section">
+                <div class="game-container">
 
-            <div class="grid-wrapper">
-                <div class="slot-canvas-container">
-                    <canvas id="slotCanvas" data-slot-type="<%= slotType %>"></canvas>
-                </div>
-                
-                <div class="hud-bar">
-                    <div class="hud-item">
-                        <span class="label">Last Win</span>
-                        <span class="value highlight" id="resultAmount">$0.00</span>
+                    <div class="game-header">
+                        <h2 class="neon-title">
+                            <%= slotsConfig[slotType].title %>
+                        </h2>
+                        <div class="balance-pill">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span id="balance" data-raw-balance="<%= user.balance %>">
+                                <%= formatBalance(user.balance) %>
+                            </span>
+                        </div>
                     </div>
-                    <div class="hud-divider"></div>
-                    <div class="hud-item">
-                        <span class="label">Status</span>
-                        <span class="value" id="statusText">Good Luck</span>
+
+                    <div class="grid-wrapper">
+                        <div class="slot-canvas-container">
+                            <canvas id="slotCanvas" data-slot-type="<%= slotType %>"></canvas>
+                        </div>
+
+                        <div class="hud-bar">
+                            <div class="hud-item">
+                                <span class="label">Last Win</span>
+                                <span class="value highlight" id="resultAmount">$0.00</span>
+                            </div>
+                            <div class="hud-divider"></div>
+                            <div class="hud-item">
+                                <span class="label">Status</span>
+                                <span class="value" id="statusText">Good Luck</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-dock">
+                        <div class="settings-group">
+                            <button id="openBetModalBtn" class="setting-trigger">
+                                <span class="trigger-label">Total Bet</span>
+                                <span class="trigger-value" id="displayBetValue">$<%= slotsConfig[slotType].minBet %>
+                                        </span>
+                            </button>
+
+                            <button id="openInfoModalBtn" class="setting-trigger">
+                                <span class="trigger-label">Paytable</span>
+                                <span class="trigger-value"><i class="fas fa-info-circle"></i> Info</span>
+                            </button>
+                        </div>
+
+                        <button id="actionBtn" class="btn-action start">
+                            <span class="btn-text">SPIN</span>
+                            <span class="btn-subtext">Press to Roll</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div style="display:none;">
+                <input type="number" id="betAmount" value="<%= slotsConfig[slotType].minBet %>">
+                <button id="spinBtn">Hidden Spin</button>
+            </div>
+
+            <div id="betModal" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Set Bet Amount</h3>
+                        <button class="close-modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-wrapper">
+                            <span class="currency-symbol">$</span>
+                            <input type="number" id="modalBetInput" min="<%= slotsConfig[slotType].minBet %>"
+                                max="<%= slotsConfig[slotType].maxBet %>" value="<%= slotsConfig[slotType].minBet %>">
+                        </div>
+                        <div class="chip-grid">
+                            <button class="chip-btn" data-set="<%= slotsConfig[slotType].minBet %>">Min</button>
+                            <button class="chip-btn" data-set="<%= slotsConfig[slotType].minBet * 2 %>">2x</button>
+                            <button class="chip-btn" data-set="<%= slotsConfig[slotType].minBet * 5 %>">5x</button>
+                            <button class="chip-btn" data-set="<%= slotsConfig[slotType].minBet * 10 %>">10x</button>
+                            <button class="chip-btn action" id="halfBet">1/2</button>
+                            <button class="chip-btn action" id="doubleBet">Double</button>
+                            <button class="chip-btn action" id="maxBet">Max</button>
+                        </div>
+                        <button class="btn-confirm" id="confirmBet">Confirm Bet</button>
                     </div>
                 </div>
             </div>
 
-            <div class="control-dock">
-                <div class="settings-group">
-                    <button id="openBetModalBtn" class="setting-trigger">
-                        <span class="trigger-label">Total Bet</span>
-                        <span class="trigger-value" id="displayBetValue">$<%= slotsConfig[slotType].minBet %></span>
-                    </button>
-                    
-                    <button id="openInfoModalBtn" class="setting-trigger">
-                        <span class="trigger-label">Paytable</span>
-                        <span class="trigger-value"><i class="fas fa-info-circle"></i> Info</span>
-                    </button>
+            <div id="infoModal" class="modal-overlay">
+                <div class="modal-content wide">
+                    <div class="modal-header">
+                        <h3>Game Rules & Paytable</h3>
+                        <button class="close-modal">&times;</button>
+                    </div>
+                    <div class="modal-body scrollable" id="infoContent">
+                    </div>
                 </div>
-
-                <button id="actionBtn" class="btn-action start">
-                    <span class="btn-text">SPIN</span>
-                    <span class="btn-subtext">Press to Roll</span>
-                </button>
             </div>
-        </div>
-    </section>
 
-    <div style="display:none;">
-        <input type="number" id="betAmount" value="<%= slotsConfig[slotType].minBet %>">
-        <button id="spinBtn">Hidden Spin</button>
-    </div>
+            <%- include('partials/footer') %>
 
-    <div id="betModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Set Bet Amount</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="input-wrapper">
-                    <span class="currency-symbol">$</span>
-                    <input type="number" id="modalBetInput" 
-                           min="<%= slotsConfig[slotType].minBet %>" 
-                           max="<%= slotsConfig[slotType].maxBet %>" 
-                           value="<%= slotsConfig[slotType].minBet %>">
-                </div>
-                <div class="chip-grid">
-                    <button class="chip-btn" data-set="<%= slotsConfig[slotType].minBet %>">Min</button>
-                    <button class="chip-btn" data-set="<%= slotsConfig[slotType].minBet * 2 %>">2x</button>
-                    <button class="chip-btn" data-set="<%= slotsConfig[slotType].minBet * 5 %>">5x</button>
-                    <button class="chip-btn" data-set="<%= slotsConfig[slotType].minBet * 10 %>">10x</button>
-                    <button class="chip-btn action" id="halfBet">1/2</button>
-                    <button class="chip-btn action" id="doubleBet">Double</button>
-                    <button class="chip-btn action" id="maxBet">Max</button>
-                </div>
-                <button class="btn-confirm" id="confirmBet">Confirm Bet</button>
-            </div>
-        </div>
-    </div>
+                <script>
+                    window.slotsConfig = <% - JSON.stringify(slotsConfig) %>;
+                    window.currentSlot = "<%= slotType %>";
+                </script>
 
-    <div id="infoModal" class="modal-overlay">
-        <div class="modal-content wide">
-            <div class="modal-header">
-                <h3>Game Rules & Paytable</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body scrollable" id="infoContent">
-                </div>
-        </div>
-    </div>
+                <script src="/js/formatBalance.js"></script>
+                <script src="/js/slotEngine.js"></script>
+                <script src="/js/slotsModal.js"></script>
+</body>
 
-    <%- include('partials/footer') %>
-    
-    <script>
-        window.slotsConfig = <%- JSON.stringify(slotsConfig) %>;
-        window.currentSlot = "<%= slotType %>";
-    </script>
-
-    <script src="/js/formatBalance.js"></script>
-    <script src="/js/slotEngine.js"></script> 
-    <script src="/js/slotsModal.js"></script> </body>
 </html>
 
 <style>
-  <%= slotsConfig[slotType].theme %>
+    <%=slotsConfig[slotType].theme %>
 </style>

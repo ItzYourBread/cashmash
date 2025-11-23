@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    
+
     // ================= DOM ELEMENTS =================
     // Game Areas
     const playerHand = document.getElementById('playerHand');
@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const bankerScoreEl = document.getElementById('bankerScoreDisplay');
     const balanceEl = document.getElementById('balance');
     const popupMessage = document.getElementById('popupMessage');
-    
+
     // Message Element (Restored)
     const resultText = document.getElementById('resultText');
 
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnDeal = document.getElementById('btnDeal');
     const totalBetDisplay = document.getElementById('totalBetDisplay');
     const openBetModalBtn = document.getElementById('openBetModalBtn');
-    
+
     // Trigger Display Tags
     const displayBetP = document.getElementById('displayBetP');
     const displayBetB = document.getElementById('displayBetB');
@@ -38,12 +38,23 @@ document.addEventListener("DOMContentLoaded", () => {
     let bets = { player: 0, banker: 0, tie: 0 };
     let totalBet = 0;
     let lastActiveInput = inputPlayer; // Default target for chips
+    const MIN_BET = 0.1;
+    const MAX_BET = 100;
+
 
     // ================= UTILS =================
     const formatChips = (amount) => {
-        if (Math.abs(amount) < 1000) return parseFloat(amount).toFixed(2);
-        return new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(amount);
+        if (amount === null || amount === undefined) return '0.00';
+
+        const num = Number(amount);
+        if (isNaN(num)) return '0.00';
+
+        return num.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
     };
+
 
     const showPopup = (msg) => {
         popupMessage.textContent = msg;
@@ -58,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // ================= MESSAGE DISPLAY LOGIC (Restored) =================
-    
+
     // Helper to set message and optional winner class for color
     const setMessage = (message, winner = 'none') => {
         resultText.textContent = message;
@@ -73,14 +84,19 @@ document.addEventListener("DOMContentLoaded", () => {
             // Default color (gold)
         }
     };
-    
+
     // ================= BETTING MODAL LOGIC =================
-    
+
     // Track which input was last focused to apply chips there
     [inputPlayer, inputBanker, inputTie].forEach(input => {
-        input.addEventListener('focus', () => lastActiveInput = input);
-        input.addEventListener('input', calculateModalTotal);
+        input.addEventListener('blur', () => {
+            let val = parseFloat(input.value) || 0;
+            val = Math.min(Math.max(val, MIN_BET), MAX_BET);
+            input.value = val;
+            calculateModalTotal();
+        });
     });
+
 
     openBetModalBtn.addEventListener('click', () => {
         // Sync modal with current bets
@@ -95,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     chipBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            if(btn.id === 'clearBets') {
+            if (btn.id === 'clearBets') {
                 inputPlayer.value = 0; inputBanker.value = 0; inputTie.value = 0;
             } else {
                 const add = parseFloat(btn.dataset.add);
@@ -106,12 +122,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+
     function calculateModalTotal() {
         const p = parseFloat(inputPlayer.value) || 0;
         const b = parseFloat(inputBanker.value) || 0;
         const t = parseFloat(inputTie.value) || 0;
         const sum = p + b + t;
-        
+
         modalTotal.textContent = `$${formatChips(sum)}`;
         if (sum > balance) modalTotal.style.color = '#ff4b4b'; // Danger red
         else modalTotal.style.color = '#fff';
@@ -133,14 +150,14 @@ document.addEventListener("DOMContentLoaded", () => {
         displayBetB.textContent = `B: $${formatChips(b)}`;
         displayBetT.textContent = `T: $${formatChips(t)}`;
         totalBetDisplay.textContent = `Total Bet: $${formatChips(sum)}`;
-        
+
         // Dim zero bets
         displayBetP.style.opacity = p > 0 ? 1 : 0.3;
         displayBetB.style.opacity = b > 0 ? 1 : 0.3;
         displayBetT.style.opacity = t > 0 ? 1 : 0.3;
 
         betModal.classList.remove('active');
-        if(sum > 0) setMessage(`Ready to Deal. Total Bet: $${formatChips(sum)}`);
+        if (sum > 0) setMessage(`Ready to Deal. Total Bet: $${formatChips(sum)}`);
     });
 
 
@@ -151,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
                 const div = document.createElement('div');
                 div.classList.add('card');
-                
+
                 const inner = document.createElement('div');
                 inner.classList.add('card-inner');
                 div.appendChild(inner);
@@ -162,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const front = document.createElement('div');
                 front.classList.add('card-front');
-                if(card) {
+                if (card) {
                     const fname = getCardFilename(card);
                     front.innerHTML = `<img src="/images/playing-cards/${fname}" alt="${card.rank}">`;
                 }
@@ -172,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Trigger Flip
                 requestAnimationFrame(() => div.classList.add('flipped'));
-                
+
                 resolve();
             }, delay);
         });
@@ -198,14 +215,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const res = await fetch("/baccarat/play", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    betPlayer: bets.player, 
-                    betBanker: bets.banker, 
-                    betTie: bets.tie 
+                body: JSON.stringify({
+                    betPlayer: bets.player,
+                    betBanker: bets.banker,
+                    betTie: bets.tie
                 }),
             });
             const data = await res.json();
-            
+
             if (!data.success) throw new Error(data.message);
 
             // Animation Sequence
@@ -229,11 +246,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Show Scores
                 playerScoreEl.textContent = data.player.points;
                 bankerScoreEl.textContent = data.banker.points;
-                
+
                 // Finalize
                 balance = data.balance;
                 balanceEl.textContent = formatChips(balance);
-                
+
                 let winAmt = data.profit;
                 let finalMessage = "";
                 let winnerClass = "none";
@@ -248,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     winnerClass = 'tie';
                     finalMessage = `TIE GAME! | Profit: $${formatChips(winAmt)}`;
                 }
-                
+
                 if (winAmt <= 0 && data.result !== 'tie') { // If no profit, show loss/return message
                     finalMessage = `${finalMessage.split(' | ')[0]} | Lost: $${formatChips(totalBet)}`;
                 }

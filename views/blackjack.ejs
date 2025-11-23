@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -10,114 +11,133 @@
     <link rel="stylesheet" href="/css/blackjack.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <%- include('partials/header') %>
+        <%- include('partials/gameLoader') %>
 
-    <section class="blackjack-section">
-        <div class="game-container">
-            
-            <div class="game-header">
-                <h2 class="neon-title">Blackjack</h2>
-                <div class="balance-pill">
-                    <i class="fas fa-wallet"></i>
-                    <span id="balance" data-raw-balance="<%= user.balance %>">
-                        <%= formatBalance(user.balance) %>
-                    </span>
+            <section class="blackjack-section">
+                <div class="game-container">
+
+                    <div class="game-header">
+                        <h2 class="neon-title">Blackjack</h2>
+                        <div class="balance-pill">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span id="balance" data-raw-balance="<%= user.balance %>">
+                                <%= formatBalance(user.balance) %>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <div class="hand-section dealer">
+                            <div class="hand-label">DEALER</div>
+                            <div class="cards-container" id="dealerHand">
+                                <div class="card placeholder">
+                                    <div class="card-inner">
+                                        <div class="card-back"></div>
+                                    </div>
+                                </div>
+                                <div class="card placeholder">
+                                    <div class="card-inner">
+                                        <div class="card-back"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tableMessage" class="table-message">Place Bet to Start</div>
+
+                        <div class="hand-section player">
+                            <div class="hand-label">YOU</div>
+                            <div class="cards-container" id="playerHand">
+                                <div class="card placeholder">
+                                    <div class="card-inner">
+                                        <div class="card-back"></div>
+                                    </div>
+                                </div>
+                                <div class="card placeholder">
+                                    <div class="card-inner">
+                                        <div class="card-back"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hud-bar">
+                            <div class="hud-item">
+                                <span class="label">Dealer</span>
+                                <span class="value" id="dealerScoreDisplay">0</span>
+                            </div>
+                            <div class="hud-divider"></div>
+                            <div class="hud-item">
+                                <span class="label">Player</span>
+                                <span class="value highlight" id="playerScoreDisplay">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-dock">
+                        <div class="settings-group">
+                            <button id="openBetModalBtn" class="setting-trigger">
+                                <span class="trigger-label">Bet Amount</span>
+                                <span class="trigger-value" id="displayBetValue">$10</span>
+                            </button>
+                        </div>
+
+                        <div class="actions-container">
+
+                            <button id="btnDeal" class="btn-action start">
+                                <span class="btn-text">DEAL HAND</span>
+                                <span class="btn-subtext">Start Round</span>
+                            </button>
+
+                            <div id="ingameControls" class="ingame-grid" style="display:none;">
+                                <button id="btnStand" class="btn-action secondary">
+                                    <span class="btn-icon"><i class="fas fa-hand-paper"></i></span>
+                                    <span class="btn-text-small">STAND</span>
+                                </button>
+                                <button id="btnHit" class="btn-action primary">
+                                    <span class="btn-icon"><i class="fas fa-plus"></i></span>
+                                    <span class="btn-text-small">HIT</span>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div id="betModal" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Set Bet Amount</h3>
+                        <button class="close-modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-wrapper">
+                            <span class="currency-symbol">$</span>
+                            <input type="number" id="modalBetInput" value="10" min="1" max="1000">
+                        </div>
+                        <div class="chip-grid">
+                            <button class="chip-btn" data-add="10">+10</button>
+                            <button class="chip-btn" data-add="50">+50</button>
+                            <button class="chip-btn" data-add="100">+100</button>
+                            <button class="chip-btn action" id="halfBet">1/2</button>
+                            <button class="chip-btn action" id="doubleBet">2x</button>
+                            <button class="chip-btn action" id="maxBet">Max</button>
+                        </div>
+                        <button class="btn-confirm" id="confirmBet">Confirm Bet</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="table-wrapper">
-                
-                <div class="hand-section dealer">
-                    <div class="hand-label">DEALER</div>
-                    <div class="cards-container" id="dealerHand">
-                        <div class="card placeholder"><div class="card-inner"><div class="card-back"></div></div></div>
-                        <div class="card placeholder"><div class="card-inner"><div class="card-back"></div></div></div>
-                    </div>
-                </div>
+            <div id="popupMessage" class="popup-message"></div>
 
-                <div id="tableMessage" class="table-message">Place Bet to Start</div>
-
-                <div class="hand-section player">
-                    <div class="hand-label">YOU</div>
-                    <div class="cards-container" id="playerHand">
-                         <div class="card placeholder"><div class="card-inner"><div class="card-back"></div></div></div>
-                         <div class="card placeholder"><div class="card-inner"><div class="card-back"></div></div></div>
-                    </div>
-                </div>
-
-                <div class="hud-bar">
-                    <div class="hud-item">
-                        <span class="label">Dealer</span>
-                        <span class="value" id="dealerScoreDisplay">0</span>
-                    </div>
-                    <div class="hud-divider"></div>
-                    <div class="hud-item">
-                        <span class="label">Player</span>
-                        <span class="value highlight" id="playerScoreDisplay">0</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="control-dock">
-                <div class="settings-group">
-                    <button id="openBetModalBtn" class="setting-trigger">
-                        <span class="trigger-label">Bet Amount</span>
-                        <span class="trigger-value" id="displayBetValue">$10</span>
-                    </button>
-                </div>
-
-                <div class="actions-container">
-                    
-                    <button id="btnDeal" class="btn-action start">
-                        <span class="btn-text">DEAL HAND</span>
-                        <span class="btn-subtext">Start Round</span>
-                    </button>
-
-                    <div id="ingameControls" class="ingame-grid" style="display:none;">
-                        <button id="btnStand" class="btn-action secondary">
-                            <span class="btn-icon"><i class="fas fa-hand-paper"></i></span>
-                            <span class="btn-text-small">STAND</span>
-                        </button>
-                        <button id="btnHit" class="btn-action primary">
-                            <span class="btn-icon"><i class="fas fa-plus"></i></span>
-                            <span class="btn-text-small">HIT</span>
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div id="betModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Set Bet Amount</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="input-wrapper">
-                    <span class="currency-symbol">$</span>
-                    <input type="number" id="modalBetInput" value="10" min="1" max="1000">
-                </div>
-                <div class="chip-grid">
-                    <button class="chip-btn" data-add="10">+10</button>
-                    <button class="chip-btn" data-add="50">+50</button>
-                    <button class="chip-btn" data-add="100">+100</button>
-                    <button class="chip-btn action" id="halfBet">1/2</button>
-                    <button class="chip-btn action" id="doubleBet">2x</button>
-                    <button class="chip-btn action" id="maxBet">Max</button>
-                </div>
-                <button class="btn-confirm" id="confirmBet">Confirm Bet</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="popupMessage" class="popup-message"></div>
-
-    <%- include('partials/footer') %>
-    <script src="/js/formatBalance.js"></script>
-    <script src="/js/blackjack.js"></script>
+            <%- include('partials/footer') %>
+                <script src="/js/formatBalance.js"></script>
+                <script src="/js/blackjack.js"></script>
 </body>
+
 </html>

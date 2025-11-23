@@ -3,9 +3,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ====================== UTILITY ======================
   const formatChips = (amount) => {
-    if (Math.abs(amount) < 1000) return parseFloat(amount).toFixed(2);
-    return new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(amount);
+    if (amount === null || amount === undefined) return '0.00';
+
+    const num = Number(amount);
+    if (isNaN(num)) return '0.00';
+
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   };
+
 
   // ====================== DOM ELEMENTS ======================
   // Main UI
@@ -64,6 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Auto Cashout
   let autoCashoutEnabled = false;
   let autoCashoutValue = 2.00;
+
+  const MIN_BET = 1;
+  const MAX_BET = 100;
 
   // Initialize Balance
   balanceEl.textContent = formatChips(userBalance);
@@ -343,28 +354,38 @@ document.addEventListener("DOMContentLoaded", () => {
     betModal.classList.add('active');
   });
 
+  modalBetInput.addEventListener('blur', () => {
+    let val = parseFloat(modalBetInput.value) || MIN_BET;
+    if (val < MIN_BET) val = MIN_BET;
+    if (val > MAX_BET) val = MAX_BET;
+    modalBetInput.value = val;
+  });
+
+
   chipBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       let current = parseFloat(modalBetInput.value) || 0;
-      if (btn.dataset.add) current += parseFloat(btn.dataset.add);
-      else if (btn.id === 'halfBet') current = Math.max(1, Math.floor(current / 2));
-      else if (btn.id === 'doubleBet') current *= 2;
-      else if (btn.id === 'maxBet') current = userBalance;
 
-      if (current > userBalance) current = userBalance;
-      modalBetInput.value = current;
+      if (btn.dataset.add) current += parseFloat(btn.dataset.add);
+      else if (btn.id === 'halfBet') current = Math.max(MIN_BET, Math.floor(current / 2));
+      else if (btn.id === 'doubleBet') current *= 2;
+      else if (btn.id === 'maxBet') current = MAX_BET; // only clamp here
+
+      modalBetInput.value = current; // show temporary value
     });
   });
 
   confirmBetBtn.addEventListener('click', () => {
-    let val = parseFloat(modalBetInput.value);
-    if (val < 1) val = 1;
-    if (val > userBalance) val = userBalance;
+    let val = parseFloat(modalBetInput.value) || MIN_BET;
+
+    if (val < MIN_BET) val = MIN_BET;
+    if (val > MAX_BET) val = MAX_BET;
 
     currentBetAmount = val;
     displayBetValue.textContent = `$${formatChips(currentBetAmount)}`;
     betModal.classList.remove('active');
   });
+
 
   // Auto Modal
   openAutoModalBtn.addEventListener('click', () => {
@@ -433,13 +454,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let animStart = Date.now();
     // Adjust duration to match average crash curve or socket sync
-    let duration = 10000; // This controls the "speed" of the curve visually
+    let duration = 3000; // This controls the "speed" of the curve visually
 
     // Bezier Control Points (Classic Aviator curve)
     const p0 = { x: 0, y: 0 };
     const p1 = { x: 0.2, y: 0.05 };
     const p2 = { x: 0.5, y: 0.15 };
-    const p3 = { x: 0.95, y: 0.9 };
+    const p3 = { x: 0.80, y: 0.7 };
 
     function cubicBezier(t, p0, p1, p2, p3) {
       const x = Math.pow(1 - t, 3) * p0.x + 3 * Math.pow(1 - t, 2) * t * p1.x + 3 * (1 - t) * t * t * p2.x + t * t * t * p3.x;
@@ -465,8 +486,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const py = pt.y * areaHeight; // from bottom
 
       // Update Plane
-      const tilt = 5 + (30 * t); // Tilt up as it goes
-      const scale = 1 + (0.5 * t);
+      const tilt = 5 + (3 * t); // Tilt up as it goes
+      const scale = 1 + (1 * t);
 
       planeEl.style.left = `${px}px`;
       planeEl.style.bottom = `${py}px`;

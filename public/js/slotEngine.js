@@ -33,14 +33,16 @@
   const cfg = HUB[slotType];
   if (!cfg) return console.error('slotEngine: config for', slotType, 'not found');
 
-  // Format Helper (Matches slotsUI.js)
   const formatChips = (amount) => {
-    if (amount === null || amount === undefined) return '0';
-    if (Math.abs(amount) < 1000) return parseFloat(amount).toFixed(2);
-    return new Intl.NumberFormat('en-US', {
-      notation: 'compact', compactDisplay: 'short',
-      minimumFractionDigits: 1, maximumFractionDigits: 1,
-    }).format(amount);
+    if (amount === null || amount === undefined) return '0.00';
+
+    const num = Number(amount);
+    if (isNaN(num)) return '0.00';
+
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   };
 
   // Initialize Balance

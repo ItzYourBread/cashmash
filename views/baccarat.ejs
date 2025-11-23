@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -10,118 +11,136 @@
     <link rel="stylesheet" href="/css/baccarat.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <%- include('partials/header') %>
-    <%- include('partials/gameLoader') %>
+        <%- include('partials/gameLoader') %>
 
-    <section class="baccarat-section">
-        <div class="game-container">
-            
-            <div class="game-header">
-                <h2 class="neon-title">Baccarat</h2>
-                <div class="balance-pill">
-                    <i class="fas fa-wallet"></i>
-                    <span id="balance" data-raw-balance="<%= user.balance %>">
-                        <%= formatBalance(user.balance) %>
-                    </span>
-                </div>
-            </div>
+            <section class="baccarat-section">
+                <div class="game-container">
 
-            <div class="table-wrapper">
-                
-                <div class="hand-section player-zone">
-                    <div class="zone-label">PLAYER</div>
-                    <div class="cards-container" id="playerHand">
-                        <div class="card placeholder"><div class="card-inner"><div class="card-back"></div></div></div>
-                        <div class="card placeholder"><div class="card-inner"><div class="card-back"></div></div></div>
-                    </div>
-                    <div class="zone-score" id="playerScoreDisplay">0</div>
-                </div>
-
-                <div class="hand-section banker-zone">
-                    <div class="zone-label">BANKER</div>
-                    <div class="cards-container" id="bankerHand">
-                        <div class="card placeholder"><div class="card-inner"><div class="card-back"></div></div></div>
-                        <div class="card placeholder"><div class="card-inner"><div class="card-back"></div></div></div>
-                    </div>
-                    <div class="zone-score" id="bankerScoreDisplay">0</div>
-                </div>
-
-            </div>
-            
-            <div class="result-text" id="resultText">Place your bets and deal.</div>
-
-            <div class="control-dock">
-                <div class="settings-group">
-                    <button id="openBetModalBtn" class="setting-trigger">
-                        <span class="trigger-label">Active Bets</span>
-                        <div class="trigger-value-row">
-                            <span id="displayBetP" class="bet-tag player">P: $0</span>
-                            <span id="displayBetB" class="bet-tag banker">B: $0</span>
-                            <span id="displayBetT" class="bet-tag tie">T: $0</span>
-                        </div>
-                    </button>
-                </div>
-
-                <button id="btnDeal" class="btn-action start">
-                    <span class="btn-text">DEAL CARDS</span>
-                    <span class="btn-subtext" id="totalBetDisplay">Total Bet: $0</span>
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <div id="betModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Place Your Bets</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                
-                <div class="betting-grid">
-                    <div class="bet-row">
-                        <label class="lbl-player">PLAYER</label>
-                        <div class="input-wrapper">
-                            <span>$</span>
-                            <input type="number" id="inputPlayer" value="0" min="0">
+                    <div class="game-header">
+                        <h2 class="neon-title">Baccarat</h2>
+                        <div class="balance-pill">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span id="balance" data-raw-balance="<%= user.balance %>">
+                                <%= formatBalance(user.balance) %>
+                            </span>
                         </div>
                     </div>
-                    <div class="bet-row">
-                        <label class="lbl-banker">BANKER</label>
-                        <div class="input-wrapper">
-                            <span>$</span>
-                            <input type="number" id="inputBanker" value="0" min="0">
+
+                    <div class="table-wrapper">
+
+                        <div class="hand-section player-zone">
+                            <div class="zone-label">PLAYER</div>
+                            <div class="cards-container" id="playerHand">
+                                <div class="card placeholder">
+                                    <div class="card-inner">
+                                        <div class="card-back"></div>
+                                    </div>
+                                </div>
+                                <div class="card placeholder">
+                                    <div class="card-inner">
+                                        <div class="card-back"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="zone-score" id="playerScoreDisplay">0</div>
                         </div>
+
+                        <div class="hand-section banker-zone">
+                            <div class="zone-label">BANKER</div>
+                            <div class="cards-container" id="bankerHand">
+                                <div class="card placeholder">
+                                    <div class="card-inner">
+                                        <div class="card-back"></div>
+                                    </div>
+                                </div>
+                                <div class="card placeholder">
+                                    <div class="card-inner">
+                                        <div class="card-back"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="zone-score" id="bankerScoreDisplay">0</div>
+                        </div>
+
                     </div>
-                    <div class="bet-row">
-                        <label class="lbl-tie">TIE</label>
-                        <div class="input-wrapper">
-                            <span>$</span>
-                            <input type="number" id="inputTie" value="0" min="0">
+
+                    <div class="result-text" id="resultText">Place your bets and deal.</div>
+
+                    <div class="control-dock">
+                        <div class="settings-group">
+                            <button id="openBetModalBtn" class="setting-trigger">
+                                <span class="trigger-label">Active Bets</span>
+                                <div class="trigger-value-row">
+                                    <span id="displayBetP" class="bet-tag player">P: $0</span>
+                                    <span id="displayBetB" class="bet-tag banker">B: $0</span>
+                                    <span id="displayBetT" class="bet-tag tie">T: $0</span>
+                                </div>
+                            </button>
                         </div>
+
+                        <button id="btnDeal" class="btn-action start">
+                            <span class="btn-text">DEAL CARDS</span>
+                            <span class="btn-subtext" id="totalBetDisplay">Total Bet: $0</span>
+                        </button>
                     </div>
                 </div>
+            </section>
 
-                <div class="chip-grid">
-                    <button class="chip-btn" data-add="10">+10</button>
-                    <button class="chip-btn" data-add="50">+50</button>
-                    <button class="chip-btn" data-add="100">+100</button>
-                    <button class="chip-btn action" id="clearBets">Clear</button>
-                </div>
+            <div id="betModal" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Place Your Bets</h3>
+                        <button class="close-modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
 
-                <div class="modal-footer">
-                     <div class="total-bet-summary">Total: <span id="modalTotal">$0</span></div>
-                     <button class="btn-confirm" id="confirmBet">Confirm Bets</button>
+                        <div class="betting-grid">
+                            <div class="bet-row">
+                                <label class="lbl-player">PLAYER</label>
+                                <div class="input-wrapper">
+                                    <span>$</span>
+                                    <input type="number" id="inputPlayer" value="0" min="0">
+                                </div>
+                            </div>
+                            <div class="bet-row">
+                                <label class="lbl-banker">BANKER</label>
+                                <div class="input-wrapper">
+                                    <span>$</span>
+                                    <input type="number" id="inputBanker" value="0" min="0">
+                                </div>
+                            </div>
+                            <div class="bet-row">
+                                <label class="lbl-tie">TIE</label>
+                                <div class="input-wrapper">
+                                    <span>$</span>
+                                    <input type="number" id="inputTie" value="0" min="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chip-grid">
+                            <button class="chip-btn" data-add="10">+10</button>
+                            <button class="chip-btn" data-add="50">+50</button>
+                            <button class="chip-btn" data-add="100">+100</button>
+                            <button class="chip-btn action" id="clearBets">Clear</button>
+                        </div>
+
+                        <div class="modal-footer">
+                            <div class="total-bet-summary">Total: <span id="modalTotal">$0</span></div>
+                            <button class="btn-confirm" id="confirmBet">Confirm Bets</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div id="popupMessage" class="popup-message"></div>
+            <div id="popupMessage" class="popup-message"></div>
 
-    <%- include('partials/footer') %>
-    <script src="/js/formatBalance.js"></script>
-    <script src="/js/baccarat.js"></script>
+            <%- include('partials/footer') %>
+                <script src="/js/formatBalance.js"></script>
+                <script src="/js/baccarat.js"></script>
 </body>
+
 </html>

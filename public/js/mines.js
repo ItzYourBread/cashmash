@@ -1,14 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
-    
+
     // ====================== UTILITY FUNCTION ======================
     const formatChips = (amount) => {
-        if (Math.abs(amount) < 1000) return parseFloat(amount).toFixed(2);
-        const formatter = new Intl.NumberFormat('en-US', {
-            notation: 'compact', compactDisplay: 'short',
-            minimumFractionDigits: 1, maximumFractionDigits: 1,
+        if (amount === null || amount === undefined) return '0.00';
+
+        const num = Number(amount);
+        if (isNaN(num)) return '0.00';
+
+        return num.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
         });
-        return formatter.format(amount);
     };
+
 
     // ====================== DOM ELEMENTS ======================
     const grid = document.getElementById("grid");
@@ -16,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const profitDisplay = document.getElementById("profitDisplay");
     const balanceDisplay = document.getElementById("balance");
     const popupMessage = document.getElementById('popupMessage');
-    
+
     // Controls
     const actionBtn = document.getElementById("actionBtn");
     const btnText = actionBtn.querySelector(".btn-text");
@@ -54,14 +58,14 @@ document.addEventListener("DOMContentLoaded", () => {
     balanceDisplay.textContent = formatChips(balance);
 
     // ====================== MODAL LOGIC ======================
-    
+
     // Open Modals
     openBetModalBtn.addEventListener("click", () => {
-        if(gameActive) return showPopup("Cannot change bet during game");
+        if (gameActive) return showPopup("Cannot change bet during game");
         betModal.classList.add("active");
     });
     openMinesModalBtn.addEventListener("click", () => {
-        if(gameActive) return showPopup("Cannot change mines during game");
+        if (gameActive) return showPopup("Cannot change mines during game");
         minesModal.classList.add("active");
     });
 
@@ -185,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function startGame() {
         if (bet > balance) return showPopup("Insufficient Balance!");
-        
+
         setActionState("LOADING");
 
         try {
@@ -205,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
             multiplier = 1;
             gameActive = true;
             tiles = [];
-            
+
             // UI Reset
             multiplierDisplay.textContent = "1.00x";
             profitDisplay.textContent = formatChips(0);
@@ -260,11 +264,11 @@ document.addEventListener("DOMContentLoaded", () => {
             tile.classList.add("safe");
             setTileImage(tile, SAFE_IMAGE);
             multiplier = data.multiplier;
-            
+
             const currentProfit = bet * multiplier;
             multiplierDisplay.textContent = `${multiplier.toFixed(2)}x`;
             profitDisplay.textContent = formatChips(currentProfit);
-            
+
             // Update Cashout Button Text
             setActionState("CASHOUT", currentProfit);
 

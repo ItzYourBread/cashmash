@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Current user balance (grabbed from DOM)
     const balanceEl = document.getElementById("balance");
-    let userBalance = parseFloat(balanceEl.dataset.rawBalance) || 0;
+    let userBalance = parseFloat(balanceEl?.dataset?.rawBalance) || parseFloat(balanceEl?.textContent) || 0;
     let currentBet = minBet;
 
     // ================= DOM ELEMENTS =================
@@ -94,6 +94,9 @@ document.addEventListener("DOMContentLoaded", () => {
             statusTextDisplay.textContent = "Insufficient Funds!";
             statusTextDisplay.style.color = "#ff4b4b";
 
+                    console.log(`Spinning with bet: $${currentBet.toFixed(2)}`);
+
+                    console.log(userBalance)
             return;
         }
 
