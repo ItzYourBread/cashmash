@@ -15,7 +15,7 @@
   --gold: #f5c542;
   --gold-light: #ffdb6e;
   --bg-dark: #000;
-  --bg-deep: #04040a;
+  --bg-deep: #000000;
   --text-light: #fff;
   --text-dim: #bbb;
 }
@@ -23,7 +23,7 @@
 /* BODY */
 body {
   font-family: 'Poppins', sans-serif;
-  background: radial-gradient(circle at center, #000 20%, #020617 100%);
+  background: radial-gradient(circle at center, #000 20%, #000000 100%);
   color: var(--text-light);
   overflow-x: hidden;
 }

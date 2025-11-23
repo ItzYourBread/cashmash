@@ -5,133 +5,190 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Games | CashMash</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/header.css" />
     <link rel="stylesheet" href="/css/footer.css" />
     <link rel="stylesheet" href="/css/games.css" />
-
-    <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
-    <link rel="shortcut icon" href="/favicons/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="CashMash" />
-    <link rel="manifest" href="/favicons/site.webmanifest" />
+    <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" />
 </head>
 
 <body>
     <%- include('partials/header') %>
 
-        <section class="games">
-            <div class="games-header">
-                <h1>🎮 Explore Games</h1>
-                <p>Play and experience the thrill — anytime, anywhere.</p>
+    <div class="main-container">
+        
+        <div class="games-toolbar">
+            <div class="toolbar-left">
+                <h2>Lobby</h2>
+                <span class="online-count">🟢 1,240 Online</span>
             </div>
-
-            <!-- 🎰 SLOTS CATEGORY -->
-            <div class="category">
-                <h2>Slot Machines</h2>
-                <div class="game-grid">
-                    <div class="game-card" data-game="Classic Slot">
-                        <img src="/images/classic-slot-cover.jpg" alt="Classic Slot" />
-                        <div class="overlay">Classic</div>
-                    </div>
-                    <div class="game-card" data-game="Pharaoh's Riches">
-                        <img src="/images/Pharaohs-Riches-slot-cover.jpg" alt="Pharaoh's Riches" />
-                        <div class="overlay">Pharaoh's Riches</div>
-                    </div>
-                    <div class="game-card" data-game="Dragon Blaze">
-                        <img src="/images/Dragon-Blaze-slot-cover.jpg" alt="Dragon Blaze" />
-                        <div class="overlay">Dragon Blaze</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 🎡 CARDS CATEGORY -->
-            <div class="category">
-                <h2>Cards & Casino</h2>
-                <div class="game-grid">
-                    <div class="game-card" data-game="Blackjack">
-                        <img src="/images/blackjack-cover.jpg" alt="Blackjack" />
-                        <div class="overlay">Blackjack</div>
-                    </div>
-                    <div class="game-card" data-game="Baccarat">
-                        <img src="/images/baccarat-cover.jpg" alt="Baccarat" />
-                        <div class="overlay">Baccarat</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 🧨 OTHER CATEGORY -->
-            <div class="category">
-                <h2>Other</h2>
-                <div class="game-grid">
-                    <div class="game-card" data-game="Mines">
-                        <img src="/images/mines-cover.jpg" alt="Mines" />
-                        <div class="overlay">Mines</div>
-                    </div>
-                    <div class="game-card" data-game="Aviator">
-                        <img src="/images/aviator-cover.jpg" alt="Aviator" />
-                        <div class="overlay">Aviator</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 🔐 LOGIN MODAL -->
-        <div class="login-modal" id="loginModal">
-            <div class="modal-content">
-                <h2>Login Required</h2>
-                <p>You need to be logged in to play <span id="selectedGame"></span>.</p>
-                <div class="modal-actions">
-                    <a href="/login" class="btn gold">Login</a>
-                    <button class="btn outline" id="closeModal">Cancel</button>
-                </div>
+            <div class="category-pills">
+                <button class="pill active" data-target="all">🔥 Lobby</button>
+                <button class="pill" data-target="section-slots">🎰 Slots</button>
+                <button class="pill" data-target="section-table">🃏 Tables</button>
+                <button class="pill" data-target="section-original">🚀 Originals</button>
             </div>
         </div>
 
-        <%- include('partials/footer') %>
+        <div class="games-wrapper">
+            
+            <div class="game-section" id="section-popular">
+                <div class="section-title">
+                    <h3>🔥 Popular Now</h3>
+                </div>
+                <div class="compact-grid">
+                    <div class="game-card" data-game="Dragon Blaze">
+                        <div class="badge hot">HOT</div>
+                        <div class="img-container"><img src="/images/Dragon-Blaze-slot-cover.jpg" loading="lazy" alt="Dragon Blaze" /></div>
+                        <div class="card-meta"><span>Dragon Blaze</span><div class="play-icon">▶</div></div>
+                    </div>
+                    <div class="game-card" data-game="Aviator">
+                        <div class="badge live">LIVE</div>
+                        <div class="img-container"><img src="/images/aviator-cover.jpg" loading="lazy" alt="Aviator" /></div>
+                        <div class="card-meta"><span>Aviator</span><div class="play-icon">▶</div></div>
+                    </div>
+                    <div class="game-card" data-game="Mines">
+                        <div class="img-container"><img src="/images/mines-cover.jpg" loading="lazy" alt="Mines" /></div>
+                        <div class="card-meta"><span>Mines</span><div class="play-icon">▶</div></div>
+                    </div>
+                    <div class="game-card" data-game="Blackjack">
+                        <div class="img-container"><img src="/images/blackjack-cover.jpg" loading="lazy" alt="Blackjack" /></div>
+                        <div class="card-meta"><span>Blackjack</span><div class="play-icon">▶</div></div>
+                    </div>
+                </div>
+            </div>
 
-            <script>
-                const modal = document.getElementById('loginModal');
-                const closeBtn = document.getElementById('closeModal');
-                const gameCards = document.querySelectorAll('.game-card');
-                const selectedGame = document.getElementById('selectedGame');
+            <div class="game-section mt-4" id="section-slots">
+                <div class="section-title">
+                    <h3>🎰 Slots</h3>
+                </div>
+                <div class="compact-grid">
+                    <div class="game-card" data-game="Dragon Blaze">
+                        <div class="badge hot">HOT</div>
+                        <div class="img-container"><img src="/images/Dragon-Blaze-slot-cover.jpg" loading="lazy" alt="Dragon Blaze" /></div>
+                        <div class="card-meta"><span>Dragon Blaze</span><div class="play-icon">▶</div></div>
+                    </div>
+                    <div class="game-card" data-game="Classic Slot">
+                        <div class="img-container"><img src="/images/classic-slot-cover.jpg" loading="lazy" alt="Classic Slot" /></div>
+                        <div class="card-meta"><span>Classic Slot</span><div class="play-icon">▶</div></div>
+                    </div>
+                    <div class="game-card" data-game="Pharaoh's Riches">
+                        <div class="img-container"><img src="/images/Pharaohs-Riches-slot-cover.jpg" loading="lazy" alt="Pharaoh's Riches" /></div>
+                        <div class="card-meta"><span>Pharaoh's Riches</span><div class="play-icon">▶</div></div>
+                    </div>
+                </div>
+            </div>
 
-                // Check if logged in (server-side injection)
-                const isLoggedIn = <%= user ? 'true' : 'false' %>;
+            <div class="game-section mt-4" id="section-table">
+                <div class="section-title">
+                    <h3>🃏 Casino & Cards</h3>
+                </div>
+                <div class="compact-grid">
+                    <div class="game-card" data-game="Blackjack">
+                        <div class="img-container"><img src="/images/blackjack-cover.jpg" loading="lazy" alt="Blackjack" /></div>
+                        <div class="card-meta"><span>Blackjack</span><div class="play-icon">▶</div></div>
+                    </div>
+                    <div class="game-card" data-game="Baccarat">
+                        <div class="img-container"><img src="/images/baccarat-cover.jpg" loading="lazy" alt="Baccarat" /></div>
+                        <div class="card-meta"><span>Baccarat</span><div class="play-icon">▶</div></div>
+                    </div>
+                </div>
+            </div>
 
-                // Map each game name to its route
-                const gameRoutes = {
-                    "Classic Slot": "/slot?type=ClassicSlot",
-                    "Pharaoh's Riches": "/slot?type=PharaohsRiches",
-                    "Dragon Blaze": "/slot?type=DragonBlaze",
-                    "Blackjack": "/blackjack",
-                    "Baccarat": "/baccarat",
-                    "Mines": "/mines",
-                    "Aviator": "/aviator"
-                };
+            <div class="game-section mt-4" id="section-original">
+                <div class="section-title">
+                    <h3>🚀 Originals</h3>
+                </div>
+                <div class="compact-grid">
+                    <div class="game-card" data-game="Mines">
+                        <div class="badge hot">POPULAR</div>
+                        <div class="img-container"><img src="/images/mines-cover.jpg" loading="lazy" alt="Mines" /></div>
+                        <div class="card-meta"><span>Mines</span><div class="play-icon">▶</div></div>
+                    </div>
+                    <div class="game-card" data-game="Aviator">
+                        <div class="badge live">LIVE</div>
+                        <div class="img-container"><img src="/images/aviator-cover.jpg" loading="lazy" alt="Aviator" /></div>
+                        <div class="card-meta"><span>Aviator</span><div class="play-icon">▶</div></div>
+                    </div>
+                </div>
+            </div>
 
-                gameCards.forEach(card => {
-                    card.addEventListener('click', () => {
-                        const gameName = card.dataset.game;
-                        if (isLoggedIn) {
-                            // Redirect to game page
-                            window.location.href = gameRoutes[gameName] || '/';
-                        } else {
-                            // Show login modal
-                            selectedGame.textContent = gameName;
-                            modal.classList.add('show');
-                        }
-                    });
-                });
+        </div>
+    </div>
 
-                // Modal close logic
-                closeBtn.addEventListener('click', () => modal.classList.remove('show'));
-                window.addEventListener('click', e => {
-                    if (e.target === modal) modal.classList.remove('show');
-                });
-            </script>
+    <div class="login-modal" id="loginModal">
+        <div class="modal-box">
+            <h3>Login Required</h3>
+            <p>Please login to play <strong id="selectedGame"></strong></p>
+            <div class="modal-btns">
+                <a href="/login" class="btn-gold-sm">Login</a>
+                <button id="closeModal" class="btn-outline-sm">Cancel</button>
+            </div>
+        </div>
+    </div>
 
+    <%- include('partials/footer') %>
+
+    <script>
+        // --- 1. SECTION TOGGLE LOGIC ---
+        const filterBtns = document.querySelectorAll('.pill');
+        const sections = document.querySelectorAll('.game-section');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from buttons
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const targetId = btn.getAttribute('data-target');
+
+                if (targetId === 'all') {
+                    // Show ALL sections
+                    sections.forEach(sec => sec.style.display = 'block');
+                } else {
+                    // Hide ALL sections first
+                    sections.forEach(sec => sec.style.display = 'none');
+                    // Show ONLY the target section
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.style.display = 'block';
+                    }
+                }
+            });
+        });
+
+        // --- 2. MODAL & GAME CLICK LOGIC ---
+        const modal = document.getElementById('loginModal');
+        const selectedGame = document.getElementById('selectedGame');
+        const isLoggedIn = <%= user ? 'true' : 'false' %>;
+
+        const gameRoutes = {
+            "Classic Slot": "/slot?type=ClassicSlot",
+            "Pharaoh's Riches": "/slot?type=PharaohsRiches",
+            "Dragon Blaze": "/slot?type=DragonBlaze",
+            "Blackjack": "/blackjack",
+            "Baccarat": "/baccarat",
+            "Mines": "/mines",
+            "Aviator": "/aviator"
+        };
+
+        // Note: We use querySelectorAll so it catches duplicates (e.g. Dragon Blaze in Popular AND Slots)
+        document.querySelectorAll('.game-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const gameName = card.dataset.game;
+                if (isLoggedIn) {
+                    window.location.href = gameRoutes[gameName] || '/';
+                } else {
+                    selectedGame.textContent = gameName;
+                    modal.classList.add('active');
+                }
+            });
+        });
+
+        document.getElementById('closeModal').addEventListener('click', () => modal.classList.remove('active'));
+        modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('active') });
+    </script>
 </body>
-
 </html>

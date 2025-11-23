@@ -3,7 +3,7 @@
     --gold: #f5c542;
     --gold-glow: rgba(245, 197, 66, 0.4);
     --dark-bg: #0a0f1f;
-    --panel-bg: rgba(20, 27, 47, 0.9);
+    --panel-bg: rgba(20, 27, 47, 0.875);
     --glass: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
     --danger: #ff4b4b;
@@ -11,7 +11,7 @@
 }
 
 html, body {
-    background: radial-gradient(circle at center, #000000 35%, #1a1a1a 100%);
+    background: radial-gradient(circle at center, #000000 35%, #000000 100%);
     font-family: 'Poppins', sans-serif;
     color: #fff;
     overflow-x: hidden;

@@ -12,7 +12,7 @@
 }
 
 html, body {
-    background: radial-gradient(circle at center, #000000 35%, #1a1a1a 100%);
+    background: radial-gradient(circle at center, #000000 35%, #000000 100%);
     font-family: 'Poppins', sans-serif;
     color: #fff;
     overflow-x: hidden;
