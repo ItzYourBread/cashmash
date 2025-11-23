@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const span = document.createElement("span");
       span.classList.add("badge");
 
-      // Coloring rules
+      // Coloring rules2
       if (crash >= 10) span.classList.add("high");
       else if (crash >= 2) span.classList.add("med");
       else span.classList.add("low");
