@@ -102,7 +102,7 @@
 
       case 'WIN':
         const winAmount = data;
-        actionBtn.disabled = false;
+        // NOTE: actionBtn.disabled remains TRUE here for visual effect duration
         actionBtn.style.background = ''; // Reset to CSS default
         if (btnText) btnText.textContent = "SPIN AGAIN";
         if (btnSubtext) btnSubtext.textContent = "Press to Roll";
@@ -116,7 +116,7 @@
         break;
 
       case 'LOSE':
-        actionBtn.disabled = false;
+        // NOTE: actionBtn.disabled remains TRUE here until resetSpinUI is called
         actionBtn.style.background = '';
         if (btnText) btnText.textContent = "SPIN";
         if (btnSubtext) btnSubtext.textContent = "Press to Roll";
@@ -338,7 +338,9 @@
     let bet = parseFloat(hiddenBetInput.value) || cfg.minBet;
     if (bet > currentBalance) {
       if (statusText) { statusText.textContent = "No Funds!"; statusText.style.color = "#ff4b4b"; }
-      return;
+      // *** FIX: Since the spin didn't start, the UI button remains enabled.
+      // We don't need to call resetSpinUI, as the UI script didn't disable it.
+      return; 
     }
 
     // 2. UI Setup
@@ -365,7 +367,9 @@
 
       // 6. End Sequence
       // Calculate when the last reel stops
-      const totalAnimationTime = 1000 + (REELS * 300) + 800; // +800 for settling buffer
+      const animationBuffer = 800; // Time for settling/snapping
+      const visualEffectTime = 3000; // Time for glow/particles
+      const totalAnimationTime = 1000 + (REELS * 300) + animationBuffer;
 
       setTimeout(() => {
         spinning = false;
@@ -394,15 +398,7 @@
             }
           }));
         }
-        // ClassicSlot: show JACKPOT markers for jackpot symbol (no automatic cash unless server returns)
-        // if (slotType === 'ClassicSlot') {
-        //   finalSymbols.forEach((col, ci) => col.forEach((s, ri) => {
-        //     if (s && s.name === 'jackpot') {
-        //       bonusMarkers.push({ x: ci, y: ri, text: 'JACKPOT', ms: 2000 });
-        //     }
-        //   }));
-        // }
-
+        
         if (bonusAdded > 0) {
           currentBalance += bonusAdded;
           if (balanceDisplay) balanceDisplay.textContent = formatChips(currentBalance);
@@ -419,9 +415,16 @@
           draw();
 
           // Stop glowing after a few seconds
-          setTimeout(() => { glowing = false; }, 3000);
+          setTimeout(() => { 
+            glowing = false; 
+            // *** FIX: Call the UI reset function after all WIN effects are finished
+            if (window.resetSpinUI) window.resetSpinUI();
+          }, visualEffectTime); 
+
         } else {
           updateUIState('LOSE');
+          // *** FIX: Call the UI reset function immediately on LOSE
+          if (window.resetSpinUI) window.resetSpinUI();
         }
 
       }, totalAnimationTime);
@@ -433,6 +436,9 @@
       currentBalance += bet;
       if (balanceDisplay) balanceDisplay.textContent = formatChips(currentBalance);
       updateUIState('LOSE'); // Reset UI
+      
+      // *** FIX: Call the UI reset function on error/refund
+      if (window.resetSpinUI) window.resetSpinUI();
     }
   }
 
