@@ -23,7 +23,8 @@
         <div class="games-toolbar">
             <div class="toolbar-left">
                 <h2>Lobby</h2>
-                <span class="online-count">🟢 1,240 Online</span>
+                <!-- REAL ONLINE COUNT -->
+                <span class="online-count" id="onlineCount">🟢 Connecting...</span>
             </div>
             <div class="category-pills">
                 <button class="pill active" data-target="all">🔥 Lobby</button>
@@ -192,8 +193,21 @@
 
     <%- include('partials/footer') %>
 
+    <!-- IMPORTANT: Include Socket.IO client script -->
+    <script src="/socket.io/socket.io.js"></script>
+
     <script>
-        // --- 1. SECTION TOGGLE LOGIC ---
+        // --- 1. REAL ONLINE USERS ---
+        const socket = io(); // Connects to the same server
+
+        const onlineCountEl = document.getElementById('onlineCount');
+
+        socket.on('updateOnlineCount', (count) => {
+            // Update the text with the real number from server
+            onlineCountEl.textContent = `🟢 ${count.toLocaleString()} Online`;
+        });
+
+        // --- 2. SECTION TOGGLE LOGIC ---
         const filterBtns = document.querySelectorAll('.pill');
         const sections = document.querySelectorAll('.game-section');
 
@@ -213,7 +227,7 @@
             });
         });
 
-        // --- 2. MODAL & GAME CLICK LOGIC ---
+        // --- 3. MODAL & GAME CLICK LOGIC ---
         const modal = document.getElementById('loginModal');
         const selectedGame = document.getElementById('selectedGame');
         const isLoggedIn = <%= user ? 'true' : 'false' %>;

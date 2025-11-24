@@ -1,5 +1,3 @@
-// app.js
-
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -26,14 +24,12 @@ i18n.configure({
     locales: ['en'],
     directory: path.join(__dirname, 'locales'),
     defaultLocale: 'en',
-    // setting cookie name to null to use session instead
     cookie: null, 
-    // Register the translation function 't' as a helper in EJS templates
     register: global, 
-    queryParameter: 'lang', // For initial setting via URL (optional)
+    queryParameter: 'lang', 
     syncFiles: true 
 });
-app.use(i18n.init); // Initialize i18n middleware
+app.use(i18n.init);
 
 // Middlewares
 app.set('view engine', 'ejs');
@@ -42,9 +38,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- CORS for Render ---
+// --- CORS ---
 const cors = require('cors');
-
 app.use(cors({
   origin: [
     'https://cashmash.onrender.com', 
@@ -57,7 +52,6 @@ app.use(cors({
   credentials: true
 }));
 
-
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET || 'cashmashsecret',
   resave: false,
@@ -69,47 +63,26 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // --- Language Utilities ---
-const languageMap = {
-    'en': 'English',
-};
+const languageMap = { 'en': 'English' };
+function getLangName(langCode) { return languageMap[langCode] || 'English'; }
 
-function getLangName(langCode) {
-    return languageMap[langCode] || 'English'; // Default to English
-}
-
-// --- Language Detection Middleware ---
 app.use((req, res, next) => {
     const lang = req.session.lang || 'en';
-    
-    // Set the language for the current request using i18n
     req.setLocale(lang); 
-    
-    // Make variables available to all EJS templates
     res.locals.currentLang = lang;
     res.locals.getLangName = getLangName;
     res.locals.user = req.user || null;
-    
-    // The translation function __() is now available globally (or as res.locals.__)
-
     next();
 });
 
-// --- Language Setting Route ---
 app.get('/set-language', (req, res) => {
     const { lang, redirect } = req.query;
-
     if (Object.keys(languageMap).includes(lang)) {
-        // 1. Set the language preference in the session
         req.session.lang = lang;
-        // 2. Also set the locale for the current request to ensure instant change
         req.setLocale(lang); 
     }
-
-    // Redirect the user back to the page they were on
     const redirectTo = redirect ? decodeURIComponent(redirect) : '/';
-    req.session.save(() => {
-        res.redirect(redirectTo);
-    });
+    req.session.save(() => { res.redirect(redirectTo); });
 });
 
 // Routes
@@ -125,15 +98,26 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server);
 
-// Share io in controllers
 app.set('io', io);
 
-// Wrap session for Socket.IO
 io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);
 });
 
+// --- REAL-TIME CONNECTION LOGIC ---
 io.on('connection', (socket) => {
+    
+    // 1. Get Real Count & Broadcast to Everyone
+    const onlineCount = io.engine.clientsCount;
+    io.emit('updateOnlineCount', onlineCount);
+
+    // 2. Handle Disconnect (Update count when user leaves)
+    socket.on('disconnect', () => {
+        const newCount = io.engine.clientsCount;
+        io.emit('updateOnlineCount', newCount);
+    });
+
+    // --- Existing Aviator Logic ---
     socket.on('placeBet', (data, ack) => {
         aviatorController.socketPlaceBet(socket, data, ack);
     });
@@ -143,7 +127,6 @@ io.on('connection', (socket) => {
     });
 });
 
-// Start Aviator loop
 aviatorController.initAviator(io);
 
 const PORT = process.env.PORT || 3000;

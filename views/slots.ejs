@@ -64,7 +64,7 @@
                             <button id="openBetModalBtn" class="setting-trigger">
                                 <span class="trigger-label">Total Bet</span>
                                 <span class="trigger-value" id="displayBetValue">$<%= slotsConfig[slotType].minBet %>
-                                        </span>
+                                </span>
                             </button>
 
                             <button id="openInfoModalBtn" class="setting-trigger">
@@ -125,6 +125,8 @@
 
             <%- include('partials/footer') %>
 
+                <!-- IMPORTANT: Include Socket.IO client script -->
+                <script src="/socket.io/socket.io.js"></script>
                 <script>
                     window.slotsConfig = <%- JSON.stringify(slotsConfig) %>;
                     window.currentSlot = "<%= slotType %>";
@@ -133,6 +135,7 @@
                 <script src="/js/formatBalance.js"></script>
                 <script src="/js/slotEngine.js"></script>
                 <script src="/js/slotsModal.js"></script>
+
 </body>
 
 </html>
