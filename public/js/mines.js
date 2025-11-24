@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let gameId = null;
     let multiplier = 1;
-    let bet = 1; // Default
+    let bet = 10; // Default
     let mineCount = 3; // Default
     let gameActive = false;
     let tiles = [];
