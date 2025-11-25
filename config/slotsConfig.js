@@ -134,9 +134,9 @@ const slotsConfig = {
     rows: 4,
 
     symbolChances: {
-      goldCoin: 17, scarab: 15, hieroglyphScroll: 13,
-      ankh: 12, pyramid: 11, treasureChest: 10,
-      sphinx: 9, pharaoh: 7, ra: 6,
+      goldCoin: 17, scarab: 14, hieroglyphScroll: 12,
+      ankh: 11, pyramid: 10, treasureChest: 9,
+      sphinx: 8, pharaoh: 6, ra: 4,
     },
 
     paylines: [
@@ -226,9 +226,9 @@ const slotsConfig = {
     rows: 4,
 
     symbolChances: {
-      emberCoin: 18, fireRune: 14, flameSword: 12,
+      emberCoin: 17, fireRune: 14, flameSword: 12,
       lavaShield: 11, dragonEye: 10, phoenixFeather: 9,
-      blazeCrown: 8, goldenDragon: 9, dragonBlaze: 9,
+      blazeCrown: 8, goldenDragon: 6, dragonBlaze: 4,
     },
 
     paylines: [
