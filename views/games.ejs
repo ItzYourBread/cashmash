@@ -17,245 +17,292 @@
 <body>
     <%- include('partials/header') %>
 
-    <div class="main-container">
-        
-        <!-- 🔍 TOOLBAR -->
-        <div class="games-toolbar">
-            <div class="toolbar-left">
-                <h2>Lobby</h2>
-                <!-- REAL ONLINE COUNT -->
-                <span class="online-count" id="onlineCount">0 Online</span>
+        <div class="main-container">
+
+            <!-- 🔍 TOOLBAR -->
+            <div class="games-toolbar">
+                <div class="toolbar-left">
+                    <h2>Lobby</h2>
+                    <!-- REAL ONLINE COUNT -->
+                    <span class="online-count" id="onlineCount">0 Online</span>
+                </div>
+                <div class="category-pills">
+                    <button class="pill active" data-target="all">Lobby</button>
+                    <button class="pill" data-target="section-slots">Machines</button>
+                    <button class="pill" data-target="section-table">Tables</button>
+                    <button class="pill" data-target="section-original">Originals</button>
+                </div>
             </div>
-            <div class="category-pills">
-                <button class="pill active" data-target="all">Lobby</button>
-                <button class="pill" data-target="section-slots">Machines</button>
-                <button class="pill" data-target="section-table">Tables</button>
-                <button class="pill" data-target="section-original">Originals</button>
+
+            <div class="games-wrapper">
+
+                <!-- 1. POPULAR SECTION -->
+                <div class="game-section" id="section-popular">
+                    <div class="section-title">
+                        <h3>Popular Now</h3>
+                    </div>
+                    <div class="compact-grid">
+                        <div class="game-card" data-game="Dragon Blaze">
+                            <div class="badge hot">HOT</div>
+                            <div class="img-container"><img src="/images/Dragon-Blaze-slot-cover.png" loading="lazy"
+                                    alt="Dragon Blaze" /></div>
+                            <div class="card-meta">
+                                <span>Dragon Blaze</span>
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="game-card" data-game="Aviator">
+                            <div class="badge live">LIVE</div>
+                            <div class="img-container"><img src="/images/Aviator-cover.png" loading="lazy"
+                                    alt="Aviator" /></div>
+                            <div class="card-meta">
+                                <span>Aviator</span>
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="game-card" data-game="Mines">
+                            <div class="img-container"><img src="/images/Mines-cover.png" loading="lazy" alt="Mines" />
+                            </div>
+                            <div class="card-meta">
+                                <span>Mines</span>
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="game-card" data-game="Blackjack">
+                            <div class="img-container"><img src="/images/Blackjack-cover.png" loading="lazy"
+                                    alt="Blackjack" /></div>
+                            <div class="card-meta">
+                                <span>Blackjack</span>
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. SLOTS SECTION -->
+                <div class="game-section mt-4" id="section-slots">
+                    <div class="section-title">
+                        <h3>Slots</h3>
+                    </div>
+                    <div class="compact-grid">
+                        <div class="game-card" data-game="Dragon Blaze">
+                            <div class="badge hot">HOT</div>
+                            <div class="img-container"><img src="/images/Dragon-Blaze-slot-cover.png" loading="lazy"
+                                    alt="Dragon Blaze" /></div>
+                            <div class="card-meta">
+                                <span>Dragon Blaze</span>
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="game-card" data-game="Winter 2025">
+                            <div class="img-container"><img src="/images/Winter-2025-slot-cover.png" loading="lazy"
+                                    alt="Winter 2025" /></div>
+                            <div class="card-meta">
+                                <span>Winter 2025</span>
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="game-card" data-game="Classic Slot">
+                            <div class="img-container"><img src="/images/Classic-slot-cover.png" loading="lazy"
+                                    alt="Classic Slot" /></div>
+                            <div class="card-meta">
+                                <span>Classic</span>
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="game-card" data-game="Pharaoh's Riches">
+                            <div class="img-container"><img src="/images/Pharaohs-Riches-slot-cover.png" loading="lazy"
+                                    alt="Pharaoh's Riches" /></div>
+                            <div class="card-meta">
+                                <span>Pharaoh's Riches</span>
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. TABLES SECTION -->
+                <div class="game-section mt-4" id="section-table">
+                    <div class="section-title">
+                        <h3>Casino & Cards</h3>
+                    </div>
+                    <div class="compact-grid">
+                        <div class="game-card" data-game="Blackjack">
+                            <div class="img-container"><img src="/images/Blackjack-cover.png" loading="lazy"
+                                    alt="Blackjack" /></div>
+                            <div class="card-meta">
+                                <span>Blackjack</span>
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="game-card" data-game="Baccarat">
+                            <div class="img-container"><img src="/images/Baccarat-cover.png" loading="lazy"
+                                    alt="Baccarat" /></div>
+                            <div class="card-meta">
+                                <span>Baccarat</span>
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. ORIGINALS SECTION -->
+                <div class="game-section mt-4" id="section-original">
+                    <div class="section-title">
+                        <h3>Originals</h3>
+                    </div>
+                    <div class="compact-grid">
+                        <div class="game-card" data-game="Mines">
+                            <div class="badge hot">POPULAR</div>
+                            <div class="img-container"><img src="/images/Mines-cover.png" loading="lazy" alt="Mines" />
+                            </div>
+                            <div class="card-meta">
+                                <span>Mines</span>
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="game-card" data-game="Aviator">
+                            <div class="badge live">LIVE</div>
+                            <div class="img-container"><img src="/images/Aviator-cover.png" loading="lazy"
+                                    alt="Aviator" /></div>
+                            <div class="card-meta">
+                                <span>Aviator</span>
+                                <div class="play-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <div class="games-wrapper">
-            
-            <!-- 1. POPULAR SECTION -->
-            <div class="game-section" id="section-popular">
-                <div class="section-title">
-                    <h3>Popular Now</h3>
+        <!-- 🔐 LOGIN MODAL -->
+        <div class="login-modal" id="loginModal">
+            <div class="modal-box">
+                <h3>Login Required</h3>
+                <p>Please login to play <strong id="selectedGame"></strong></p>
+                <div class="modal-btns">
+                    <a href="/login" class="btn-gold-sm">Login</a>
+                    <button id="closeModal" class="btn-outline-sm">Cancel</button>
                 </div>
-                <div class="compact-grid">
-                    <div class="game-card" data-game="Dragon Blaze">
-                        <div class="badge hot">HOT</div>
-                        <div class="img-container"><img src="/images/Dragon-Blaze-slot-cover.png" loading="lazy" alt="Dragon Blaze" /></div>
-                        <div class="card-meta">
-                            <span>Dragon Blaze</span>
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="game-card" data-game="Aviator">
-                        <div class="badge live">LIVE</div>
-                        <div class="img-container"><img src="/images/Aviator-cover.png" loading="lazy" alt="Aviator" /></div>
-                        <div class="card-meta">
-                            <span>Aviator</span>
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="game-card" data-game="Mines">
-                        <div class="img-container"><img src="/images/Mines-cover.png" loading="lazy" alt="Mines" /></div>
-                        <div class="card-meta">
-                            <span>Mines</span>
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="game-card" data-game="Blackjack">
-                        <div class="img-container"><img src="/images/Blackjack-cover.png" loading="lazy" alt="Blackjack" /></div>
-                        <div class="card-meta">
-                            <span>Blackjack</span>
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. SLOTS SECTION -->
-            <div class="game-section mt-4" id="section-slots">
-                <div class="section-title">
-                    <h3>Slots</h3>
-                </div>
-                <div class="compact-grid">
-                    <div class="game-card" data-game="Dragon Blaze">
-                        <div class="badge hot">HOT</div>
-                        <div class="img-container"><img src="/images/Dragon-Blaze-slot-cover.png" loading="lazy" alt="Dragon Blaze" /></div>
-                        <div class="card-meta">
-                            <span>Dragon Blaze</span>
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="game-card" data-game="Classic Slot">
-                        <div class="img-container"><img src="/images/Classic-slot-cover.png" loading="lazy" alt="Classic Slot" /></div>
-                        <div class="card-meta">
-                            <span>Classic</span>
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="game-card" data-game="Pharaoh's Riches">
-                        <div class="img-container"><img src="/images/Pharaohs-Riches-slot-cover.png" loading="lazy" alt="Pharaoh's Riches" /></div>
-                        <div class="card-meta">
-                            <span>Pharaoh's Riches</span>
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. TABLES SECTION -->
-            <div class="game-section mt-4" id="section-table">
-                <div class="section-title">
-                    <h3>Casino & Cards</h3>
-                </div>
-                <div class="compact-grid">
-                    <div class="game-card" data-game="Blackjack">
-                        <div class="img-container"><img src="/images/Blackjack-cover.png" loading="lazy" alt="Blackjack" /></div>
-                        <div class="card-meta">
-                            <span>Blackjack</span>
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="game-card" data-game="Baccarat">
-                        <div class="img-container"><img src="/images/Baccarat-cover.png" loading="lazy" alt="Baccarat" /></div>
-                        <div class="card-meta">
-                            <span>Baccarat</span>
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. ORIGINALS SECTION -->
-            <div class="game-section mt-4" id="section-original">
-                <div class="section-title">
-                    <h3>Originals</h3>
-                </div>
-                <div class="compact-grid">
-                    <div class="game-card" data-game="Mines">
-                        <div class="badge hot">POPULAR</div>
-                        <div class="img-container"><img src="/images/Mines-cover.png" loading="lazy" alt="Mines" /></div>
-                        <div class="card-meta">
-                            <span>Mines</span>
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="game-card" data-game="Aviator">
-                        <div class="badge live">LIVE</div>
-                        <div class="img-container"><img src="/images/Aviator-cover.png" loading="lazy" alt="Aviator" /></div>
-                        <div class="card-meta">
-                            <span>Aviator</span>
-                            <div class="play-icon">
-                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- 🔐 LOGIN MODAL -->
-    <div class="login-modal" id="loginModal">
-        <div class="modal-box">
-            <h3>Login Required</h3>
-            <p>Please login to play <strong id="selectedGame"></strong></p>
-            <div class="modal-btns">
-                <a href="/login" class="btn-gold-sm">Login</a>
-                <button id="closeModal" class="btn-outline-sm">Cancel</button>
             </div>
         </div>
-    </div>
 
-    <%- include('partials/footer') %>
+        <%- include('partials/footer') %>
 
-    <!-- IMPORTANT: Include Socket.IO client script -->
-    <script src="/socket.io/socket.io.js"></script>
+            <!-- IMPORTANT: Include Socket.IO client script -->
+            <script src="/socket.io/socket.io.js"></script>
 
-    <script>
-        // --- 1. REAL ONLINE USERS ---
-        const socket = io(); // Connects to the same server
+            <script>
+                // --- 1. REAL ONLINE USERS ---
+                const socket = io(); // Connects to the same server
 
-        const onlineCountEl = document.getElementById('onlineCount');
+                const onlineCountEl = document.getElementById('onlineCount');
 
-        socket.on('updateOnlineCount', (count) => {
-            // Update the text with the real number from server
-            onlineCountEl.textContent = `${count.toLocaleString()} Online`;
-        });
+                socket.on('updateOnlineCount', (count) => {
+                    // Update the text with the real number from server
+                    onlineCountEl.textContent = `${count.toLocaleString()} Online`;
+                });
 
-        // --- 2. SECTION TOGGLE LOGIC ---
-        const filterBtns = document.querySelectorAll('.pill');
-        const sections = document.querySelectorAll('.game-section');
+                // --- 2. SECTION TOGGLE LOGIC ---
+                const filterBtns = document.querySelectorAll('.pill');
+                const sections = document.querySelectorAll('.game-section');
 
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const targetId = btn.getAttribute('data-target');
+                filterBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filterBtns.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        const targetId = btn.getAttribute('data-target');
 
-                if (targetId === 'all') {
-                    sections.forEach(sec => sec.style.display = 'block');
-                } else {
-                    sections.forEach(sec => sec.style.display = 'none');
-                    const targetSection = document.getElementById(targetId);
-                    if (targetSection) targetSection.style.display = 'block';
-                }
-            });
-        });
+                        if (targetId === 'all') {
+                            sections.forEach(sec => sec.style.display = 'block');
+                        } else {
+                            sections.forEach(sec => sec.style.display = 'none');
+                            const targetSection = document.getElementById(targetId);
+                            if (targetSection) targetSection.style.display = 'block';
+                        }
+                    });
+                });
 
-        // --- 3. MODAL & GAME CLICK LOGIC ---
-        const modal = document.getElementById('loginModal');
-        const selectedGame = document.getElementById('selectedGame');
-        const isLoggedIn = <%= user ? 'true' : 'false' %>;
+                // --- 3. MODAL & GAME CLICK LOGIC ---
+                const modal = document.getElementById('loginModal');
+                const selectedGame = document.getElementById('selectedGame');
+                const isLoggedIn = <%= user ? 'true' : 'false' %>;
 
-        const gameRoutes = {
-            "Classic Slot": "/slot?type=ClassicSlot",
-            "Pharaoh's Riches": "/slot?type=PharaohsRiches",
-            "Dragon Blaze": "/slot?type=DragonBlaze",
-            "Blackjack": "/blackjack",
-            "Baccarat": "/baccarat",
-            "Mines": "/mines",
-            "Aviator": "/aviator"
-        };
+                const gameRoutes = {
+                    "Classic Slot": "/slot?type=ClassicSlot",
+                    "Pharaoh's Riches": "/slot?type=PharaohsRiches",
+                    "Dragon Blaze": "/slot?type=DragonBlaze",
+                    "Winter 2025": "/slot?type=Winter2025",
+                    "Blackjack": "/blackjack",
+                    "Baccarat": "/baccarat",
+                    "Mines": "/mines",
+                    "Aviator": "/aviator"
+                };
 
-        document.querySelectorAll('.game-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const gameName = card.dataset.game;
-                if (isLoggedIn) {
-                    window.location.href = gameRoutes[gameName] || '/';
-                } else {
-                    selectedGame.textContent = gameName;
-                    modal.classList.add('active');
-                }
-            });
-        });
+                document.querySelectorAll('.game-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const gameName = card.dataset.game;
+                        if (isLoggedIn) {
+                            window.location.href = gameRoutes[gameName] || '/';
+                        } else {
+                            selectedGame.textContent = gameName;
+                            modal.classList.add('active');
+                        }
+                    });
+                });
 
-        document.getElementById('closeModal').addEventListener('click', () => modal.classList.remove('active'));
-        modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('active') });
-    </script>
+                document.getElementById('closeModal').addEventListener('click', () => modal.classList.remove('active'));
+                modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active') });
+            </script>
 </body>
+
 </html>
