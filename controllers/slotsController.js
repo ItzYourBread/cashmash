@@ -18,15 +18,15 @@ const getHourlyRTP = () => {
   const seed = parseInt(
     `${now.getFullYear()}${now.getMonth() + 1}${now.getDate()}${now.getHours()}`
   );
-  
+
   // Simple pseudo-random number generator using sine wave based on the seed
   // (Math.sin returns -1 to 1, we normalize it to 0 to 1)
   const x = Math.sin(seed) * 10000;
-  const randomFactor = x - Math.floor(x); 
+  const randomFactor = x - Math.floor(x);
 
   // Scale to range [0.85, 0.92]
   const currentRTP = RTP_MIN + (randomFactor * (RTP_MAX - RTP_MIN));
-  
+
   console.log(`🕒 Hourly RTP for hour ${seed}: ${currentRTP.toFixed(4)}`);
   // Return with 4 decimal precision (e.g., 0.8743)
   return parseFloat(currentRTP.toFixed(4));
@@ -63,9 +63,9 @@ const getDynamicConfig = () => {
   const today = new Date();
   const isLuckyDay = today.getDay() === 0 || today.getDay() === 1; // Sun/Mon
   const payoutBoost = isLuckyDay ? 1.1 : 1.0; // +10% payouts
-  
+
   // CALCULATE CURRENT HOURLY RTP
-  const currentBaseRTP = getHourlyRTP(); 
+  const currentBaseRTP = getHourlyRTP();
 
   const symbols = baseConfig.symbols.map(sym => ({
     ...sym,
@@ -126,9 +126,9 @@ exports.spin = async (req, res) => {
 
   try {
     setSlotType(req);
-    
+
     // Config now contains the dynamic Hourly RTP
-    let config = getDynamicConfig(); 
+    let config = getDynamicConfig();
     config = cacheValidPaylines(config);
 
     const user = await User.findById(req.user.id).lean(false);
@@ -148,15 +148,35 @@ exports.spin = async (req, res) => {
     // --- BONUS LOGIC ---
     let dragonEyeBonus = 0;
     let pharaohBonus = 0;
+    let northStarBonus = 0;      
+    let snowflakeBonus = 0;    
 
     for (const reel of finalSymbols) {
       for (const sym of reel) {
-        if (sym.name === "dragonEye") dragonEyeBonus += bet * 0.10;
-        if (sym.name === "pharaoh") pharaohBonus += bet * 0.05;
+
+        if (sym.name === "dragonEye") {
+          dragonEyeBonus += bet * 0.10;
+        }
+
+        if (sym.name === "pharaoh") {
+          pharaohBonus += bet * 0.05;
+        }
+
+        if (sym.name === "northStar") {
+          northStarBonus += bet * 0.10;
+        }
+
+        if (sym.name === "snowflake") {
+          snowflakeBonus += bet * 0.05;
+        }
       }
     }
 
-    totalWin += dragonEyeBonus + pharaohBonus;
+    totalWin +=
+      dragonEyeBonus +
+      pharaohBonus +
+      northStarBonus +
+      snowflakeBonus;
 
     // --- UPDATE BALANCE ---
     user.balance += totalWin;
@@ -265,7 +285,7 @@ exports.simulate = async (req, res) => {
     console.log(`💰 Final Balance: ${finalBalance.toFixed(4)}`);
     console.log(`📉 Net Result: ${netResult.toFixed(4)}`);
     console.log(`🎯 Effective RTP: ${effectiveRTP.toFixed(4)}`);
-    
+
 
     res.json({
       ok: true,

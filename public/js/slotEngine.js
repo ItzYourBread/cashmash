@@ -222,17 +222,55 @@
   let particles = [];
   let bonusMarkers = [];
 
-  // --- Particles ---
-  const createParticles = (count = 25, colorFn) => {
-    for (let i = 0; i < count; i++) {
+  // ================= PARTICLES SYSTEM =================
+  const createParticles = () => {
+    // 1. Get Theme from Config (or use Default)
+    const theme = cfg.particleTheme || {
+      shape: 'circle',
+      colors: ['#FFD700', '#FFA500'],
+      count: 50,
+      gravity: 0.1,
+      speedY: { min: -8, max: -4 },
+      speedX: { min: -3, max: 3 },
+      size: { min: 3, max: 6 },
+      life: 0.015
+    };
+
+    for (let i = 0; i < theme.count; i++) {
+      const color = theme.colors[Math.floor(Math.random() * theme.colors.length)];
+
+      const speedYMin = theme.speedY.min;
+      const speedYMax = theme.speedY.max;
+
+      // Calculate speeds
+      let vy = (Math.random() * (speedYMax - speedYMin)) + speedYMin;
+      let vx = (Math.random() * (theme.speedX.max - theme.speedX.min)) + theme.speedX.min;
+      let sz = (Math.random() * (theme.size.max - theme.size.min)) + theme.size.min;
+
+      // Determine Start Position based on Logic
+      let startX = Math.random() * CANVAS_WIDTH;
+      let startY;
+
+      // Logic: If Gravity is POSITIVE (Falling) AND SpeedY is POSITIVE (Moving Down)
+      // It is RAIN/SNOW -> Start at TOP
+      if ((theme.gravity || 0) > 0 && speedYMin > 0) {
+        startY = -20; // Above screen
+      } else {
+        // Otherwise (Explosion or Rising Fire) -> Start at BOTTOM
+        startY = CANVAS_HEIGHT - 10;
+      }
+
       particles.push({
-        x: Math.random() * CANVAS_WIDTH,
-        y: CANVAS_HEIGHT,
-        size: Math.random() * 4 + 2,
-        speedY: 2 + Math.random() * 4,
-        speedX: (Math.random() - 0.5) * 2,
+        x: startX,
+        y: startY,
+        vx: vx,
+        vy: vy,
+        grav: theme.gravity || 0,
+        size: sz,
         alpha: 1,
-        color: colorFn ? colorFn() : `rgba(255,215,0,1)`,
+        color: color,
+        shape: theme.shape || 'circle',
+        decay: theme.life || 0.01
       });
     }
   };
@@ -242,18 +280,31 @@
       ctx.save();
       ctx.globalAlpha = p.alpha;
       ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
+
+      if (p.shape === 'snowflake') {
+        ctx.font = `${p.size * 3}px Arial`;
+        ctx.fillText("❄", p.x, p.y);
+      }
+      else if (p.shape === 'rect') {
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+      }
+      else {
+        // Default Circle
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.restore();
 
-      p.y -= p.speedY;
-      p.x += p.speedX;
-      p.alpha -= 0.015;
+      // Physics
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += p.grav; // Apply Gravity
+      p.alpha -= p.decay;
     });
     particles = particles.filter(p => p.alpha > 0);
   };
-
+  
   // --- Background ---
   function drawBackground(ctx) {
     // Clean dark background to match glassmorphism
@@ -340,7 +391,7 @@
       if (statusText) { statusText.textContent = "No Funds!"; statusText.style.color = "#ff4b4b"; }
       // *** FIX: Since the spin didn't start, the UI button remains enabled.
       // We don't need to call resetSpinUI, as the UI script didn't disable it.
-      return; 
+      return;
     }
 
     // 2. UI Setup
@@ -398,7 +449,26 @@
             }
           }));
         }
-        
+
+        // Winter2025 bonuses
+        if (slotType === 'Winter2025') {
+          finalSymbols.forEach((col, ci) => col.forEach((s, ri) => {
+            if (!s) return;
+
+            // North Star → +10%
+            if (s.name === 'northStar') {
+              bonusAdded += bet * 0.10;
+              bonusMarkers.push({ x: ci, y: ri, text: '+10%', ms: 1600 });
+            }
+
+            // Snowflake → +5%
+            if (s.name === 'snowflake') {
+              bonusAdded += bet * 0.05;
+              bonusMarkers.push({ x: ci, y: ri, text: '+5%', ms: 1600 });
+            }
+          }));
+        }
+
         if (bonusAdded > 0) {
           currentBalance += bonusAdded;
           if (balanceDisplay) balanceDisplay.textContent = formatChips(currentBalance);
@@ -415,11 +485,11 @@
           draw();
 
           // Stop glowing after a few seconds
-          setTimeout(() => { 
-            glowing = false; 
+          setTimeout(() => {
+            glowing = false;
             // *** FIX: Call the UI reset function after all WIN effects are finished
             if (window.resetSpinUI) window.resetSpinUI();
-          }, visualEffectTime); 
+          }, visualEffectTime);
 
         } else {
           updateUIState('LOSE');
@@ -436,7 +506,7 @@
       currentBalance += bet;
       if (balanceDisplay) balanceDisplay.textContent = formatChips(currentBalance);
       updateUIState('LOSE'); // Reset UI
-      
+
       // *** FIX: Call the UI reset function on error/refund
       if (window.resetSpinUI) window.resetSpinUI();
     }
