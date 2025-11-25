@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const slot = slotsConfig[type];
     const { minBet, maxBet } = slot;
-    
+
     // Current user balance (grabbed from DOM)
     const balanceEl = document.getElementById("balance");
     let userBalance = parseFloat(balanceEl?.dataset?.rawBalance) || parseFloat(balanceEl?.textContent) || 0;
@@ -17,12 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const displayBetValue = document.getElementById("displayBetValue");
     const resultAmountDisplay = document.getElementById("resultAmount");
     const statusTextDisplay = document.getElementById("statusText");
-    
+
     // Main Action
     const actionBtn = document.getElementById("actionBtn");
     const btnText = actionBtn.querySelector(".btn-text");
     const btnSubtext = actionBtn.querySelector(".btn-subtext");
-    
+
     // Hidden Engine Elements (Bridge to your engine)
     const hiddenBetInput = document.getElementById("betAmount");
     const hiddenSpinBtn = document.getElementById("spinBtn");
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const openBetModalBtn = document.getElementById("openBetModalBtn");
     const openInfoModalBtn = document.getElementById("openInfoModalBtn");
     const closeButtons = document.querySelectorAll(".close-modal");
-    
+
     // Bet Modal Logic
     const modalBetInput = document.getElementById("modalBetInput");
     const confirmBetBtn = document.getElementById("confirmBet");
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     openBetModalBtn.addEventListener("click", () => {
-        if(actionBtn.disabled) return; // Prevent change during spin
+        if (actionBtn.disabled) return; // Prevent change during spin
         modalBetInput.value = currentBet;
         betModal.classList.add("active");
     });
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
     chipBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             let val = parseFloat(modalBetInput.value) || minBet;
-            
+
             if (btn.dataset.set) {
                 val = parseFloat(btn.dataset.set);
             } else if (btn.id === "halfBet") {
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let val = parseFloat(modalBetInput.value);
         if (isNaN(val) || val < minBet) val = minBet;
         if (val > maxBet) val = maxBet;
-        
+
         currentBet = val;
         updateBetDisplay();
         betModal.classList.remove("active");
@@ -94,9 +94,9 @@ document.addEventListener("DOMContentLoaded", () => {
             statusTextDisplay.textContent = "Insufficient Funds!";
             statusTextDisplay.style.color = "#ff4b4b";
 
-                    console.log(`Spinning with bet: $${currentBet.toFixed(2)}`);
+            console.log(`Spinning with bet: $${currentBet.toFixed(2)}`);
 
-                    console.log(userBalance)
+            console.log(userBalance)
             return;
         }
 
@@ -116,19 +116,18 @@ document.addEventListener("DOMContentLoaded", () => {
         // (Assuming your engine resets the button state, or we simulate it)
         // Since I don't see the engine code, I will add a listener to the canvas 
         // or rely on the engine to re-enable interaction. 
-        
+
         // If your engine doesn't emit an event, we can reset UI after a timeout 
         // based on standard spin time (e.g., 3 seconds)
         setTimeout(() => {
+            hiddenSpinBtn.click();
             actionBtn.disabled = false;
-            btnText.textContent = "SPIN";
-            btnSubtext.textContent = "Press to Roll";
-        }, 2500); 
+        }, 2500); // Adjust based on actual spin duration
     });
 
     // Monitor Balance Changes (Optional: if engine updates the hidden balance span)
     const observer = new MutationObserver(() => {
-        userBalance = parseFloat(balanceEl.innerText.replace(/[^0-9.-]+/g,"")) || 0;
+        userBalance = parseFloat(balanceEl.innerText.replace(/[^0-9.-]+/g, "")) || 0;
     });
     observer.observe(balanceEl, { childList: true, subtree: true });
 
@@ -140,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function populateInfoModal() {
         const container = document.getElementById("infoContent");
-        
+
         const symbolList = slot.symbols.map(s => `
             <li class="paytable-item">
                 <img src="${s.file}" class="mini-symbol" alt="${s.name}">
@@ -165,9 +164,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function formatSymbolName(name) {
         return name.replace(/([A-Z])/g, " $1")
-                   .replace(/[_-]+/g, " ")
-                   .trim()
-                   .replace(/\b\w/g, c => c.toUpperCase());
+            .replace(/[_-]+/g, " ")
+            .trim()
+            .replace(/\b\w/g, c => c.toUpperCase());
     }
 
     // ================= GLOBAL CLOSE =================
