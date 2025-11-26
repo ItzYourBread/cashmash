@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let bets = { player: 0, banker: 0, tie: 0 };
     let totalBet = 0;
     let lastActiveInput = inputPlayer; // Default target for chips
-    const MIN_BET = 0.1;
+    const MIN_BET = 0;
     const MAX_BET = 100;
 
 
