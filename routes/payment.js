@@ -43,7 +43,7 @@ const agentPayments = JSON.parse(fs.readFileSync(agentPaymentsPath, 'utf-8'));
 let cachedCurrencies = null;
 let lastFetch = 0;
 
-router.get('/deposit', async (req, res) => {
+router.get('/deposit', ensureAuth, async (req, res) => {
   try {
     const now = Date.now();
 
