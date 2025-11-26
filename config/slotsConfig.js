@@ -138,7 +138,7 @@ const slotsConfig = {
     particleTheme: {
       shape: 'circle',
       // Color Palette: White (hot core) -> Gold -> Orange -> Red -> Dark Red (cooling ash)
-      colors: ['#FFFFFF', '#FFF700', '#FFD700', '#FF4500', '#8B0000', '#420000'], 
+      colors: ['#FFFFFF', '#FFF700', '#FFD700', '#FF4500', '#8B0000', '#420000'],
       count: 120,          // Higher count for a dense blast
       gravity: -0.2,       // Strong negative gravity (accelerates UP)
       speedY: { min: -12, max: -5 }, // FAST initial upward burst (Negative Y = Up)
@@ -189,25 +189,23 @@ const slotsConfig = {
       .close-btn { position: absolute; top: 14px; right: 16px; font-size: 1.8em; color: #cfe8ff; cursor: pointer; transition: 0.3s; }
       .modal-content h2 { text-align: center; color: #d6edff; font-size: 1.8em; margin-bottom: 16px; }
       .modal-content li { margin-bottom: 10px; color: #e9f6ff; border-left: 3px solid rgba(180,220,255,0.55); padding-left: 12px; }
+      .btn-action{width:100%;padding:18px;border-radius:15px;border:none;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.3s all;box-shadow:0 5px 20px rgba(0,0,0,.35);background:linear-gradient(135deg,#c9e8ff,#7fc8f7,#4aa3e6);background-size:220% 220%;color:#042033;text-shadow:0 0 6px rgba(255,255,255,.35),0 0 12px rgba(180,220,255,.4)}.btn-action:hover{transform:translateY(-2px);box-shadow:0 0 25px rgba(180,220,255,.7),0 0 40px rgba(110,170,255,.5);background-position:100% 0;filter:brightness(1.12)}
     `,
     minBet: 0.1,
     maxBet: 100,
     description: "A frosty wonderland filled with holiday magic, cold treasures, and seasonal rewards.",
     bonusInfo: "Snowflake gives +5% winter bonus; North Star gives +10% bet bonus.",
     baseWinRate: { MIN: 0.7, MAX: 0.3 },
-
-    // --- NEW: Falling Snowflakes ---
     particleTheme: {
-      shape: 'snowflake', // Will use unicode ❄
-      colors: ['#FFFFFF', '#E0F7FA', '#B3E5FC'], // White/Ice
-      count: 60,
-      gravity: 0.05, // Very light fall
-      speedY: { min: 2, max: 4 }, // Falling down speed
-      speedX: { min: -1.5, max: 1.5 }, // Gentle Sway
-      size: { min: 4, max: 8 }, // Text Size
-      life: 0.008 // Lasts a long time
+      shape: 'snowflake',
+      colors: ['#FFFFFF', '#E8F9FF', '#CFEFFF'], // Softer natural tones
+      count: 50,                      // Slightly more to fill screen naturally
+      gravity: 0.02,                  // Very light pull (long fall)
+      speedY: { min: 0.4, max: 1.2 }, // Slow descent
+      speedX: { min: -0.8, max: 0.8 },// Gentle horizontal drift
+      size: { min: 5, max: 9 },       // Slightly larger so slow feels natural
+      life: 0.0025                    // Very long lifespan (slow fade)
     },
-
     symbols: [
       { name: 'snowball', file: '/images/Winter2025Slots/snowball.png', multiplier: 0.5 },
       { name: 'mittens', file: '/images/Winter2025Slots/mittens.png', multiplier: 0.7 },
