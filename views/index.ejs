@@ -4,56 +4,151 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CashMash | Online Betting & Casino</title>
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="stylesheet" href="/css/header.css" />
-  <link rel="stylesheet" href="/css/footer.css" />
+  <title>CashMash | Online Casino, Betting & Real Money Slots</title>
+  <meta name="description" content="Join CashMash for thrilling online casino games, sports betting, and real money slots. Experience instant payouts, massive jackpots, and global leaderboards. Bet boldly and win big today!" />
+  <meta name="keywords" content="online casino, online betting, real money slots, casino games, sports betting, instant payouts, jackpot slots, high RTP slots, gambling site" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="CashMash Team" />
+  <meta name="geo.region" content="US" /> <!-- Adjust based on target audience; assuming global but US-focused for gambling laws -->
+  <meta name="geo.placename" content="Online" />
+  <meta name="geo.position" content="0;0" /> <!-- Placeholder for global online service -->
+  <meta name="ICBM" content="0,0" />
 
+  <!-- Open Graph for social sharing (Facebook, etc.) -->
+  <meta property="og:title" content="CashMash | Online Casino & Betting Platform" />
+  <meta property="og:description" content="Dive into real cash winnings with high-stakes online betting, casino slots, and table games at CashMash. Instant payouts and global competitions await!" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://cashmash.watchnsfw.com/" />
+  <meta property="og:image" content="https://cashmash.watchnsfw.com/images/CashMash.png" /> <!-- Add an actual image URL for sharing -->
+  <meta property="og:site_name" content="CashMash" />
+
+  <!-- Twitter Card for better X (Twitter) sharing -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="CashMash | Online Casino, Betting & Real Money Slots" />
+  <meta name="twitter:description" content="Experience the ultimate online casino and betting thrill at CashMash. Real money wins, instant cashouts, and top-tier games." />
+  <meta name="twitter:image" content="https://cashmash.watchnsfw.com/images/CashMash.png" /> <!-- Replace with actual image -->
+
+  <!-- Canonical URL to avoid duplicate content issues -->
+  <link rel="canonical" href="https://cashmash.watchnsfw.com/" />
+
+  <!-- Structured Data (Schema.org) for better SEO rich snippets -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "CashMash",
+    "url": "https://cashmash.watchnsfw.com/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://cashmash.watchnsfw.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "CashMash",
+    "url": "https://cashmash.watchnsfw.com/",
+    "logo": "https://cashmash.watchnsfw.com/favicons/apple-touch-icon.png",
+    "description": "Premier online casino and betting platform offering real money games, slots, and sports betting with instant payouts.",
+    "sameAs": [
+      "https://t.me/cashmashnet"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Casino",
+    "name": "CashMash Online Casino",
+    "url": "https://cashmash.watchnsfw.com/",
+    "description": "Online casino featuring slots, table games, and sports betting with real cash winnings and instant payouts.",
+    "currenciesAccepted": "USD, EUR, BTC", <!-- Adjust based on actual supported currencies -->
+    "paymentAccepted": "Credit Card, PayPal, Cryptocurrency, E-Wallets",
+    "openingHours": "Mo,Tu,We,Th,Fr,Sa,Su 00:00-24:00"
+  }
+  </script>
+
+  <!-- Favicons (already good, but ensuring alt-like descriptions if needed) -->
   <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
   <link rel="shortcut icon" href="/favicons/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-title" content="CashMash" />
   <link rel="manifest" href="/favicons/site.webmanifest" />
+
+  <!-- CSS Links (keep existing, add preload for faster loading) -->
+  <link rel="preload" href="/css/style.css" as="style" />
+  <link rel="preload" href="/css/header.css" as="style" />
+  <link rel="preload" href="/css/footer.css" as="style" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
 </head>
 
 <body>
   <%- include('partials/header') %>
 
-    <section class="hero">
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-        <h1>Welcome to <span class="cash">Cash</span><span class="mash">Mash</span></h1>
+  <section class="hero" itemscope itemtype="https://schema.org/ImageObject">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 itemprop="name">Welcome to <span class="cash">Cash</span><span class="mash">Mash</span></h1>
+      <p itemprop="description">
+        THE GAME IS LIVE. FEAR IS A LUXURY. BET BOLDLY. <br>
+        The adrenaline rush that pays your bills. Maximum payout. Minimum regret. Discover top online casino games, real money betting, and high-stakes slots.
+      </p>
+      <a href="/login" class="btn-gold big">Play Now & Win Real Money</a>
+    </div>
+    <!-- Assuming a background image; add meta for SEO -->
+    <meta itemprop="contentUrl" content="https://cashmash.watchnsfw.com/images/hero-background.jpg" /> <!-- Replace with actual -->
+  </section>
 
-        <p>
-          THE GAME IS LIVE. FEAR IS A LUXURY. BET BOLDLY. <br>
-          The adrenaline rush that pays your bills. Maximum payout. Minimum regret.
-        </p>
+  <section class="features" itemscope itemtype="https://schema.org/ItemList">
+    <div class="feature" itemprop="itemListElement" itemscope itemtype="https://schema.org/Offer">
+      <h2 itemprop="name">Real Cash Winnings in Online Casino Games</h2>
+      <p itemprop="description">Experience the ultimate adrenaline rush at CashMash online casino. Turn your spins into massive payouts and walk away with cold, hard cash. The stakes are real, and the jackpots are waiting in our real money slots and betting options.</p>
+    </div>
+    <div class="feature" itemprop="itemListElement" itemscope itemtype="https://schema.org/Offer">
+      <h2 itemprop="name">Global Leaderboards for Competitive Betting</h2>
+      <p itemprop="description">Don't just play—dominate. Compete against high rollers from around the world in online betting and casino tournaments, climb the daily ranks, and claim your spot at the top to unlock legendary rewards and VIP status.</p>
+    </div>
+    <div class="feature" itemprop="itemListElement" itemscope itemtype="https://schema.org/Offer">
+      <h2 itemprop="name">Instant Payout Games & High RTP Slots</h2>
+      <p itemprop="description">Dive into our exclusive library of high-RTP slots, table games, and sports betting. Win big in real money casino games and cash out in seconds—no waiting, no hassle, just instant rewards directly to your wallet.</p>
+    </div>
+  </section>
 
-        <a href="/login" class="btn-gold big">Play Now</a>
-      </div>
-    </section>
+  <!-- Additional SEO-Optimized Sections for Complexity & Content Depth -->
+  <section class="games-overview">
+    <h2>Popular Online Casino Games at CashMash</h2>
+    <p>Explore a wide range of online casino games including classic slots, progressive jackpots, blackjack, roulette, and table game experiences. Our platform ensures fair play with certified RNG and secure betting environments for all players.</p>
+    <ul>
+      <li>Real Money Slots: Spin to win with themes from adventure to luxury.</li>
+      <li>Casino Table Games: Enjoy true gaming with complex RTP systems and certified fair play—no cheats, just pure excitement.</li>
+    </ul>
+    <a href="/games" class="btn-gold">Browse All Games</a>
+  </section>
 
-    <section class="features">
-      <div class="feature">
-        <h2>Real Cash Winnings</h2>
-        <p>Experience the ultimate adrenaline rush at CashMash. Turn your spins into massive payouts and walk away with
-          cold, hard cash. The stakes are real, and the jackpots are waiting.</p>
-      </div>
-      <div class="feature">
-        <h2>Global Leaderboards</h2>
-        <p>Don't just play—dominate. Compete against high rollers from around the world, climb the daily ranks, and
-          claim your spot at the top to unlock legendary rewards and VIP status.</p>
-      </div>
-      <div class="feature">
-        <h2>Instant Payout Games</h2>
-        <p>Dive into our exclusive library of high-RTP slots and live dealer tables. Win big and cash out in seconds—no
-          waiting, no hassle, just instant rewards directly to your wallet.</p>
-      </div>
-    </section>
-    <%- include('partials/footer') %>
-     <!-- IMPORTANT: Include Socket.IO client script -->
-    <script src="/socket.io/socket.io.js"></script>
+  <section class="promotions">
+    <h2>Exclusive Bonuses & Promotions for New Players</h2>
+    <p>Sign up today for welcome bonuses, free spins on real money slots, and cashback offers. At CashMash, we reward loyalty with VIP programs and daily tournaments to boost your online betting experience.</p>
+    <a href="/promotions" class="btn-gold">Claim Your Bonus</a>
+  </section>
+
+  <section class="why-choose-us">
+    <h2>Why Choose CashMash for Online Betting & Casino?</h2>
+    <p>As a leading gambling site, CashMash offers secure transactions, 24/7 support, and mobile-optimized games. Whether you're into casino slots or bettings, our platform delivers excitement and real cash rewards.</p>
+    <!-- Add internal links for crawlability -->
+    <a href="/about">Learn More About Us</a> | <a href="/terms">Terms & Conditions</a> | <a href="/responsible-gaming">Responsible Gaming</a>
+  </section>
+
+  <%- include('partials/footer') %>
+
+  <!-- IMPORTANT: Include Socket.IO client script (good for real-time betting updates, which can improve user engagement and SEO via longer session times) -->
+  <script src="/socket.io/socket.io.js"></script>
+
 </body>
 
 </html>
