@@ -134,17 +134,15 @@ const slotsConfig = {
     bonusInfo: "Dragon Eye grants +10% bet bonus instantly.",
     baseWinRate: { MIN: 0.7, MAX: 0.3 },
 
-    // --- UPDATED: Dragon's Breath Inferno ---
     particleTheme: {
       shape: 'circle',
-      // Color Palette: White (hot core) -> Gold -> Orange -> Red -> Dark Red (cooling ash)
-      colors: ['#FFFFFF', '#FFF700', '#FFD700', '#FF4500', '#8B0000', '#420000'],
-      count: 120,          // Higher count for a dense blast
-      gravity: -0.2,       // Strong negative gravity (accelerates UP)
-      speedY: { min: -12, max: -5 }, // FAST initial upward burst (Negative Y = Up)
-      speedX: { min: -5, max: 5 },   // Wide chaotic spread
-      size: { min: 1, max: 6 },      // Mix of tiny sparks and large embers
-      life: 0.025          // fast decay for a flickering effect
+      colors: ['#FFFAE5', '#FFD27F', '#FF9A28', '#FF5A00', '#B82E00', '#4A0E00'],
+      count: 90,                     // Balanced spark density
+      gravity: -0.05,                // Light upward lift (embers slowly float up)
+      speedY: { min: -2, max: -0.6 },// Slow-rise sparks from bottom (negative = up)
+      speedX: { min: -1.2, max: 1.2 },// Gentle horizontal drift, feels natural
+      size: { min: 2, max: 6 },      // Variety: small embers + warm glows
+      life: 0.006                    // Long life so sparks travel upward farther
     },
 
     symbols: [
