@@ -109,16 +109,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     closeModalBtns.forEach(btn => btn.addEventListener('click', () => betModal.classList.remove('active')));
 
+    // --- Bet Modal Logic (Chips & Math) ---
     chipBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (btn.id === 'clearBets') {
-                inputPlayer.value = 0; inputBanker.value = 0; inputTie.value = 0;
-            } else {
-                const add = parseFloat(btn.dataset.add);
-                let cur = parseFloat(lastActiveInput.value) || 0;
-                lastActiveInput.value = cur + add;
+        btn.addEventListener("click", () => {
+            let currentVal = parseFloat(modalBetInput.value) || 0;
+            if (btn.dataset.add) {
+                currentVal += parseFloat(btn.dataset.add);
+            } else if (btn.id === "halfBet") {
+                currentVal = Math.floor(currentVal / 2);
+            } else if (btn.id === "doubleBet") {
+                currentVal *= 2;
+            } else if (btn.id === "maxBet") {
+                currentVal = balance;
             }
-            calculateModalTotal();
+
+            // Enforce min/max
+            currentVal = Math.min(Math.max(currentVal, MIN_BET), Math.min(MAX_BET, balance));
+            modalBetInput.value = currentVal;
         });
     });
 

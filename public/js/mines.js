@@ -48,20 +48,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let gameId = null;
     let multiplier = 1;
-    let bet = 10; // Default
+    let bet = 1; // Default
     let mineCount = 3; // Default
     let gameActive = false;
     let tiles = [];
     let balance = parseFloat(balanceDisplay.dataset.rawBalance) || parseFloat(balanceDisplay.textContent) || 1000;
 
+    const MIN_BET = 1;
+    const MAX_BET = 100;
+
     // Initialize Display
     balanceDisplay.textContent = formatChips(balance);
 
+
+    // Clamp function
+    function clampBet(val) {
+        val = parseFloat(val) || MIN_BET;
+        return Math.min(Math.max(val, MIN_BET), Math.min(MAX_BET, balance));
+    }
+
     // ====================== MODAL LOGIC ======================
 
-    // Open Modals
+    // Open modal
     openBetModalBtn.addEventListener("click", () => {
-        if (gameActive) return showPopup("Cannot change bet during game");
+        modalBetInput.value = bet; // sync current bet
         betModal.classList.add("active");
     });
     openMinesModalBtn.addEventListener("click", () => {
@@ -69,37 +79,31 @@ document.addEventListener("DOMContentLoaded", () => {
         minesModal.classList.add("active");
     });
 
-    // Close Modals
     document.querySelectorAll(".close-modal").forEach(btn => {
         btn.addEventListener("click", () => {
+            modalBetInput.value = clampBet(modalBetInput.value);
             betModal.classList.remove("active");
-            minesModal.classList.remove("active");
         });
     });
 
-    // Bet Modal Logic (Chips & Math)
+    // Chips buttons (respect min/max like Baccarat)
     chipBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             let currentVal = parseFloat(modalBetInput.value) || 0;
-            if (btn.dataset.add) {
-                modalBetInput.value = currentVal + parseFloat(btn.dataset.add);
-            } else if (btn.id === "halfBet") {
-                modalBetInput.value = Math.max(1, Math.floor(currentVal / 2));
-            } else if (btn.id === "doubleBet") {
-                modalBetInput.value = currentVal * 2;
-            } else if (btn.id === "maxBet") {
-                modalBetInput.value = balance;
-            }
+
+            if (btn.dataset.add) currentVal += parseFloat(btn.dataset.add);
+            else if (btn.id === "halfBet") currentVal = Math.floor(currentVal / 2);
+            else if (btn.id === "doubleBet") currentVal *= 2;
+            else if (btn.id === "maxBet") currentVal = balance;
+
+            modalBetInput.value = clampBet(currentVal);
         });
     });
 
-    // Confirm Bet
+    // Confirm bet
     confirmBetBtn.addEventListener("click", () => {
-        let val = parseFloat(modalBetInput.value);
-        if (val < 1) val = 1;
-        if (val > balance) val = balance; // Cap at balance
-        bet = val;
-        displayBetValue.textContent = bet;
+        bet = clampBet(modalBetInput.value);
+        displayBetValue.textContent = "$" + bet.toFixed(2);
         betModal.classList.remove("active");
     });
 
