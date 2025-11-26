@@ -1,0 +1,267 @@
+<!-- views/wiki?search=about.ejs - Example about page -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CashMash | About Us</title>
+    <meta name="description"
+        content="Learn about CashMash, the premier online casino and betting platform offering real money games, instant payouts, and exciting features." />
+    <meta name="keywords" content="about CashMash, online casino about, betting platform info" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="CashMash Team" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="CashMash | About Us" />
+    <meta property="og:description"
+        content="Discover the story behind CashMash and our commitment to fair gaming and user satisfaction." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cashmash.watchnsfw.com/wiki?search=about" />
+    <meta property="og:image" content="https://cashmash.watchnsfw.com/images/CashMash.png" />
+    <meta property="og:site_name" content="CashMash" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CashMash | About Us" />
+    <meta name="twitter:description"
+        content="Discover the story behind CashMash and our commitment to fair gaming and user satisfaction." />
+    <meta name="twitter:image" content="https://cashmash.watchnsfw.com/images/CashMash.png" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cashmash.watchnsfw.com/wiki?search=about" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "About CashMash",
+    "url": "https://cashmash.watchnsfw.com/wiki?search=about",
+    "description": "Information about CashMash online casino."
+  }
+  </script>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
+    <link rel="shortcut icon" href="/favicons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="CashMash" />
+    <link rel="manifest" href="/favicons/site.webmanifest" />
+
+    <!-- CSS Links (keep existing, add preload for faster loading) -->
+    <link rel="preload" href="/css/style.css" as="style" />
+    <link rel="preload" href="/css/wiki.css" as="style" />
+    <link rel="preload" href="/css/header.css" as="style" />
+    <link rel="preload" href="/css/footer.css" as="style" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/wiki.css" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
+
+    <style>
+        :root {
+            --gold: #f5c542;
+            --gold-light: #ffdb6e;
+            --text-light: #fff;
+            --text-dim: #cfcfcf;
+            --bg-dark: #000;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .about-hero {
+            padding: 140px 20px 120px;
+            text-align: center;
+            background:
+                radial-gradient(circle at center top, rgba(245, 197, 66, 0.12), transparent 70%),
+                linear-gradient(to bottom, #020617, #000);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.06;
+            background: url('/images/glow-pattern.png');
+            background-size: cover;
+        }
+
+        .about-hero-content {
+            position: relative;
+            z-index: 3;
+            animation: fadeUp 1s ease forwards;
+        }
+
+        .about-hero-content h1 {
+            font-size: 3em;
+            letter-spacing: 1px;
+            font-weight: 700;
+            text-shadow: 0 0 15px rgba(245, 197, 66, 0.3);
+        }
+
+        .about-hero-content h1 span {
+            color: var(--gold);
+            animation: goldGlow 3s ease-in-out infinite;
+        }
+
+        .about-hero-content p {
+            max-width: 650px;
+            margin: 18px auto 0;
+            color: var(--text-dim);
+            font-size: 1.15em;
+            line-height: 1.6;
+        }
+
+        .about-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 20px 120px;
+        }
+
+        .about-content {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+        }
+
+        .about-section h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(245, 197, 66, 0.3);
+        }
+
+        .about-section p {
+            color: var(--text-dim);
+            line-height: 1.7;
+            font-size: 1.05em;
+            margin-bottom: 15px;
+        }
+
+        .about-section:last-child {
+            margin-bottom: 0;
+        }
+
+        @keyframes goldGlow {
+
+            0%,
+            100% {
+                text-shadow: 0 0 12px rgba(245, 197, 66, 0.4);
+            }
+
+            50% {
+                text-shadow: 0 0 26px rgba(245, 197, 66, 0.9);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .about-hero-content h1 {
+                font-size: 2.2em;
+            }
+
+            .about-container {
+                padding: 60px 20px 100px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+
+        <!-- ABOUT HERO -->
+        <section class="about-hero">
+            <div class="about-hero-content">
+                <h1 itemprop="name">About Cash<span class="mash">Mash</span></h1>
+                <p>Your trusted gaming ecosystem crafted for speed, fairness, and real winnings.</p>
+            </div>
+        </section>
+
+        <!-- ABOUT CONTENT -->
+        <div class="about-container">
+            <div class="about-content">
+
+                <section class="about-section">
+                    <h2>Who We Are</h2>
+                    <p>
+                        CashMash is an advanced online casino and gaming network engineered to deliver
+                        instant-action gameplay, real-time payouts, and a premium gambling environment.
+                        Founded originally in the United States, CashMash was built by a team of ambitious IT students
+                        passionate about secure systems, game mathematics, and modern digital entertainment.
+                    </p>
+                </section>
+
+                <section class="about-section">
+                    <h2>Global Infrastructure</h2>
+                    <p>
+                        To ensure low latency and uninterrupted play, CashMash operates its primary production
+                        servers in Singapore, supported by distributed failover nodes for reliability.
+                        This infrastructure allows players worldwide to enjoy smooth gameplay, lightning-fast
+                        transactions, and round-the-clock availability.
+                    </p>
+                </section>
+
+                <section class="about-section">
+                    <h2>Our Mission</h2>
+                    <p>
+                        Our mission is to deliver a transparent, secure, and rewarding gaming experience built on
+                        responsible systems, fair RNG mechanics, and generous RTP values.
+                        CashMash is committed to continuous innovation—creating games that are both fun and financially
+                        competitive, while ensuring compliance and player safety.
+                    </p>
+                </section>
+
+                <section class="about-section">
+                    <h2>The Team Behind CashMash</h2>
+                    <p>
+                        CashMash is developed and maintained by a multidisciplinary team of engineers, designers,
+                        mathematicians, backend architects, and gaming analysts.
+                        The team brings together expertise in cryptography, scalable system design, casino game logic,
+                        UI/UX excellence, and high-performance web development.
+                    </p>
+                    <p>
+                        Every feature, from game RTP balancing to UI animations, is built with intent—ensuring players
+                        experience reliability and excitement at every click.
+                    </p>
+                </section>
+
+                <section class="about-section">
+                    <h2>Commitment to Fair Play</h2>
+                    <p>
+                        CashMash adheres to strict operational guidelines, transparent game mechanics, and RNG systems
+                        designed for fairness.
+                        Our goal is not only to provide entertainment, but to deliver a gaming environment players can
+                        trust and return to with confidence.
+                    </p>
+                </section>
+
+            </div>
+        </div>
+
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

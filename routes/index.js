@@ -12,6 +12,34 @@ router.get('/games', (req, res) => {
   res.render('games', { user: req.user, currentPage: 'games' });
 });
 
+
+// Wiki
+// Wiki (with query param for different sections)
+router.get('/wiki', (req, res) => {
+  const page = req.query.search || 'index'; // Default to 'index' if no search param
+  let viewPath = 'wiki'; // Default to main wiki hub
+
+  switch (page) {
+    case 'about':
+      viewPath = 'wiki/about';
+      break;
+    case 'terms':
+      viewPath = 'wiki/terms';
+      break;
+    case 'promotions':
+      viewPath = 'wiki/promotions';
+      break;
+    case 'responsible-gaming':
+      viewPath = 'wiki/responsible-gaming';
+      break;
+    // Add more cases for other wiki pages as needed
+    default:
+      viewPath = 'wiki'; // Fallback to hub if invalid
+  }
+
+  res.render(viewPath, { user: req.user, currentPage: 'wiki', wikiPage: page });
+});
+
 // Leaderboard
 router.get('/leaderboard', async (req, res) => {
   try {

@@ -1,0 +1,79 @@
+<!-- views/wiki/terms.ejs - Example terms page -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CashMash | Terms & Conditions</title>
+  <meta name="description" content="Read CashMash's terms and conditions for using our online casino and betting services. Understand our rules, policies, and user agreements." />
+  <meta name="keywords" content="CashMash terms, casino terms conditions, betting rules" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="CashMash Team" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="CashMash | Terms & Conditions" />
+  <meta property="og:description" content="Detailed terms of service for CashMash users." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://cashmash.watchnsfw.com/wiki/terms" />
+  <meta property="og:image" content="https://cashmash.watchnsfw.com/images/CashMash.png" />
+  <meta property="og:site_name" content="CashMash" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="CashMash | Terms & Conditions" />
+  <meta name="twitter:description" content="Detailed terms of service for CashMash users." />
+  <meta name="twitter:image" content="https://cashmash.watchnsfw.com/images/CashMash.png" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://cashmash.watchnsfw.com/wiki/terms" />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Terms & Conditions",
+    "url": "https://cashmash.watchnsfw.com/wiki/terms",
+    "description": "Legal terms for CashMash."
+  }
+  </script>
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
+  <link rel="shortcut icon" href="/favicons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="CashMash" />
+  <link rel="manifest" href="/favicons/site.webmanifest" />
+
+  <!-- CSS Links (keep existing, add preload for faster loading) -->
+  <link rel="preload" href="/css/style.css" as="style" />
+  <link rel="preload" href="/css/wiki.css" as="style" />
+  <link rel="preload" href="/css/header.css" as="style" />
+  <link rel="preload" href="/css/footer.css" as="style" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/wiki.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+</head>
+
+<body>
+  <%- include('../partials/header') %>
+
+  <div class="wiki-container">
+    <div class="wiki-content">
+      <h1>Terms & Conditions</h1>
+      <p>These terms govern your use of CashMash. By accessing our site, you agree to these terms.</p>
+      <h2>Eligibility</h2>
+      <p>You must be at least 18 years old to use our services.</p>
+      <h2>Account Registration</h2>
+      <p>Users must provide accurate information during registration.</p>
+      <!-- Add more legal sections as needed -->
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+
+</html>

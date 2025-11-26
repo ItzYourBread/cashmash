@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CashMash | Wiki & Information Hub</title>
+    <meta name="description"
+        content="Explore CashMash's official wiki for detailed information about our platform, terms, promotions, security, responsible gaming, and more." />
+    <meta name="keywords"
+        content="CashMash wiki, casino wiki, online casino information, betting rules, terms, promotions, responsible gaming, CashMash help" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="CashMash Team" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="CashMash | Wiki & Information Hub" />
+    <meta property="og:description"
+        content="Your official CashMash resource center. Learn about our games, terms, promotions, and responsible gaming policies." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cashmash.watchnsfw.com/wiki" />
+    <meta property="og:image" content="https://cashmash.watchnsfw.com/images/CashMash.png" />
+    <meta property="og:site_name" content="CashMash" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CashMash | Wiki & Information Hub" />
+    <meta name="twitter:description"
+        content="Your official CashMash resource center. Learn about our games, terms, promotions, and responsible gaming policies." />
+    <meta name="twitter:image" content="https://cashmash.watchnsfw.com/images/CashMash.png" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cashmash.watchnsfw.com/wiki" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "CashMash Wiki",
+      "url": "https://cashmash.watchnsfw.com/wiki",
+      "description": "Official wiki and help center for CashMash users."
+    }
+    </script>
+
+    <!-- CSS -->
+    <link rel="preload" href="/css/style.css" as="style" />
+    <link rel="preload" href="/css/wiki.css" as="style" />
+    <link rel="preload" href="/css/header.css" as="style" />
+    <link rel="preload" href="/css/footer.css" as="style" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/wiki.css" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+    <!-- HERO SECTION -->
+    <section class="wiki-hero">
+        <div class="wiki-hero-content">
+            <h1>Cash<span class="mash">Mash</span> Wiki</h1>
+            <p>Your complete guide to understanding our platform, policies, and features.</p>
+
+            <form action="/wiki" method="GET" class="wiki-search">
+                <input type="text" name="search" placeholder="Search topics... (e.g., 'about', 'terms', 'bonus')" />
+                <button type="submit">Search</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <section class="wiki-section">
+        <div class="wiki-grid">
+
+            <!-- ABOUT -->
+            <a href="/wiki?search=about" class="wiki-card">
+                <h2>About Us</h2>
+                <p>Learn who we are, our vision, and how CashMash operates.</p>
+            </a>
+
+            <!-- TERMS -->
+            <a href="/wiki?search=terms" class="wiki-card">
+                <h2>Terms & Conditions</h2>
+                <p>Understand the legal rules and policies that govern our platform.</p>
+            </a>
+
+            <!-- PROMOTIONS -->
+            <a href="/wiki?search=promotions" class="wiki-card">
+                <h2>Promotions</h2>
+                <p>Explore bonuses, cashback, daily rewards, and special offers.</p>
+            </a>
+
+            <!-- RESPONSIBLE GAMING -->
+            <a href="/wiki?search=responsible-gaming" class="wiki-card">
+                <h2>Responsible Gaming</h2>
+                <p>Guidelines to ensure safe and sustainable gaming behavior.</p>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <%- include('partials/footer') %>
+</body>
+
+</html>
