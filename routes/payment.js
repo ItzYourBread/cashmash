@@ -107,7 +107,7 @@ router.get('/deposit', ensureAuth, async (req, res) => {
 ['Bkash', 'Nagad', 'Upay'].forEach(method => {
   router.post(`/deposit/${method}`, ensureAuth, async (req, res) => {
     if (req.user.country !== 'BD') {
-      return res.status(403).send("Bkash deposit not available in your country.");
+      return res.status(403).send(`${method} deposit not available in your country.`);
     }
 
     try {
@@ -115,37 +115,42 @@ router.get('/deposit', ensureAuth, async (req, res) => {
       if (!amount || !transactionId) throw new Error('Invalid input');
 
       const agents = agentPayments[method];
-
       if (!agents || agents.length === 0) {
-        console.warn(`[Deposit] No agents found for method: ${method}.`);
         return res.status(503).send(`Payment service unavailable: No active agents for ${method}.`);
       }
 
       const randomAgent = agents[Math.floor(Math.random() * agents.length)];
-
-      // ✅ FIX: Use consistent ID for deposit
       const newDepositId = new mongoose.Types.ObjectId();
 
       const depositData = {
         _id: newDepositId,
-        amount,
-        method: method.charAt(0).toUpperCase() + method.slice(1),
+        amount: Number(amount),
+        method,
         txnId: transactionId,
         status: 'Pending',
         agentName: randomAgent.full_name,
         agentContact: randomAgent.contact
       };
 
-      // Save in User deposits
+      // Save deposit in user
       req.user.deposits.push(depositData);
       await req.user.save();
 
-      // Save in separate Deposit model (Explicitly pass _id and user)
+      // Save deposit in Deposit model
       await Deposit.create({
         _id: newDepositId,
         user: req.user._id,
         ...depositData
       });
+
+      // ✅ First-Time Deposit Bonus Check
+      const hasCompletedDeposit = req.user.deposits.some(d => d.status === 'Completed');
+      if (!hasCompletedDeposit) {
+        const bonusAmount = Number(amount); // 100% bonus
+        req.user.balance += bonusAmount;
+        await req.user.save();
+        console.log(`🎁 First-time deposit bonus of $${bonusAmount} applied to user ${req.user.username}`);
+      }
 
       res.redirect('/dashboard?section=deposit&page=1');
     } catch (err) {
@@ -155,7 +160,7 @@ router.get('/deposit', ensureAuth, async (req, res) => {
   });
 });
 
-// Handle BinancePay deposit (USD only)
+// Handle BinancePay deposit (USD)
 router.post('/deposit/binance', ensureAuth, async (req, res) => {
   try {
     const { amount, txnId } = req.body;
@@ -166,10 +171,9 @@ router.post('/deposit/binance', ensureAuth, async (req, res) => {
     }
 
     const newDepositId = new mongoose.Types.ObjectId();
-
     const depositData = {
       _id: newDepositId,
-      amount: parsedAmount, // USD amount
+      amount: parsedAmount,
       method: 'BinancePay',
       txnId,
       status: 'Pending',
@@ -177,16 +181,18 @@ router.post('/deposit/binance', ensureAuth, async (req, res) => {
       agentContact: "01341803889",
     };
 
-    // Save in user's deposits array
     req.user.deposits.push(depositData);
     await req.user.save();
+    await Deposit.create({ _id: newDepositId, user: req.user._id, ...depositData });
 
-    // Save in Deposit model
-    await Deposit.create({
-      _id: newDepositId,
-      user: req.user._id,
-      ...depositData
-    });
+    // ✅ First-Time Deposit Bonus Check
+    const hasCompletedDeposit = req.user.deposits.some(d => d.status === 'Completed');
+    if (!hasCompletedDeposit) {
+      const bonusAmount = parsedAmount;
+      req.user.balance += bonusAmount;
+      await req.user.save();
+      console.log(`🎁 First-time deposit bonus of $${bonusAmount} applied to user ${req.user.username}`);
+    }
 
     res.redirect('/dashboard?section=deposit&page=1');
   } catch (err) {
@@ -195,24 +201,16 @@ router.post('/deposit/binance', ensureAuth, async (req, res) => {
   }
 });
 
-// Handle Crypto deposit (USD only)
+// Handle Crypto deposit (USD)
 router.post('/deposit/crypto', ensureAuth, async (req, res) => {
   try {
     const { amount, currency } = req.body;
     const usdAmount = Number(amount);
 
-    if (!usdAmount || usdAmount < 1) {
-      return res.status(400).send('Invalid amount');
-    }
+    if (!usdAmount || usdAmount < 1) return res.status(400).send('Invalid amount');
 
     const allowedCurrencies = [
-      'usdttrc20',
-      // 'usdterc20',
-      'usdtbsc',
-      'usdtsol',
-      'usdtmatic',
-      'usdtcelo',
-      'usdtarb',
+      'usdttrc20', 'usdtbsc', 'usdtsol', 'usdtmatic', 'usdtcelo', 'usdtarb',
     ];
 
     const currencyLower = currency.toLowerCase();
@@ -233,10 +231,9 @@ router.post('/deposit/crypto', ensureAuth, async (req, res) => {
     if (!txnId) return res.status(500).send("Failed to create payment ID.");
 
     const formattedCurrency = formatCurrencyNetwork(currencyLower);
-
     const depositData = {
       user: req.user._id,
-      amount: usdAmount, // USD only
+      amount: usdAmount,
       method: `Crypto (${formattedCurrency})`,
       txnId,
       status: "Pending"
@@ -245,6 +242,9 @@ router.post('/deposit/crypto', ensureAuth, async (req, res) => {
     req.user.deposits.push(depositData);
     await req.user.save();
     await Deposit.create(depositData);
+
+    // ✅ First-Time Deposit Bonus will be applied in the webhook after status 'Completed'
+    // (Crypto deposits are async, so we handle bonus when payment is confirmed)
 
     return res.redirect(payment.invoice_url);
 
@@ -321,17 +321,22 @@ router.post(
           await deposit.save();
 
           // ✅ Update the deposit inside user.deposits array
-          const userDeposit = user.deposits.find(
-            (d) => d.txnId === payment_id
-          );
+          const userDeposit = user.deposits.find(d => d.txnId === payment_id);
+          if (userDeposit) userDeposit.status = 'Completed';
 
-          if (userDeposit) {
-            userDeposit.status = 'Completed';
-          }
-
-          // 💰 Reward user (only once)
+          // 💰 Reward user with deposit amount
           const rewardAmount = deposit.amount || price_amount || 0;
           user.balance = (user.balance || 0) + rewardAmount;
+
+          // ✅ FIRST-TIME DEPOSIT BONUS
+          const hasPreviousCompletedDeposit = user.deposits.some(
+            d => d.status === 'Completed' && d.txnId !== payment_id
+          );
+          if (!hasPreviousCompletedDeposit) {
+            const bonusAmount = rewardAmount; // 100% bonus
+            user.balance += bonusAmount;
+            console.log(`🎁 First-time deposit bonus of $${bonusAmount} applied to user ${user.username}`);
+          }
 
           await user.save();
 
