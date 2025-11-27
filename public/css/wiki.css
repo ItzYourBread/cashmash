@@ -68,48 +68,6 @@ body {
   line-height: 1.6;
 }
 
-/* Search */
-.wiki-search {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.wiki-search input {
-  width: 100%;
-  padding: 14px 18px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: var(--text-light);
-  font-size: 1em;
-  transition: 0.3s;
-}
-
-.wiki-search input:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 12px rgba(245,197,66,0.3);
-  outline: none;
-}
-
-.wiki-search button {
-  padding: 14px 28px;
-  border-radius: 30px;
-  background: linear-gradient(145deg, var(--gold-light), var(--gold));
-  color: #000;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: 0.3s;
-}
-
-.wiki-search button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(245,197,66,0.5);
-}
-
 /* ==========================================
    WIKI GRID SECTION
    ========================================== */
@@ -210,11 +168,5 @@ body {
   }
   .wiki-hero-content p {
     font-size: 1em;
-  }
-  .wiki-search {
-    flex-direction: column;
-  }
-  .wiki-search button {
-    width: 100%;
   }
 }
