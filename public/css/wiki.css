@@ -61,7 +61,7 @@ body {
 }
 
 .wiki-hero-content p {
-  margin: 18px auto 40px;
+  margin: 18px auto 0px;
   max-width: 650px;
   color: var(--text-dim);
   font-size: 1.15em;
