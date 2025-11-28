@@ -2,11 +2,11 @@
 const express = require('express');
 const router = express.Router();
 const Deposit = require('../models/Deposit');
-const User = require('../models/User'); 
+const User = require('../models/User');
 const transporter = require('../config/nodemailer'); // 👈 Import the configured transporter
 
 // ⚠️ Configuration: Define your SECRET API Key
-const ADMIN_API_KEY = '41F89E1A2D9439B3A1CDA16D643A4'; 
+const ADMIN_API_KEY = '41F89E1A2D9439B3A1CDA16D643A4';
 
 // --- API Key Authentication Function (Internal) ---
 const checkApiKey = (req, res, next) => {
@@ -70,6 +70,64 @@ const sendDepositSuccessEmail = async (userEmail, amount, method) => {
     }
 };
 
+/* ------------------------------------
+   Helper: First-Time Deposit + Bonus Email
+   ------------------------------------ */
+const sendFirstDepositBonusEmail = async (userEmail, amount, bonusAmount, method) => {
+    try {
+        await transporter.sendMail({
+            from: `"CashMash Rewards" <${process.env.SMTP_EMAIL || 'security@yourdomain.com'}>`,
+            to: userEmail,
+            subject: '🎁 Welcome Bonus Activated – 100% First Deposit Matched!',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; border: 1px solid #333; border-radius: 12px; overflow: hidden; background-color: #000; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                    
+                    <div style="background-color: #4CAF50; padding: 15px 25px; text-align: center;">
+                        <h1 style="color: #fff; margin: 0; font-size: 26px;">CashMash Welcome Bonus</h1>
+                    </div>
+
+                    <div style="padding: 25px;">
+                        <h2 style="color: #f5c542; margin-top: 0; font-size: 20px;">Your First Deposit is Boosted!</h2>
+                        <p style="font-size: 15px; line-height: 1.5;">
+                            Thank you for making your first deposit at CashMash.  
+                            As a part of our welcome reward, we have matched your first deposit <b>100%</b>.
+                        </p>
+
+                        <table style="width: 100%; margin: 20px 0; background-color: #1a1a1a; border-radius: 8px;">
+                            <tr>
+                                <td style="padding: 10px; font-weight: bold; color: #f5c542;">Deposit Amount:</td>
+                                <td style="padding: 10px; color: #4CAF50; font-weight: bold;">$${amount}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; font-weight: bold; color: #f5c542;">Bonus Added:</td>
+                                <td style="padding: 10px; color: #4CAF50; font-weight: bold;">$${bonusAmount}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; font-weight: bold; color: #f5c542;">Method:</td>
+                                <td style="padding: 10px;">${method}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; font-weight: bold; color: #f5c542;">Status:</td>
+                                <td style="padding: 10px; color: #4CAF50; font-weight: bold;">COMPLETED + BONUS APPLIED</td>
+                            </tr>
+                        </table>
+
+                        <p style="font-size: 14px; color: #bbb;">Enjoy your boosted balance and good luck!</p>
+                    </div>
+
+                    <div style="background-color: #111; padding: 10px 25px; text-align: center; font-size: 12px; color: #666;">
+                        <p style="margin: 0;">CashMash Rewards Team</p>
+                    </div>
+                </div>
+            `,
+        });
+
+        console.log(`First deposit bonus email sent to ${userEmail}`);
+    } catch (error) {
+        console.error("First deposit bonus email failed:", error);
+    }
+};
+
 
 /* =====================================
    🔹 GET PENDING DEPOSITS (GET) - SECURED
@@ -81,7 +139,7 @@ router.get('/deposits/pending', checkApiKey, async (req, res) => {
             .populate('user', 'username email phone')
             .sort({ createdAt: 1 });
 
-        return res.json({ 
+        return res.json({
             message: `All pending deposits fetched.`,
             count: pendingDeposits.length,
             deposits: pendingDeposits
@@ -98,9 +156,9 @@ router.get('/deposits/pending', checkApiKey, async (req, res) => {
    🔹 UPDATE DEPOSIT STATUS (POST) - SECURED
    ===================================== */
 router.post('/deposit/update-status', checkApiKey, async (req, res) => {
-    const { 
-        depositId, 
-        status, 
+    const {
+        depositId,
+        status,
         agentName,
         agentContact // Passed from the Agent Panel
     } = req.body;
@@ -108,7 +166,7 @@ router.post('/deposit/update-status', checkApiKey, async (req, res) => {
     if (!depositId || !status || !agentName || !agentContact) {
         return res.status(400).json({ message: 'Missing required fields (depositId, status, agentName, agentContact).' });
     }
-    
+
     const validStatuses = ['Completed', 'Failed', 'Cancelled'];
     if (!validStatuses.includes(status)) {
         return res.status(400).json({ message: `Invalid status provided.` });
@@ -118,47 +176,72 @@ router.post('/deposit/update-status', checkApiKey, async (req, res) => {
         const deposit = await Deposit.findById(depositId);
         if (!deposit) return res.status(404).json({ message: 'Deposit not found.' });
         if (deposit.status !== 'Pending') {
-             return res.status(400).json({ message: `Deposit status is '${deposit.status}'. Only 'Pending' deposits can be processed.` });
+            return res.status(400).json({ message: `Deposit status is '${deposit.status}'. Only 'Pending' deposits can be processed.` });
         }
-        
+
         let chipsCredited = false;
         const userId = deposit.user;
-        
+
         // 5a. Update User's Deposit Subdocument Status
         await User.updateOne(
             { "_id": userId, "deposits._id": depositId },
             { "$set": { "deposits.$.status": status } }
         );
 
-        // 5b. If Completed, Credit Chips and Send Email
+        // 5b. If Completed, Credit Chips + Check First Deposit Bonus
         if (status === 'Completed') {
             const user = await User.findById(userId);
 
             if (!user) {
                 console.error(`User ID ${userId} not found for deposit ${depositId}`);
-                deposit.status = 'Failed'; 
+                deposit.status = 'Failed';
                 deposit.agentName = 'SYSTEM_ERROR';
                 await deposit.save();
                 return res.status(500).json({ message: 'Associated user not found, Deposit set to Failed.' });
             }
-            
+
+            // CREDIT NORMAL DEPOSIT
             await user.addChips(deposit.amount);
             chipsCredited = true;
 
-            // 🌟 Send Email Notification 🌟
-            if (user.email) {
-                sendDepositSuccessEmail(user.email, deposit.amount, deposit.method);
+            // CHECK FOR PREVIOUS COMPLETED DEPOSITS
+            const previousCompleted = user.deposits.some(
+                d => d.status === 'Completed' && d._id.toString() !== depositId.toString()
+            );
+
+            // FIRST TIME BONUS
+            if (!previousCompleted) {
+                const bonus = deposit.amount; // 100% match
+                user.balance += bonus;
+                await user.save();
+
+                console.log(`🎁 100% First Deposit Bonus Applied: +$${bonus}`);
+
+                // SEND FIRST-TIME BONUS EMAIL
+                if (user.email) {
+                    await sendFirstDepositBonusEmail(
+                        user.email,
+                        deposit.amount,
+                        bonus,
+                        deposit.method
+                    );
+                }
+            } else {
+                // SEND NORMAL SUCCESS EMAIL
+                if (user.email) {
+                    sendDepositSuccessEmail(user.email, deposit.amount, deposit.method);
+                }
             }
         }
-        
+
         // 6. Update Main Deposit Document
         deposit.status = status;
-        deposit.agentName = agentName; 
+        deposit.agentName = agentName;
         deposit.agentContact = agentContact; // 👈 Ensure this is saved on the Deposit model
         await deposit.save();
-        
+
         // 7. Response
-        return res.json({ 
+        return res.json({
             message: `Deposit ${depositId} status updated to ${status}. User history updated.`,
             deposit: deposit,
             chipsCredited: chipsCredited

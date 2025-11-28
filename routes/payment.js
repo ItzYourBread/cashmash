@@ -125,6 +125,7 @@ router.get('/deposit', ensureAuth, async (req, res) => {
       const depositData = {
         _id: newDepositId,
         amount: Number(amount),
+        amountBDT: Number(amount * 123),
         method,
         txnId: transactionId,
         status: 'Pending',

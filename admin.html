@@ -1,333 +1,552 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MD Arif Agent Panel</title>
+    <title>Agent Panel | MD Arif</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* ... (CSS STYLES REMAINS THE SAME) ... */
-        /* --- DARK THEME VARIABLES --- */
+        /* --- VARIABLES & RESET --- */
         :root {
-            --primary-color: #f5c542; /* Gold/Yellow */
-            --secondary-color: #4CAF50; /* Success/Green */
-            --background-color: #121212; /* Dark background */
-            --card-background: #1e1e1e; /* Slightly lighter card */
-            --text-color: #e0e0e0; /* Light text */
-            --border-color: #333;
-            --success-color: #28a745;
-            --fail-color: #dc3545;
+            --primary: #f5c542;       /* Gold */
+            --primary-dim: #f5c54220; /* Gold Transparent */
+            --bg-body: #0f1115;       /* Deep Dark */
+            --bg-card: #181b21;       /* Card Dark */
+            --bg-hover: #22262e;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --success: #10b981;       /* Modern Green */
+            --success-hover: #059669;
+            --danger: #ef4444;        /* Modern Red */
+            --danger-hover: #dc2626;
+            --border: #2d333b;
+            --glass: rgba(24, 27, 33, 0.85);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.16);
         }
 
+        * { box-sizing: border-box; outline: none; }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding-top: 80px; /* Space for fixed header */
+            min-height: 100vh;
         }
 
+        /* --- HEADER / AGENT DASHBOARD --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background-color: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand h1 {
+            font-size: 1.2rem;
+            margin: 0;
+            color: var(--primary);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .agent-pill {
+            background: var(--bg-hover);
+            padding: 6px 14px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .agent-pill strong { color: var(--text-main); }
+        .agent-pill .dot {
+            width: 8px; height: 8px; background: var(--success); border-radius: 50%; display: block;
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        /* --- MAIN CONTAINER --- */
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
-        }
-
-        h1 {
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        #agent-info, #deposit-list-container {
-            background: var(--card-background);
-            padding: 15px; /* Compact padding */
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            margin-bottom: 20px;
-        }
-
-        #agent-info h2, #deposit-list-container h2 {
-            color: var(--primary-color);
-            margin-top: 0;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        #agent-info label {
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 5px;
-            margin-right: 10px;
-            color: var(--text-color);
-        }
-
-        #agent-info input {
-            width: 250px;
-            padding: 6px 10px; /* Compact input */
-            margin-right: 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background-color: #2a2a2a;
-            color: var(--text-color);
-        }
-        
-        .disabled-input {
-            background-color: #3a3a3a !important;
-            color: #ccc !important;
-        }
-
-        /* --- TABLE STYLING --- */
-        #deposits-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 5px; /* Compact spacing */
-        }
-
-        #deposits-table th, #deposits-table td {
-            padding: 8px 10px; /* Compact padding */
-            text-align: left;
-            font-size: 0.9em;
-            border: none;
-        }
-
-        #deposits-table th {
-            background-color: #000;
-            color: var(--primary-color);
-        }
-
-        #deposits-table tr:not(:first-child) {
-            background-color: #2a2a2a;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-        
-        #deposits-table tr:not(:first-child):hover {
-            background-color: #383838;
-            transform: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .action-btn {
-            padding: 5px 10px; /* Compact button */
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.2s;
-            margin-right: 2px;
-            font-size: 0.85em;
-        }
-
-        .approve-btn {
-            background-color: var(--success-color);
-            color: white;
-        }
-
-        .fail-btn {
-            background-color: var(--fail-color);
-            color: white;
-        }
-        
-        .loading-message, #no-deposits {
-            color: var(--primary-color);
-            text-align: center;
             padding: 20px;
-            font-size: 1.1em;
+        }
+
+        /* --- CONTROLS --- */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .btn-refresh {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-refresh:hover { background: var(--bg-hover); border-color: var(--text-muted); }
+        .btn-refresh:active { transform: scale(0.98); }
+
+        /* --- DATA TABLE (DESKTOP) --- */
+        .table-container {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden; /* Important for rounding corners */
+            box-shadow: var(--shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        thead {
+            background: var(--bg-hover);
+        }
+
+        th {
+            text-align: left;
+            padding: 16px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr { transition: background 0.2s; }
+        tbody tr:hover { background: var(--bg-hover); }
+
+        /* Custom Data Styles */
+        .amount-highlight {
+            color: var(--primary);
+            font-weight: 700;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        .method-badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .copyable {
+            cursor: pointer;
+            border-bottom: 1px dashed var(--text-muted);
+            position: relative;
+        }
+        .copyable:hover { color: var(--primary); border-color: var(--primary); }
+
+        /* Action Buttons */
+        .actions-cell { display: flex; gap: 8px; }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: transform 0.1s, opacity 0.2s;
+            color: white;
+        }
+
+        .btn:active { transform: scale(0.95); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+        .btn-approve { background: var(--success); }
+        .btn-approve:hover { background: var(--success-hover); }
+        
+        .btn-fail { background: var(--danger); }
+        .btn-fail:hover { background: var(--danger-hover); }
+
+        /* --- STATUS MESSAGES --- */
+        .status-box {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .loader {
+            width: 24px; height: 24px;
+            border: 3px solid var(--text-muted);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- TOAST NOTIFICATIONS --- */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: var(--text-main);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+            min-width: 250px;
+        }
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* --- MOBILE RESPONSIVE (Card View) --- */
+        @media (max-width: 768px) {
+            body { padding-top: 130px; } /* More space for stacked header */
+            
+            header {
+                height: auto;
+                flex-direction: column;
+                padding: 15px;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .brand { justify-content: center; }
+            .agent-pill { justify-content: center; }
+
+            /* Hide Table Header */
+            thead { display: none; }
+
+            /* Make Rows into Cards */
+            tbody, tr, td { display: block; width: 100%; }
+
+            tr {
+                background: var(--bg-card);
+                margin-bottom: 15px;
+                border-radius: 12px;
+                border: 1px solid var(--border);
+                padding: 15px;
+                box-shadow: var(--shadow);
+            }
+
+            tr:hover { transform: none; box-shadow: var(--shadow); }
+
+            td {
+                padding: 8px 0;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: right;
+            }
+
+            td:last-child { border-bottom: none; display: flex; gap: 10px; justify-content: stretch; padding-top: 15px; }
+            
+            /* Add labels via CSS */
+            td::before {
+                content: attr(data-label);
+                float: left;
+                font-weight: 600;
+                color: var(--text-muted);
+                font-size: 0.85rem;
+                text-transform: uppercase;
+            }
+
+            .action-btn { flex: 1; padding: 12px; }
+            
+            /* Specific cell tweaks for mobile */
+            td:nth-child(1) { color: var(--text-muted); font-size: 0.8rem; } /* ID */
+            .amount-highlight { font-size: 1.2rem; }
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h1>💰 Agent Deposit Panel - MD Arif</h1>
-    <p style="color: var(--fail-color); font-weight: bold;">⚠️ Secure Panel (API Key Required). Handles Bkash, Nagad, Upay, and BinancePay.</p>
+    <header>
+        <div class="brand">
+            <span style="font-size: 1.5rem;">💰</span>
+            <h1>Agent Deposit Panel</h1>
+        </div>
+        <div class="agent-pill">
+            <span class="dot"></span>
+            <span>Agent: <strong>MD Arif</strong></span>
+            <span style="opacity: 0.3;">|</span>
+            <span>01341803889</span>
+        </div>
+    </header>
 
-    <div id="agent-info">
-        <h2>Agent Details</h2>
-        <label for="agentName">Name:</label>
-        <input type="text" id="agentName" value="MD Arif" class="disabled-input" readonly required>
+    <div class="container">
+        
+        <div class="page-header">
+            <h2>Pending Deposits</h2>
+            <button class="btn-refresh" onclick="fetchPendingDeposits()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                Refresh
+            </button>
+        </div>
 
-        <label for="agentContact">Contact:</label>
-        <input type="text" id="agentContact" value="01341803889" class="disabled-input" readonly required>
+        <div class="table-container">
+            <table id="deposits-table">
+                <thead>
+                    <tr>
+                        <th width="10%">ID</th>
+                        <th width="20%">User</th>
+                        <th width="20%">Amount</th>
+                        <th width="10%">Method</th>
+                        <th width="15%">Txn ID</th>
+                        <th width="10%">Time</th>
+                        <th width="15%" style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="deposits-tbody">
+                    </tbody>
+            </table>
+
+            <div id="loading-message" class="status-box">
+                <span class="loader"></span>
+                <p style="margin-top: 10px;">Syncing with server...</p>
+            </div>
+
+            <div id="no-deposits" class="status-box" style="display: none;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
+                <h3>All caught up!</h3>
+                <p>No pending deposits found for MD Arif.</p>
+            </div>
+        </div>
     </div>
 
-    <div id="deposit-list-container">
-        <h2>Pending Deposits (Consolidated View)</h2>
-        <p id="loading-message" class="loading-message">Loading pending deposits...</p>
-        <table id="deposits-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>User (ID/Name)</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Txn ID</th>
-                    <th>Requested At</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="deposits-tbody">
-                </tbody>
-        </table>
-        <p id="no-deposits" style="text-align: center; padding: 20px; display: none;">✅ No pending deposits for MD Arif's accounts found.</p>
-    </div>
-</div>
+    <div id="toast-container"></div>
 
-<script>
-    // ------------------------------------------------------------------
-    // ⚠️ IMPORTANT: Agent Configuration and API Key
-    // ------------------------------------------------------------------
-    const API_BASE_URL = 'http://localhost:3000/api/admin'; 
-    // http://localhost:3000/api/admin for local testing
-    // https://cashmash.watchnsfw.com/api/admin for production
-    
-    // --- SECURITY KEY ---
-    const ADMIN_API_KEY = '41F89E1A2D9439B3A1CDA16D643A4'; // MUST match the key in routes/admin.js
-    
-    // --- AGENT DETAILS ---
-    const AGENT_NAME = 'MD Arif'; 
-    
-    // 🌟 MASTER FIX: The Single Master Identifier for ALL of MD Arif's payments
-    const MASTER_AGENT_CONTACT = '01341803889'; 
-    
-    const AGENT_CONTACT = MASTER_AGENT_CONTACT; // Used for display and sending to backend
-    
-    const AGENT_METHODS = ['Bkash', 'Nagad', 'Upay', 'BinancePay']; // For reference
-    // ------------------------------------------------------------------
+    <script>
+        // ------------------------------------------------------------------
+        // CONFIGURATION
+        // ------------------------------------------------------------------
+        const API_BASE_URL = 'http://localhost:3000/api/admin'; 
+        // Production: 'https://cashmash.watchnsfw.com/api/admin'
+        
+        const ADMIN_API_KEY = '41F89E1A2D9439B3A1CDA16D643A4';
+        const AGENT_NAME = 'MD Arif';
+        const MASTER_AGENT_CONTACT = '01341803889'; // Single identifier
+        // ------------------------------------------------------------------
 
-    const depositsTbody = document.getElementById('deposits-tbody');
-    const loadingMessage = document.getElementById('loading-message');
-    const noDepositsMessage = document.getElementById('no-deposits');
+        const depositsTbody = document.getElementById('deposits-tbody');
+        const loadingMessage = document.getElementById('loading-message');
+        const noDepositsMessage = document.getElementById('no-deposits');
 
-    /**
-     * Fetches all pending deposits and filters them by the single master contact.
-     */
-    async function fetchPendingDeposits() {
-        loadingMessage.style.display = 'block';
-        depositsTbody.innerHTML = '';
-        noDepositsMessage.style.display = 'none';
+        // --- UTILS ---
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/deposits/pending`, {
-                headers: {
-                    'X-API-Key': ADMIN_API_KEY 
-                }
+        function formatNumber(num) {
+            if (num === undefined || num === null) return "";
+            return Number(num).toLocaleString('en-US');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`Copied: ${text}`, 'success');
             });
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = type === 'success' ? `<span>✓</span> ${message}` : `<span>⚠️</span> ${message}`;
+            container.appendChild(toast);
             
-            if (!response.ok) {
-                throw new Error(`API Error! Status: ${response.status}. Check your API Key in the JS.`);
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- CORE LOGIC ---
+
+        async function fetchPendingDeposits() {
+            loadingMessage.style.display = 'block';
+            depositsTbody.innerHTML = '';
+            noDepositsMessage.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/deposits/pending`, {
+                    headers: { 'X-API-Key': ADMIN_API_KEY }
+                });
+
+                if (!response.ok) throw new Error(`API Error: ${response.status}`);
+
+                const data = await response.json();
+                
+                // Filter logic
+                const filteredDeposits = data.deposits.filter(deposit =>
+                    deposit.agentContact === MASTER_AGENT_CONTACT
+                );
+
+                displayDeposits(filteredDeposits);
+
+            } catch (error) {
+                console.error(error);
+                showToast('Failed to fetch deposits. Check console.', 'error');
+                loadingMessage.style.display = 'none';
+                depositsTbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px; color: var(--danger);">Connection Error</td></tr>`;
+            }
+        }
+
+        function displayDeposits(deposits) {
+            loadingMessage.style.display = 'none';
+
+            if (deposits.length === 0) {
+                noDepositsMessage.style.display = 'block';
+                return;
             }
 
-            const data = await response.json();
-            
-            // 🌟 CRITICAL FIX: Filter deposits based ONLY on the MASTER_AGENT_CONTACT
-            // This assumes the deposit object returned from the API contains a field named 'agentContact'
-            const filteredDeposits = data.deposits.filter(deposit => 
-                deposit.agentContact === MASTER_AGENT_CONTACT
-            );
+            deposits.forEach(deposit => {
+                const userDisplay = deposit.user
+                    ? `<div style="line-height:1.2">
+                        <span style="font-weight:600; color:white;">${deposit.user.username}</span><br>
+                        <span style="font-size:0.8em; color:var(--text-muted);">${deposit.user.phone || deposit.user.email}</span>
+                       </div>`
+                    : '<span style="color:var(--danger)">User Deleted</span>';
 
-            displayDeposits(filteredDeposits);
+                const amountDisplay = deposit.amountBDT
+                    ? `<span class="amount-highlight">৳${formatNumber(deposit.amountBDT)}</span><br><span style="font-size:0.8em; color:var(--text-muted);">$${formatNumber(deposit.amount)}</span>`
+                    : `<span class="amount-highlight">$${formatNumber(deposit.amount)}</span>`;
 
-        } catch (error) {
-            console.error('Error fetching deposits:', error);
-            depositsTbody.innerHTML = `<tr><td colspan="7" style="color: var(--fail-color); text-align: center;">${error.message || 'Failed to load deposits. Check console.'}</td></tr>`;
-        } finally {
-            loadingMessage.style.display = 'none';
-        }
-    }
+                const shortId = deposit._id.substring(18); // Show last few chars
+                
+                const timeStr = new Date(deposit.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', day:'numeric', month:'short'});
 
-    /**
-     * Displays fetched deposits in the table.
-     */
-    function displayDeposits(deposits) {
-        if (deposits.length === 0) {
-            noDepositsMessage.style.display = 'block';
-            return;
-        }
+                const row = depositsTbody.insertRow();
+                row.id = `deposit-row-${deposit._id}`;
 
-        deposits.forEach(deposit => {
-            const userDisplay = deposit.user 
-                ? `${deposit.user.username} (${deposit.user.phone || deposit.user.email})` 
-                : 'User Deleted';
-            
-            const row = depositsTbody.insertRow();
-            row.id = `deposit-row-${deposit._id}`;
-            
-            row.innerHTML = `
-                <td>${deposit._id.substring(18)}...</td>
-                <td>${userDisplay}</td>
-                <td style="font-weight: bold; color: var(--primary-color);">${deposit.amount}</td>
-                <td>${deposit.method}</td>
-                <td>${deposit.txnId}</td>
-                <td>${new Date(deposit.createdAt).toLocaleString()}</td>
-                <td>
-                    <button class="action-btn approve-btn" data-id="${deposit._id}" data-status="Completed">Approve</button>
-                    <button class="action-btn fail-btn" data-id="${deposit._id}" data-status="Failed">Fail</button>
-                </td>
-            `;
-        });
-    }
-
-    /**
-     * Sends the status update request to the backend.
-     */
-    async function updateDepositStatus(depositId, status) {
-        const buttonId = `[data-id="${depositId}"]`;
-        const buttons = document.querySelectorAll(buttonId);
-        buttons.forEach(btn => btn.disabled = true);
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/deposit/update-status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-Key': ADMIN_API_KEY
-                },
-                body: JSON.stringify({
-                    depositId,
-                    status,
-                    agentName: AGENT_NAME,    
-                    agentContact: AGENT_CONTACT // Send the identifier to be saved/logged
-                })
+                // Note: data-label attributes are used by CSS for Mobile View
+                row.innerHTML = `
+                    <td data-label="ID">
+                        <span class="copyable" onclick="copyToClipboard('${deposit._id}')">...${shortId}</span>
+                    </td>
+                    <td data-label="User">${userDisplay}</td>
+                    <td data-label="Amount">${amountDisplay}</td>
+                    <td data-label="Method"><span class="method-badge">${deposit.method}</span></td>
+                    <td data-label="Txn ID"><span class="copyable" onclick="copyToClipboard('${deposit.txnId}')">${deposit.txnId}</span></td>
+                    <td data-label="Time" style="color:var(--text-muted); font-size:0.85em;">${timeStr}</td>
+                    <td data-label="Actions">
+                        <div class="actions-cell">
+                            <button class="btn btn-approve" onclick="handleAction('${deposit._id}', 'Completed')">Approve</button>
+                            <button class="btn btn-fail" onclick="handleAction('${deposit._id}', 'Failed')">Fail</button>
+                        </div>
+                    </td>
+                `;
             });
+        }
 
-            const data = await response.json();
+        async function handleAction(depositId, status) {
+            if (!confirm(`Are you sure you want to mark this as ${status}?`)) return;
 
-            if (response.ok) {
-                alert(`${status} successful! Chips Credited: ${data.chipsCredited}.`);
-                document.getElementById(`deposit-row-${depositId}`).remove();
-                if (depositsTbody.rows.length === 0) {
-                    noDepositsMessage.style.display = 'block';
+            // Optimistic UI: Disable buttons immediately
+            const row = document.getElementById(`deposit-row-${depositId}`);
+            const buttons = row.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/deposit/update-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': ADMIN_API_KEY
+                    },
+                    body: JSON.stringify({
+                        depositId,
+                        status,
+                        agentName: AGENT_NAME,
+                        agentContact: MASTER_AGENT_CONTACT
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast(`${status} Successfully! Chips: ${data.chipsCredited || 'N/A'}`);
+                    
+                    // Animate removal
+                    row.style.opacity = '0';
+                    setTimeout(() => {
+                        row.remove();
+                        if (depositsTbody.rows.length === 0) noDepositsMessage.style.display = 'block';
+                    }, 300);
+                } else {
+                    showToast(data.message || 'Error updating status', 'error');
+                    buttons.forEach(btn => btn.disabled = false);
                 }
 
-            } else {
-                alert(`Error processing deposit: ${data.message || 'Unknown error'}`);
+            } catch (error) {
+                console.error(error);
+                showToast('Network error occurred', 'error');
                 buttons.forEach(btn => btn.disabled = false);
             }
-
-        } catch (error) {
-            console.error('Network or processing error:', error);
-            alert('A network error occurred. Check the console and API Key.');
-            buttons.forEach(btn => btn.disabled = false);
         }
-    }
 
-    // Event listener delegation
-    depositsTbody.addEventListener('click', (event) => {
-        if (event.target.classList.contains('action-btn')) {
-            const depositId = event.target.dataset.id;
-            const status = event.target.dataset.status;
-            
-            if (confirm(`Set Deposit ID ${depositId.substring(18)}... to ${status}?`)) {
-                updateDepositStatus(depositId, status);
-            }
-        }
-    });
+        // Initialize
+        window.onload = fetchPendingDeposits;
 
-    // Initial load
-    window.onload = fetchPendingDeposits;
-
-</script>
+    </script>
 
 </body>
+
 </html>

@@ -6,7 +6,7 @@ const { COUNTRY_CODES } = require('../config/countries')
 // ----------------- SUBSCHEMAS -----------------
 const depositSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
-  amountUSD: { type: Number, required: false, default: 0 },
+  amountBDT: { type: Number, required: false },
   method: { type: String, required: true }, // Bkash, Nagad, Upay, etc.
   txnId: { type: String },
   status: { 
