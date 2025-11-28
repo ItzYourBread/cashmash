@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let points = [];
 
   // User State
-  let currentBetAmount = 5;
+  let currentBetAmount = 1;
   let nextRoundBet = false; // If user clicks bet during flight
   let hasActiveBet = false; // Bet accepted by server for CURRENT round
   let hasCashedOut = false;
