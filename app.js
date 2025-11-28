@@ -44,6 +44,7 @@ app.use(cors({
   origin: [
     'https://cashmash.onrender.com', 
     'https://cashmash.watchnsfw.com',
+    'https://visionary-mermaid-550163.netlify.app',
     'http://localhost:3000',
     'http://127.0.0.1:5500',
     'http://0.0.0.0:3000'
