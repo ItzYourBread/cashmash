@@ -1,0 +1,30 @@
+<h2>Game History</h2>
+<% if (gameHistory.length || historyPages > 0) { %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Game</th>
+        <th>Bet</th>
+        <th>Multiplier</th>
+        <th>Win</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for(let i = 0; i < gameHistory.length; i++) { %>
+        <% const g = gameHistory[i]; %>
+        <tr>
+          <td><%= new Date(g.playedAt).toLocaleDateString() %></td>
+          <td><%= g.gameType %></td>
+          <td><%= parseFloat(g.betAmount.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits: 2 }) %></td>
+          <td><%= g.multiplier.toFixed(2) %>x</td>
+          <td><%= parseFloat(g.winAmount.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits: 2 }) %></td>
+          <td><%= g.result %></td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+<% } else { %>
+  <p>No game history yet.</p>
+<% } %>

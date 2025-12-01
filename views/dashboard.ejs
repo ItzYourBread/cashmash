@@ -5,71 +5,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | CashMash</title>
+
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/dashboard.css" />
-
   <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
   <link rel="shortcut icon" href="/favicons/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="CashMash" />
   <link rel="manifest" href="/favicons/site.webmanifest" />
-
-  <style>
-    .withdraw-container {
-      max-width: 400px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    .withdraw-box {
-      background: #111;
-      padding: 20px;
-      border-radius: 10px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-
-    input,
-    select {
-      width: 50%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: 1px solid #444;
-      background: #222;
-      color: #fff;
-    }
-
-    button {
-      width: 50 %;
-      padding: 12px;
-      margin-top: 15px;
-      background: gold;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-    }
-
-    .withdraw-list {
-      margin-top: 20px;
-    }
-
-    .withdraw-item {
-      background: #1b1b1b;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-  </style>
 </head>
 
 <body>
@@ -77,14 +20,13 @@
 
     <section class="dashboard">
       <div class="dashboard-container">
+
         <aside class="sidebar">
           <div class="balance-box">
             <h3>Balance</h3>
-            <p>
-              $<%= user.balance.toLocaleString() %>
+            <p>$<%= user.balance.toLocaleString() %>
             </p>
           </div>
-
           <ul class="sidebar-menu">
             <li class="active" data-section="statistics">Statistics</li>
             <li data-section="deposit">Deposit</li>
@@ -97,508 +39,38 @@
 
         <div class="content-area">
 
-          <% const renderPagination=(current_page, total_pages, section_id)=> {
-            // Ensure total_pages is at least 1
-            if (total_pages <= 1) return; let startPage=Math.max(1, current_page - 2); let endPage=Math.min(total_pages,
-              current_page + 2); if (total_pages> 5) {
-              if (current_page <= 3) { startPage=1; endPage=5; } else if (current_page>= total_pages - 2) {
-                startPage = total_pages - 4;
-                endPage = total_pages;
-                }
-                } else {
-                startPage = 1;
-                }
-                %>
+          <div id="statistics" class="content-section active">
+            <%- include('partials/dashboard/section-statistics') %>
+          </div>
+
+          <div id="deposit" class="content-section">
+            <%- include('partials/dashboard/section-deposit') %>
+              <%- include('partials/dashboard/pagination', { currentPage: depositPage, totalPages: depositPages,
+                sectionId: 'deposit' }) %>
+          </div>
+
+          <div id="withdraw" class="content-section">
+            <%- include('partials/dashboard/section-withdraw') %>
+              <%- include('partials/dashboard/pagination', { currentPage: withdrawalPage, totalPages: withdrawalPages,
+                sectionId: 'withdraw' }) %>
+          </div>
+
+          <div id="history" class="content-section">
+            <%- include('partials/dashboard/section-history') %>
+              <%- include('partials/dashboard/pagination', { currentPage: historyPage, totalPages: historyPages,
+                sectionId: 'history' }) %>
+          </div>
+
+          <div id="rakeback" class="content-section">
+            <%- include('partials/dashboard/section-rakeback') %>
+              <%- include('partials/dashboard/pagination', { currentPage: rakePage, totalPages: rakePages,
+                sectionId: 'rakeback' }) %>
+          </div>
+
+          <div id="account" class="content-section">
+            <%- include('partials/dashboard/section-account') %>
+          </div>
 
-                <div class="pagination-controls">
-                  <% if (current_page> 1) { %>
-                    <a href="/dashboard?section=<%= section_id %>&page=<%= current_page - 1 %>" class="btn">&laquo;</a>
-                    <% } else { %>
-                      <span class="btn disabled">&laquo;</span>
-                      <% } %>
-
-                        <% for (let i=startPage; i <=endPage; i++) { %>
-                          <a href="/dashboard?section=<%= section_id %>&page=<%= i %>"
-                            class="btn <%= i === current_page ? 'active' : '' %>">
-                            <%= i %>
-                          </a>
-                          <% } %>
-
-                            <% if (current_page < total_pages) { %>
-                              <a href="/dashboard?section=<%= section_id %>&page=<%= current_page + 1 %>"
-                                class="btn">&raquo;</a>
-                              <% } else { %>
-                                <span class="btn disabled">&raquo;</span>
-                                <% } %>
-                </div>
-
-                <% }; // End of renderPagination helper %>
-                  <div id="statistics" class="content-section active">
-                    <h2>Welcome, <%= user.username %> 👋</h2>
-                    <p>Joined: <%= new Date(user.joinedAt).toLocaleDateString() %>
-                    </p>
-                    <p>Email: <%= user.email || 'N/A' %>
-                    </p>
-                    <p>Phone: <%= user.phone || 'N/A' %>
-                    </p>
-                  </div>
-
-                  <div id="deposit" class="content-section">
-                    <h2>Your Deposits</h2>
-                    <% if (deposits.length || depositPages> 0) { %>
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th>Date</th>
-                            <th>Amount</th>
-                            <th>Method</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <% for (let i=0; i < deposits.length; i++) { %>
-                            <% const dep=deposits[i]; %>
-                            
-                              <tr>
-                                <td>
-                                  <%= new Date(dep.createdAt).toLocaleDateString() %>
-                                </td>
-
-                                <td>
-                                  $<%= parseFloat(dep.amount.toFixed(2)).toLocaleString('en-US', {
-                                    minimumFractionDigits: 2 }) %>
-                                </td>
-
-                                <td>
-                                  <%= dep.method %>
-                                </td>
-
-                                <td style="
-          font-weight: bold;
-          color: 
-            <%= dep.status === 'Completed' 
-                ? '#28a745' 
-                : dep.status === 'Failed' 
-                  ? '#dc3545' 
-                  : '#ffc107' %>;
-        ">
-                                  <%= dep.status %>
-                                </td>
-                              </tr>
-
-                              <% } %>
-                        </tbody>
-                      </table>
-                      <%= renderPagination(depositPage, depositPages, 'deposit' ) %>
-                        <% } else { %>
-                          <p>No deposits yet.</p>
-                          <% } %>
-                  </div>
-
-                  <div id="withdraw" class="content-section active">
-
-                    <h2>Withdraw Funds</h2>
-
-                    <!-- =============================== -->
-                    <!--   SIMPLE SELECT (NO IMAGES)     -->
-                    <!-- =============================== -->
-
-                    <form id="withdrawSelectorForm">
-
-                      <label>Select Payment Method</label>
-                      <select id="withdrawMethodSelect" required>
-                        <option value="">-- Select Method --</option>
-
-                        <!-- E-WALLETS -->
-                        <optgroup label="E-Wallets">
-
-                          <% if (availableMethods.includes("Bkash")) { %>
-                            <option value="bkash">Bkash</option>
-                            <% } %>
-
-                              <% if (availableMethods.includes("Nagad")) { %>
-                                <option value="nagad">Nagad</option>
-                                <% } %>
-
-                                  <% if (availableMethods.includes("Upay")) { %>
-                                    <option value="upay">Upay</option>
-                                    <% } %>
-
-                                      <% if (availableMethods.includes("BinancePay")) { %>
-                                        <option value="binance">BinancePay</option>
-                                        <% } %>
-
-                        </optgroup>
-
-                        <!-- CRYPTO -->
-                        <optgroup label="Crypto">
-                          <% if (availableMethods.includes("Crypto")) { %>
-                            <option value="crypto">Crypto Transfer</option>
-                            <% } else { %>
-                              <option value="crypto" disabled>Crypto Transfer (Coming Soon)</option>
-                              <% } %>
-                        </optgroup>
-
-                        <!-- BANK TRANSFER -->
-                        <optgroup label="Bank">
-                          <option value="bank" disabled>Bank Transfer (Coming Soon)</option>
-                        </optgroup>
-
-                      </select>
-
-                    </form>
-
-
-
-                    <!-- =============================== -->
-                    <!--     SHOWN ONLY AFTER SELECT     -->
-                    <!-- =============================== -->
-
-                    <!-- E-WALLET form -->
-                    <div id="walletFormWrap" class="withdraw-form hidden">
-                      <h3 id="walletTitle"></h3> <!-- ADD THIS -->
-
-                      <form id="walletForm" method="POST">
-                        <label>Full Name</label>
-                        <input type="text" name="fullName" required>
-
-                        <label id="walletNumberLabel">Wallet Number</label>
-                        <input type="text" name="contact" required>
-
-                        <label>Amount (USD)</label>
-                        <input type="number" name="amount" id="walletAmount" min="10" required>
-
-                        <div id="walletFeedback" class="amount-feedback"></div>
-
-                        <button id="walletConfirmBtn" type="submit" disabled>Confirm</button>
-                      </form>
-                    </div>
-
-                    <!-- Binance form -->
-                    <div id="binanceFormWrap" class="withdraw-form hidden">
-                      <h3>BinancePay Withdraw</h3>
-
-                      <form method="POST" action="/withdraw/binance">
-
-                        <label>Email or User ID</label>
-                        <input type="text" name="userIdOrEmail" required>
-
-                        <label>Amount (USD)</label>
-                        <input type="number" name="amount" id="binanceAmount" min="10" required>
-
-                        <div id="binanceFeedback" class="amount-feedback"></div>
-
-                        <button id="binanceConfirmBtn" type="submit" disabled>Confirm</button>
-
-                      </form>
-                    </div>
-
-                    <!-- Crypto form -->
-                    <div id="cryptoFormWrap" class="withdraw-form hidden">
-                      <h3 id="cryptoWalletTitle">Crypto Withdrawal</h3>
-
-                      <form id="cryptoForm" method="POST" action="/withdraw/crypto">
-
-                        <label>Wallet Address</label>
-                        <input type="text" name="WalletAddress" id="cryptoWalletAddress" required />
-
-                        <label>Select Network</label>
-                        <select name="network" id="cryptoNetwork" required>
-                          <option value="">-- Choose Network --</option>
-
-                          <option value="TRC20">USDT TRC20 (TRON)</option>
-                          <option value="ERC20">USDT ERC20 (Ethereum)</option>
-                          <option value="BEP20">USDT BEP20 (BNB Chain)</option>
-                          <option value="SOL">USDT SOL (Solana)</option>
-                          <option value="MATIC">USDT MATIC (Polygon)</option>
-                          <option value="CELO">USDT CELO (Celo Network)</option>
-                          <option value="ARB">USDT ARB (Arbitrum)</option>
-                        </select>
-
-
-                        <label>Amount (USD)</label>
-                        <input type="number" name="amount" id="cryptoAmount" min="50" required />
-
-                        <!-- hidden note for storing network -->
-                        <input type="hidden" name="note" id="cryptoNote" value="Nothing for Note" />
-
-                        <div id="cryptoFeedback" class="amount-feedback"></div>
-
-                        <button id="cryptoConfirmBtn" type="submit" disabled>Confirm</button>
-                      </form>
-                    </div>
-
-                    <!-- ====================================== -->
-                    <!--     WITHDRAWAL LIST (unchanged)        -->
-                    <!-- ====================================== -->
-
-                    <h2 style="margin-top: 40px;">Your Withdrawals</h2>
-
-                    <% if (withdrawals.length || withdrawalPages> 0) { %>
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th>Date</th>
-                            <th>Amount</th>
-                            <th>Method</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          <% withdrawals.forEach(w=> { %>
-                            <tr>
-                              <td>
-                                <%= new Date(w.createdAt).toLocaleDateString() %>
-                              </td>
-
-                              <td>
-                                $<%= parseFloat(w.amount.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits: 2
-                                  }) %>
-                              </td>
-
-                              <td>
-                                <%= w.method %>
-                              </td>
-
-                              <td>
-                                <%= w.status %>
-                              </td>
-
-                              <td>
-                                <% if (w.status==='Pending' ) { %>
-                                  <form method="POST" action="/withdraw/cancel/<%= w._id %>"
-                                    onsubmit="return confirm('Cancel this withdrawal?')">
-                                    <button type="submit" class="btn cancel">Cancel</button>
-                                  </form>
-                                  <% } else { %>
-                                    <span class="text-dim">—</span>
-                                    <% } %>
-                              </td>
-                            </tr>
-                            <% }) %>
-                        </tbody>
-                      </table>
-
-                      <%= renderPagination(withdrawalPage, withdrawalPages, 'withdraw' ) %>
-
-                        <% } else { %>
-                          <p>No withdrawals yet.</p>
-                          <% } %>
-
-                  </div>
-
-                  <div id="history" class="content-section">
-                    <h2>Game History</h2>
-                    <% if (gameHistory.length || historyPages> 0) { %>
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th>Date</th>
-                            <th>Game</th>
-                            <th>Bet</th>
-                            <th>Multiplier</th>
-                            <th>Win</th>
-                            <th>Result</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <% // ✅ CORRECTED: Loop forward to show newest first %>
-                            <% for(let i=0; i < gameHistory.length; i++) { %>
-                              <% const g=gameHistory[i]; %>
-                                <tr>
-                                  <td>
-                                    <%= new Date(g.playedAt).toLocaleDateString() %>
-                                  </td>
-                                  <td>
-                                    <%= g.gameType %>
-                                  </td>
-                                  <td>
-                                    <%= parseFloat(g.betAmount.toFixed(2)).toLocaleString('en-US', {
-                                      minimumFractionDigits: 2 }) %>
-                                  </td>
-                                  <td>
-                                    <%= g.multiplier.toFixed(2) %>x
-                                  </td>
-                                  <td>
-                                    <%= parseFloat(g.winAmount.toFixed(2)).toLocaleString('en-US', {
-                                      minimumFractionDigits: 2 }) %>
-                                  </td>
-                                  <td>
-                                    <%= g.result %>
-                                  </td>
-                                </tr>
-                                <% } %>
-                        </tbody>
-                      </table>
-                      <%= renderPagination(historyPage, historyPages, 'history' ) %>
-                        <% } else { %>
-                          <p>No game history yet.</p>
-                          <% } %>
-                  </div>
-
-                  <div id="rakeback" class="content-section">
-                    <h2>Rakeback</h2>
-
-                    <h3>Weekly Rakeback Summary</h3>
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th>Date</th>
-                          <th>Weekly Wagered</th>
-                          <th>Percent</th>
-                          <th>Rakeback Added</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <% rakebackHistory.forEach(rb=> { %>
-                          <tr>
-                            <td>
-                              <%= rb.date.toLocaleDateString() %>
-                            </td>
-                            <td>$<%= rb.weeklyWagered.toLocaleString() %>
-                            </td>
-                            <td>
-                              <%= rb.percent %>%
-                            </td>
-                            <td>$<%= rb.rakeback.toLocaleString('en-US', { minimumFractionDigits: 2 }) %>
-                            </td>
-                          </tr>
-                          <% }) %>
-                      </tbody>
-                    </table>
-
-
-
-                    <%= renderPagination(rakePage, rakePages, 'rakeback' ) %>
-                  </div>
-
-                  <div id="account" class="content-section">
-                    <h2>Manage Account</h2>
-                    <p class="section-description">
-                      Update your profile details, change your password, or manage your account settings.
-                    </p>
-
-                    <div class="account-grid">
-
-                      <div class="account-module">
-                        <form method="POST" action="/account/update" class="account-form">
-                          <h3>Profile Details</h3>
-
-                          <div class="form-group">
-                            <label for="firstName">First Name</label>
-                            <input type="text" id="firstName" name="firstName" value="<%= user.firstName || '' %>">
-                          </div>
-
-                          <div class="form-group">
-                            <label for="lastName">Last Name</label>
-                            <input type="text" id="lastName" name="lastName" value="<%= user.lastName || '' %>">
-                          </div>
-
-                          <div class="form-group">
-                            <label for="address">Address</label>
-                            <input type="text" id="address" name="address" value="<%= user.address || '' %>">
-                          </div>
-
-                          <div class="form-group">
-                            <label for="phone">Phone Number</label>
-                            <input type="text" id="phone" name="phone" value="<%= user.phone || '' %>">
-                          </div>
-
-                          <div class="form-group">
-                            <label for="country">Country / Region</label>
-                            <select id="country" name="country">
-                              <option value="" disabled <%=!user.country ? 'selected' : '' %>>Select your country
-                              </option>
-
-                              <optgroup label="Popular">
-                                <option value="US" <%=user.country==='US' ? 'selected' : '' %>>United States</option>
-                                <option value="CA" <%=user.country==='CA' ? 'selected' : '' %>>Canada</option>
-                                <option value="GB" <%=user.country==='GB' ? 'selected' : '' %>>United Kingdom</option>
-                                <option value="AU" <%=user.country==='AU' ? 'selected' : '' %>>Australia</option>
-                                <option value="IN" <%=user.country==='IN' ? 'selected' : '' %>>India</option>
-                                <option value="BD" <%=user.country==='BD' ? 'selected' : '' %>>Bangladesh</option>
-                                <option value="DE" <%=user.country==='DE' ? 'selected' : '' %>>Germany</option>
-                                <option value="BR" <%=user.country==='BR' ? 'selected' : '' %>>Brazil</option>
-                              </optgroup>
-
-                              <optgroup label="Europe">
-                                <option value="FR" <%=user.country==='FR' ? 'selected' : '' %>>France</option>
-                                <option value="ES" <%=user.country==='ES' ? 'selected' : '' %>>Spain</option>
-                                <option value="IT" <%=user.country==='IT' ? 'selected' : '' %>>Italy</option>
-                                <option value="PL" <%=user.country==='PL' ? 'selected' : '' %>>Poland</option>
-                                <option value="NL" <%=user.country==='NL' ? 'selected' : '' %>>Netherlands</option>
-                                <option value="SE" <%=user.country==='SE' ? 'selected' : '' %>>Sweden</option>
-                                <option value="CH" <%=user.country==='CH' ? 'selected' : '' %>>Switzerland</option>
-                                <option value="IE" <%=user.country==='IE' ? 'selected' : '' %>>Ireland</option>
-                                <option value="GR" <%=user.country==='GR' ? 'selected' : '' %>>Greece</option>
-                              </optgroup>
-
-                              <optgroup label="North & South America">
-                                <option value="MX" <%=user.country==='MX' ? 'selected' : '' %>>Mexico</option>
-                                <option value="AR" <%=user.country==='AR' ? 'selected' : '' %>>Argentina</option>
-                                <option value="CO" <%=user.country==='CO' ? 'selected' : '' %>>Colombia</option>
-                                <option value="PE" <%=user.country==='PE' ? 'selected' : '' %>>Peru</option>
-                                <option value="CL" <%=user.country==='CL' ? 'selected' : '' %>>Chile</option>
-                                <option value="EC" <%=user.country==='EC' ? 'selected' : '' %>>Ecuador</option>
-                              </optgroup>
-
-                              <optgroup label="Asia & Oceania">
-                                <option value="CN" <%=user.country==='CN' ? 'selected' : '' %>>China</option>
-                                <option value="JP" <%=user.country==='JP' ? 'selected' : '' %>>Japan</option>
-                                <option value="KR" <%=user.country==='KR' ? 'selected' : '' %>>South Korea</option>
-                                <option value="ID" <%=user.country==='ID' ? 'selected' : '' %>>Indonesia</option>
-                                <option value="PK" <%=user.country==='PK' ? 'selected' : '' %>>Pakistan</option>
-                                <option value="PH" <%=user.country==='PH' ? 'selected' : '' %>>Philippines</option>
-                                <option value="VN" <%=user.country==='VN' ? 'selected' : '' %>>Vietnam</option>
-                                <option value="NZ" <%=user.country==='NZ' ? 'selected' : '' %>>New Zealand</option>
-                              </optgroup>
-
-                              <optgroup label="Africa & Middle East">
-                                <option value="NG" <%=user.country==='NG' ? 'selected' : '' %>>Nigeria</option>
-                                <option valuea="ZA" <%=user.country==='ZA' ? 'selected' : '' %>>South Africa</option>
-                                <option value="EG" <%=user.country==='EG' ? 'selected' : '' %>>Egypt</option>
-                                <option value="SA" <%=user.country==='SA' ? 'selected' : '' %>>Saudi Arabia</option>
-                                <option value="TR" <%=user.country==='TR' ? 'selected' : '' %>>Turkey</option>
-                              </optgroup>
-                            </select>
-                          </div>
-                          <div class="form-buttons">
-                            <button type="submit" class="btn gold">Save Changes</button>
-                          </div>
-                        </form>
-                      </div>
-
-                      <div class="account-module">
-                        <form action="/change-password" method="POST" class="password-form">
-                          <h3>Change Password</h3>
-
-                          <label for="currentPassword">Current Password</label>
-                          <input type="password" name="currentPassword" required />
-
-                          <label for="newPassword">New Password</label>
-                          <input type="password" name="newPassword" required minlength="6" />
-
-                          <label for="confirmPassword">Confirm New Password</label>
-                          <input type="password" name="confirmPassword" required minlength="6" />
-
-                          <button type="submit">Update Password</button>
-                        </form>
-                      </div>
-
-                      <div class="account-module danger-zone">
-                        <h3>Danger Zone</h3>
-                        <p>This action is permanent and cannot be undone.</p>
-
-                        <form method="POST" action="/account/delete"
-                          onsubmit="return confirm('Are you sure? This will permanently delete your account.')">
-                          <button type="submit" class="btn danger">Delete Account</button>
-                        </form>
-                      </div>
-
-                    </div>
-                  </div>
         </div>
       </div>
     </section>
@@ -606,71 +78,7 @@
     <%- include('partials/footer') %>
 
       <script src="/socket.io/socket.io.js"></script>
-      <script>
-        const menuItems = document.querySelectorAll('.sidebar-menu li');
-        const sections = document.querySelectorAll('.content-section');
-        const sectionIds = Array.from(menuItems).map(item => item.dataset.section);
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const activeSection = urlParams.get('section') || 'statistics';
-
-        function activateSection(targetId) {
-          menuItems.forEach(i => {
-            i.classList.remove('active');
-            if (i.dataset.section === targetId) i.classList.add('active');
-          });
-          sections.forEach(sec => {
-            sec.classList.remove('active');
-            if (sec.id === targetId) sec.classList.add('active');
-          });
-        }
-
-        // Set initial active state based on URL/server
-        activateSection(activeSection);
-
-        // Add click handlers
-        menuItems.forEach(item => {
-          item.addEventListener('click', () => {
-            const target = item.dataset.section;
-            // Navigate to the section and reset page to 1
-            history.pushState(null, '', `/dashboard?section=${target}&page=1`);
-            activateSection(target);
-          });
-        });
-
-        // --- Arrow Key Navigation ---
-        document.addEventListener('keydown', (e) => {
-          // Check if user is typing in an input field (e.g., in Account Management)
-          if (document.activeElement.tagName === 'INPUT') {
-            return;
-          }
-
-          const currentActiveItem = document.querySelector('.sidebar-menu li.active');
-          if (!currentActiveItem) return;
-
-          const currentActiveIndex = sectionIds.indexOf(currentActiveItem.dataset.section);
-          let nextIndex = currentActiveIndex;
-
-          if (e.key === 'ArrowRight') {
-            e.preventDefault(); // Prevent page scrolling
-            nextIndex = Math.min(currentActiveIndex + 1, sectionIds.length - 1);
-          } else if (e.key === 'ArrowLeft') {
-            e.preventDefault(); // Prevent page scrolling
-            nextIndex = Math.max(currentActiveIndex - 1, 0);
-          } else {
-            return;
-          }
-
-          if (nextIndex !== currentActiveIndex) {
-            const target = sectionIds[nextIndex];
-            // Navigate to the new section (page query is preserved or defaults to 1 by server)
-            history.pushState(null, '', `/dashboard?section=${target}`);
-            activateSection(target);
-          }
-        });
-        // --- END Arrow Key Navigation ---
-
-      </script>
+      <script src="/js/dashboard.js"></script>
       <script src="/js/withdraw.js"></script>
 </body>
 

@@ -563,3 +563,23 @@ body {
   border-radius: 8px;
   transition: width 0.5s ease;
 }
+
+/* Dashboard Form & Layout Customizations */
+.withdraw-container { max-width: 400px; margin: auto; padding: 20px; }
+.withdraw-box { background: #111; padding: 20px; border-radius: 10px; }
+.hidden { display: none; }
+
+label { display: block; margin-top: 10px; }
+input, select { width: 50%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #444; background: #222; color: #fff; }
+
+button { width: 50%; padding: 12px; margin-top: 15px; background: gold; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+button:disabled { background: #555; cursor: not-allowed; }
+
+.withdraw-list { margin-top: 20px; }
+.withdraw-item { background: #1b1b1b; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+
+/* Status Colors helper */
+.text-success { color: #28a745; }
+.text-danger { color: #dc3545; }
+.text-warning { color: #ffc107; }
+.text-dim { color: #666; }

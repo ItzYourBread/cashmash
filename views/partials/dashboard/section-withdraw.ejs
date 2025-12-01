@@ -1,0 +1,122 @@
+<h2>Withdraw Funds</h2>
+
+<form id="withdrawSelectorForm">
+  <label>Select Payment Method</label>
+  <select id="withdrawMethodSelect" required>
+    <option value="">-- Select Method --</option>
+
+    <optgroup label="E-Wallets">
+      <% if (availableMethods.includes("Bkash")) { %><option value="bkash">Bkash</option><% } %>
+      <% if (availableMethods.includes("Nagad")) { %><option value="nagad">Nagad</option><% } %>
+      <% if (availableMethods.includes("Upay")) { %><option value="upay">Upay</option><% } %>
+      <% if (availableMethods.includes("BinancePay")) { %><option value="binance">BinancePay</option><% } %>
+    </optgroup>
+
+    <optgroup label="Crypto">
+      <% if (availableMethods.includes("Crypto")) { %>
+        <option value="crypto">Crypto Transfer</option>
+      <% } else { %>
+        <option value="crypto" disabled>Crypto Transfer (Coming Soon)</option>
+      <% } %>
+    </optgroup>
+
+    <optgroup label="Bank">
+      <option value="bank" disabled>Bank Transfer (Coming Soon)</option>
+    </optgroup>
+  </select>
+</form>
+
+<div id="walletFormWrap" class="withdraw-form hidden">
+  <h3 id="walletTitle"></h3>
+  <form id="walletForm" method="POST">
+    <label>Full Name</label>
+    <input type="text" name="fullName" required>
+    
+    <label id="walletNumberLabel">Wallet Number</label>
+    <input type="text" name="contact" required>
+    
+    <label>Amount (USD)</label>
+    <input type="number" name="amount" id="walletAmount" min="10" required>
+    <div id="walletFeedback" class="amount-feedback"></div>
+    
+    <button id="walletConfirmBtn" type="submit" disabled>Confirm</button>
+  </form>
+</div>
+
+<div id="binanceFormWrap" class="withdraw-form hidden">
+  <h3>BinancePay Withdraw</h3>
+  <form method="POST" action="/withdraw/binance">
+    <label>Email or User ID</label>
+    <input type="text" name="userIdOrEmail" required>
+    
+    <label>Amount (USD)</label>
+    <input type="number" name="amount" id="binanceAmount" min="10" required>
+    <div id="binanceFeedback" class="amount-feedback"></div>
+    
+    <button id="binanceConfirmBtn" type="submit" disabled>Confirm</button>
+  </form>
+</div>
+
+<div id="cryptoFormWrap" class="withdraw-form hidden">
+  <h3 id="cryptoWalletTitle">Crypto Withdrawal</h3>
+  <form id="cryptoForm" method="POST" action="/withdraw/crypto">
+    <label>Wallet Address</label>
+    <input type="text" name="WalletAddress" id="cryptoWalletAddress" required />
+
+    <label>Select Network</label>
+    <select name="network" id="cryptoNetwork" required>
+      <option value="">-- Choose Network --</option>
+      <option value="TRC20">USDT TRC20 (TRON)</option>
+      <option value="ERC20">USDT ERC20 (Ethereum)</option>
+      <option value="BEP20">USDT BEP20 (BNB Chain)</option>
+      <option value="SOL">USDT SOL (Solana)</option>
+      <option value="MATIC">USDT MATIC (Polygon)</option>
+      <option value="CELO">USDT CELO (Celo Network)</option>
+      <option value="ARB">USDT ARB (Arbitrum)</option>
+    </select>
+
+    <label>Amount (USD)</label>
+    <input type="number" name="amount" id="cryptoAmount" min="50" required />
+    <input type="hidden" name="note" id="cryptoNote" value="Nothing for Note" />
+    <div id="cryptoFeedback" class="amount-feedback"></div>
+
+    <button id="cryptoConfirmBtn" type="submit" disabled>Confirm</button>
+  </form>
+</div>
+
+<h2 style="margin-top: 40px;">Your Withdrawals</h2>
+
+<% if (withdrawals.length || withdrawalPages > 0) { %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% withdrawals.forEach(w => { %>
+        <tr>
+          <td><%= new Date(w.createdAt).toLocaleDateString() %></td>
+          <td>$<%= parseFloat(w.amount.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits: 2 }) %></td>
+          <td><%= w.method %></td>
+          <td><%= w.status %></td>
+          <td>
+            <% if (w.status === 'Pending') { %>
+              <form method="POST" action="/withdraw/cancel/<%= w._id %>" onsubmit="return confirm('Cancel this withdrawal?')">
+                <button type="submit" class="btn cancel">Cancel</button>
+              </form>
+            <% } else { %>
+              <span class="text-dim">—</span>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } else { %>
+  <p>No withdrawals yet.</p>
+<% } %>

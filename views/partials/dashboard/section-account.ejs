@@ -1,0 +1,119 @@
+<h2>Manage Account</h2>
+<p class="section-description">
+  Update your profile details, change your password, or manage your account settings.
+</p>
+
+<div class="account-grid">
+
+  <div class="account-module">
+    <form method="POST" action="/account/update" class="account-form">
+      <h3>Profile Details</h3>
+
+      <div class="form-group">
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" name="firstName" value="<%= user.firstName || '' %>">
+      </div>
+
+      <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" name="lastName" value="<%= user.lastName || '' %>">
+      </div>
+
+      <div class="form-group">
+        <label for="address">Address</label>
+        <input type="text" id="address" name="address" value="<%= user.address || '' %>">
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input type="text" id="phone" name="phone" value="<%= user.phone || '' %>">
+      </div>
+
+      <div class="form-group">
+        <label for="country">Country / Region</label>
+        <select id="country" name="country">
+          <option value="" disabled <%= !user.country ? 'selected' : '' %>>Select your country</option>
+
+          <optgroup label="Popular">
+            <option value="US" <%= user.country === 'US' ? 'selected' : '' %>>United States</option>
+            <option value="CA" <%= user.country === 'CA' ? 'selected' : '' %>>Canada</option>
+            <option value="GB" <%= user.country === 'GB' ? 'selected' : '' %>>United Kingdom</option>
+            <option value="AU" <%= user.country === 'AU' ? 'selected' : '' %>>Australia</option>
+            <option value="IN" <%= user.country === 'IN' ? 'selected' : '' %>>India</option>
+            <option value="BD" <%= user.country === 'BD' ? 'selected' : '' %>>Bangladesh</option>
+            <option value="DE" <%= user.country === 'DE' ? 'selected' : '' %>>Germany</option>
+            <option value="BR" <%= user.country === 'BR' ? 'selected' : '' %>>Brazil</option>
+          </optgroup>
+
+          <optgroup label="Europe">
+            <option value="FR" <%= user.country === 'FR' ? 'selected' : '' %>>France</option>
+            <option value="ES" <%= user.country === 'ES' ? 'selected' : '' %>>Spain</option>
+            <option value="IT" <%= user.country === 'IT' ? 'selected' : '' %>>Italy</option>
+            <option value="PL" <%= user.country === 'PL' ? 'selected' : '' %>>Poland</option>
+            <option value="NL" <%= user.country === 'NL' ? 'selected' : '' %>>Netherlands</option>
+            <option value="SE" <%= user.country === 'SE' ? 'selected' : '' %>>Sweden</option>
+            <option value="CH" <%= user.country === 'CH' ? 'selected' : '' %>>Switzerland</option>
+            <option value="IE" <%= user.country === 'IE' ? 'selected' : '' %>>Ireland</option>
+            <option value="GR" <%= user.country === 'GR' ? 'selected' : '' %>>Greece</option>
+          </optgroup>
+
+          <optgroup label="North & South America">
+            <option value="MX" <%= user.country === 'MX' ? 'selected' : '' %>>Mexico</option>
+            <option value="AR" <%= user.country === 'AR' ? 'selected' : '' %>>Argentina</option>
+            <option value="CO" <%= user.country === 'CO' ? 'selected' : '' %>>Colombia</option>
+            <option value="PE" <%= user.country === 'PE' ? 'selected' : '' %>>Peru</option>
+            <option value="CL" <%= user.country === 'CL' ? 'selected' : '' %>>Chile</option>
+            <option value="EC" <%= user.country === 'EC' ? 'selected' : '' %>>Ecuador</option>
+          </optgroup>
+
+          <optgroup label="Asia & Oceania">
+            <option value="CN" <%= user.country === 'CN' ? 'selected' : '' %>>China</option>
+            <option value="JP" <%= user.country === 'JP' ? 'selected' : '' %>>Japan</option>
+            <option value="KR" <%= user.country === 'KR' ? 'selected' : '' %>>South Korea</option>
+            <option value="ID" <%= user.country === 'ID' ? 'selected' : '' %>>Indonesia</option>
+            <option value="PK" <%= user.country === 'PK' ? 'selected' : '' %>>Pakistan</option>
+            <option value="PH" <%= user.country === 'PH' ? 'selected' : '' %>>Philippines</option>
+            <option value="VN" <%= user.country === 'VN' ? 'selected' : '' %>>Vietnam</option>
+            <option value="NZ" <%= user.country === 'NZ' ? 'selected' : '' %>>New Zealand</option>
+          </optgroup>
+
+          <optgroup label="Africa & Middle East">
+            <option value="NG" <%= user.country === 'NG' ? 'selected' : '' %>>Nigeria</option>
+            <option value="ZA" <%= user.country === 'ZA' ? 'selected' : '' %>>South Africa</option>
+            <option value="EG" <%= user.country === 'EG' ? 'selected' : '' %>>Egypt</option>
+            <option value="SA" <%= user.country === 'SA' ? 'selected' : '' %>>Saudi Arabia</option>
+            <option value="TR" <%= user.country === 'TR' ? 'selected' : '' %>>Turkey</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-buttons">
+        <button type="submit" class="btn gold">Save Changes</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="account-module">
+    <form action="/change-password" method="POST" class="password-form">
+      <h3>Change Password</h3>
+      <label for="currentPassword">Current Password</label>
+      <input type="password" name="currentPassword" required />
+
+      <label for="newPassword">New Password</label>
+      <input type="password" name="newPassword" required minlength="6" />
+
+      <label for="confirmPassword">Confirm New Password</label>
+      <input type="password" name="confirmPassword" required minlength="6" />
+
+      <button type="submit">Update Password</button>
+    </form>
+  </div>
+
+  <div class="account-module danger-zone">
+    <h3>Danger Zone</h3>
+    <p>This action is permanent and cannot be undone.</p>
+    <form method="POST" action="/account/delete" onsubmit="return confirm('Are you sure? This will permanently delete your account.')">
+      <button type="submit" class="btn danger">Delete Account</button>
+    </form>
+  </div>
+
+</div>
