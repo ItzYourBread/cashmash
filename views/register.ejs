@@ -102,6 +102,8 @@
         const usernameInput = document.getElementById('username');
         const usernameMsg = document.getElementById('usernameMsg');
         const responseMsg = document.getElementById('responseMsg');
+        const refFromUrl = "<%= ref %>" || null;
+
         let usernameTimer = null;
 
         usernameInput.addEventListener('input', () => {
@@ -141,7 +143,7 @@
           if (password.length < 6) return responseMsg.textContent = 'Password must be at least 6 characters';
 
           try {
-            const res = await fetch('/register', {
+            const res = await fetch(`/register${refFromUrl ? `?ref=${refFromUrl}` : ''}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ username, email, password, country })

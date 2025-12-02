@@ -156,11 +156,7 @@ body {
   transition: all var(--transition);
   border: 1px solid transparent; /* Prepare for border on hover */
 }
-.dashboard .stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 20px rgba(245, 197, 66, 0.3);
-  border-color: rgba(245, 197, 66, 0.2);
-}
+
 /* ============================
    TABLES
    ============================ */
@@ -583,3 +579,79 @@ button:disabled { background: #555; cursor: not-allowed; }
 .text-danger { color: #dc3545; }
 .text-warning { color: #ffc107; }
 .text-dim { color: #666; }
+
+/* --- Referral Section --- */
+
+.referral-stats {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 15px 20px;
+  flex: 1;
+  min-width: 150px;
+  text-align: center;
+}
+
+.stat-card .stat-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 5px;
+}
+
+.stat-card .stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.stat-value.gold {
+  color: gold;
+}
+
+.referral-link-box {
+  background: #1b1b1b;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px dashed #444;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.input-group input {
+  flex-grow: 1;
+  width: auto; /* Override default 50% */
+  margin-top: 0;
+  background: #111;
+  cursor: text;
+}
+
+.btn-copy {
+  width: auto; /* Override default 50% */
+  padding: 10px 20px;
+  margin-top: 0;
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+}
+
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  background: #1b1b1b;
+  border-radius: 8px;
+  color: #888;
+}

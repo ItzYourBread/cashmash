@@ -20,26 +20,30 @@ function ensureAuth(req, res, next) {
 // Dashboard Route
 router.get('/dashboard', ensureAuth, async (req, res) => {
   try {
-
     const country = req.user?.country || "Unknown";
-
-    // Logic to determine withdraw methods based on country
-    let availableMethods = ["BinancePay", "Crypto"]; // universal ones
-
-    if (country === "BD") {
-      availableMethods.push("Bkash", "Nagad", "Upay");
-    }
-
     const PAGE_SIZE = 10;
+    const currentPage = parseInt(req.query.page) || 1;
+    const activeSection = req.query.section || 'statistics';
+
+    // --- 1. User Data Retrieval ---
+    // Populate sub-documents and get the current user object
     const user = await User.findById(req.user._id)
       .populate('deposits')
       .populate('withdrawals')
       .populate('gameHistory');
 
-    const activeSection = req.query.section || 'statistics';
-    const currentPage = parseInt(req.query.page) || 1;
+    if (!user) {
+        // Should not happen if ensureAuth works, but good practice
+        return res.redirect('/login'); 
+    }
 
-    // --- Force consistent sorting (newest first) ---
+    // --- 2. Withdrawal Methods Logic ---
+    let availableMethods = ["BinancePay", "Crypto"]; // universal ones
+    if (country === "BD") {
+      availableMethods.push("Bkash", "Nagad", "Upay");
+    }
+
+    // --- 3. Sorting Helper (newest first) ---
     const sortByDateDesc = (arr, field = 'createdAt') =>
       [...(arr || [])].sort((a, b) => new Date(b[field]) - new Date(a[field]));
 
@@ -48,7 +52,7 @@ router.get('/dashboard', ensureAuth, async (req, res) => {
     const sortedHistory = sortByDateDesc(user.gameHistory, 'playedAt');
     const sortedRakeback = sortByDateDesc(user.rakebackHistory || [], 'creditedAt');
 
-    // --- Pagination Helper ---
+    // --- 4. Pagination Helper ---
     const paginate = (arr) => {
       const total = arr.length;
       const pages = Math.ceil(total / PAGE_SIZE);
@@ -56,12 +60,26 @@ router.get('/dashboard', ensureAuth, async (req, res) => {
       return { paginated: arr.slice(start, start + PAGE_SIZE), total, pages };
     };
 
+    // --- 5. Pagination Execution ---
     const { paginated: paginatedDeposits, pages: depositPages } = paginate(sortedDeposits);
     const { paginated: paginatedWithdrawals, pages: withdrawalPages } = paginate(sortedWithdrawals);
     const { paginated: paginatedGameHistory, pages: historyPages } = paginate(sortedHistory);
     const { paginated: paginatedRakeback, pages: rakePages } = paginate(sortedRakeback);
 
-    // --- Process rakeback for display ---
+
+    // --- 6. REFERRAL LOGIC (NEW) ---
+    // Fetch users referred by the current user. We use find() since referredBy is a top-level field.
+    const allReferrals = await User.find({ referredBy: user._id })
+      .select('username createdAt totalWagered') // Select fields needed for the display table
+      .lean(); // Use .lean() for faster read access
+
+    const { paginated: paginatedReferrals, pages: referralPages } = paginate(allReferrals);
+    
+    // Set referralCount directly on the user object for convenience in EJS
+    user.referralCount = allReferrals.length;
+
+
+    // --- 7. Process Data for Display ---
     const rakebackDisplay = paginatedRakeback.map(rb => ({
       date: rb.creditedAt ? new Date(rb.creditedAt) : new Date(),
       weeklyWagered: rb.wagered || 0,
@@ -69,6 +87,8 @@ router.get('/dashboard', ensureAuth, async (req, res) => {
       rakeback: rb.amount || 0
     }));
 
+
+    // --- 8. Render View ---
     res.render('dashboard', {
       user,
       activeSection,
@@ -89,7 +109,12 @@ router.get('/dashboard', ensureAuth, async (req, res) => {
       rakebackHistory: rakebackDisplay,
       rakePages,
       rakePage: currentPage,
-      availableMethods
+      availableMethods,
+      
+      // ✅ NEW: Referral data
+      referrals: paginatedReferrals,
+      referralPages,
+      referralPage: currentPage,
     });
 
   } catch (err) {

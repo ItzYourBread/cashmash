@@ -32,6 +32,7 @@
             <li data-section="deposit">Deposit</li>
             <li data-section="withdraw">Withdraw</li>
             <li data-section="history">Game History</li>
+            <li data-section="referral">Referral</li>
             <li data-section="rakeback">Rakeback</li>
             <li data-section="account">Account Management</li>
           </ul>
@@ -45,26 +46,32 @@
 
           <div id="deposit" class="content-section">
             <%- include('partials/dashboard/section-deposit') %>
-              <%- include('partials/dashboard/pagination', { currentPage: depositPage, totalPages: depositPages,
-                sectionId: 'deposit' }) %>
+              <%- include('partials/dashboard/pagination') %>
+
           </div>
 
           <div id="withdraw" class="content-section">
             <%- include('partials/dashboard/section-withdraw') %>
-              <%- include('partials/dashboard/pagination', { currentPage: withdrawalPage, totalPages: withdrawalPages,
-                sectionId: 'withdraw' }) %>
+              <%- include('partials/dashboard/pagination') %>
+
           </div>
 
           <div id="history" class="content-section">
             <%- include('partials/dashboard/section-history') %>
-              <%- include('partials/dashboard/pagination', { currentPage: historyPage, totalPages: historyPages,
-                sectionId: 'history' }) %>
+              <%- include('partials/dashboard/pagination') %>
+
           </div>
 
           <div id="rakeback" class="content-section">
             <%- include('partials/dashboard/section-rakeback') %>
-              <%- include('partials/dashboard/pagination', { currentPage: rakePage, totalPages: rakePages,
-                sectionId: 'rakeback' }) %>
+              <%- include('partials/dashboard/pagination') %>
+
+          </div>
+
+          <div id="referral" class="content-section">
+            <%- include('partials/dashboard/section-referral') %>
+
+              <%- include('partials/dashboard/pagination') %>
           </div>
 
           <div id="account" class="content-section">

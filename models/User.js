@@ -9,10 +9,10 @@ const depositSchema = new mongoose.Schema({
   amountBDT: { type: Number, required: false },
   method: { type: String, required: true }, // Bkash, Nagad, Upay, etc.
   txnId: { type: String },
-  status: { 
-    type: String, 
-    enum: ['Pending', 'Completed', 'Failed', 'Cancelled'], 
-    default: 'Pending' 
+  status: {
+    type: String,
+    enum: ['Pending', 'Completed', 'Failed', 'Cancelled'],
+    default: 'Pending'
   },
   createdAt: { type: Date, default: Date.now }
 });
@@ -20,17 +20,17 @@ const depositSchema = new mongoose.Schema({
 const withdrawSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   method: { type: String, enum: ['Bkash', 'Nagad', 'Upay', 'BinancePay', 'Crypto'], required: true },
-  
+
   // Fields needed to match the main Withdraw model (made them optional in the subschema)
   fullName: { type: String },
   contact: { type: String },
-  userIdOrEmail: { type: String }, 
+  userIdOrEmail: { type: String },
   WalletAddress: { type: String },
-  
-  status: { 
-    type: String, 
-    enum: ['Pending', 'Completed', 'Failed', 'Cancelled'], 
-    default: 'Pending' 
+
+  status: {
+    type: String,
+    enum: ['Pending', 'Completed', 'Failed', 'Cancelled'],
+    default: 'Pending'
   },
   note: { type: String, default: "Nothing for Note" },
   createdAt: { type: Date, default: Date.now }
@@ -62,10 +62,10 @@ const userSchema = new mongoose.Schema({
   firstName: { type: String, required: false },
   lastName: { type: String, required: false },
   phone: { type: String, required: false },
-  country: { 
-    type: String, 
-    required: false, 
-    enum: COUNTRY_CODES 
+  country: {
+    type: String,
+    required: false,
+    enum: COUNTRY_CODES
   },
   address: { type: String, required: false },
   email: { type: String, unique: true, sparse: true },
@@ -81,6 +81,19 @@ const userSchema = new mongoose.Schema({
   rakebackPercent: { type: Number, default: 5 },       // 5% weekly rakeback (can be dynamic)
   rakebackBalance: { type: Number, default: 0 },       // Pending rakeback before credited
   rakebackHistory: [rakebackHistorySchema],            // Stores past weekly rakebacks
+
+  // ✅ Referral System Fields
+  referralCode: { type: String, unique: true, sparse: true }, // The unique code (e.g., "REF123")
+  referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // The User who invited this person
+  referralCommissionRate: { type: Number, default: 5 }, // 5% commission on deposits
+  totalReferralEarnings: { type: Number, default: 0 }, // Total stats
+  referralCount: { type: Number, default: 0 }, // Total users invited
+
+  referralHistory: [{
+    fromUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    amount: Number,
+    date: { type: Date, default: Date.now }
+  }],
 
   otp: { type: String },
   otpExpiresAt: { type: Date },
@@ -105,6 +118,14 @@ userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+
+  // 2. ✅ Generate Referral Code if missing
+  if (!this.referralCode) {
+    // Generate a 7-digit random number (1000000–9999999)
+    const code = Math.floor(1000000 + Math.random() * 9000000);
+    this.referralCode = `${code}`;
+  }
+
   next();
 });
 

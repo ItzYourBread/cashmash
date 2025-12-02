@@ -1,34 +1,60 @@
-<% 
-  // Ensure total_pages is at least 1
-  if (totalPages > 1) { 
-    let startPage = Math.max(1, currentPage - 2); 
-    let endPage = Math.min(totalPages, currentPage + 2); 
-    
-    if (totalPages > 5) {
-      if (currentPage <= 3) { startPage = 1; endPage = 5; } 
-      else if (currentPage >= totalPages - 2) {
-        startPage = totalPages - 4;
-        endPage = totalPages;
-      }
-    }
+<%
+  // --- Dynamic Variable Selection ---
+  let totalPages = 0;
+  let pageNumber = 1;
+  let currentSectionName = activeSection; // Inherited from the main dashboard render
+
+  // Map variables based on the active section
+  if (activeSection === 'deposit') {
+    totalPages = depositPages;
+    pageNumber = depositPage;
+  } else if (activeSection === 'withdraw') {
+    totalPages = withdrawalPages;
+    pageNumber = withdrawalPage;
+  } else if (activeSection === 'history') {
+    totalPages = historyPages;
+    pageNumber = historyPage;
+  } else if (activeSection === 'rakeback') {
+    totalPages = rakePages;
+    pageNumber = rakePage;
+  } else if (activeSection === 'referral') { // ✅ NEW: Referral Section
+    totalPages = referralPages;
+    pageNumber = referralPage;
+  }
+
+  // Only display pagination if there is more than one page of results
+  if (totalPages && totalPages > 1) {
 %>
-<div class="pagination-controls">
-  <% if (currentPage > 1) { %>
-    <a href="/dashboard?section=<%= sectionId %>&page=<%= currentPage - 1 %>" class="btn">&laquo;</a>
-  <% } else { %>
-    <span class="btn disabled">&laquo;</span>
-  <% } %>
 
-  <% for (let i = startPage; i <= endPage; i++) { %>
-    <a href="/dashboard?section=<%= sectionId %>&page=<%= i %>" class="btn <%= i === currentPage ? 'active' : '' %>">
-      <%= i %>
-    </a>
-  <% } %>
-
-  <% if (currentPage < totalPages) { %>
-    <a href="/dashboard?section=<%= sectionId %>&page=<%= currentPage + 1 %>" class="btn">&raquo;</a>
-  <% } else { %>
-    <span class="btn disabled">&raquo;</span>
-  <% } %>
+<div class="pagination-container">
+  <ul class="pagination">
+    
+    <li class="page-item <%= pageNumber === 1 ? 'disabled' : '' %>">
+      <a class="page-link" 
+         href="/dashboard?section=<%= currentSectionName %>&page=<%= pageNumber - 1 %>" 
+         aria-label="Previous">
+        &laquo;
+      </a>
+    </li>
+    
+    <% for (let i = 1; i <= totalPages; i++) { %>
+      <li class="page-item <%= pageNumber === i ? 'active' : '' %>">
+        <a class="page-link" 
+           href="/dashboard?section=<%= currentSectionName %>&page=<%= i %>">
+          <%= i %>
+        </a>
+      </li>
+    <% } %>
+    
+    <li class="page-item <%= pageNumber === totalPages ? 'disabled' : '' %>">
+      <a class="page-link" 
+         href="/dashboard?section=<%= currentSectionName %>&page=<%= pageNumber + 1 %>" 
+         aria-label="Next">
+        &raquo;
+      </a>
+    </li>
+    
+  </ul>
 </div>
+
 <% } %>

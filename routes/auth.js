@@ -19,16 +19,20 @@ const isNotLoggedIn = (req, res, next) => {
 /* =====================================
    🔹 GET ROUTES
    ===================================== */
-
 router.get('/register', isNotLoggedIn, (req, res) => {
   let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-
   if (ip && ip.includes(',')) ip = ip.split(',')[0].trim();
 
   const geo = geoip.lookup(ip);
   const autoCountry = geo?.country || '';
 
-  res.render('register', { currentPage: 'register', autoCountry });
+  const ref = req.query.ref || null; // <-- ADD THIS
+
+  res.render('register', { 
+    currentPage: 'register', 
+    autoCountry,
+    ref   
+  });
 });
 
 router.get('/login', isNotLoggedIn, (req, res) => {
@@ -53,16 +57,20 @@ router.get('/check-username', async (req, res) => {
 });
 
 
-/* =====================================
-   🔹 REGISTER (POST)
-   ===================================== */
 // POST Register
 router.post('/register', async (req, res) => {
   try {
+    // 1. Destructure fields from body. The referral code comes from the URL query.
     let { username, email, password, country } = req.body;
+    
+    // ✅ NEW/CORRECTED: Get the referral code ONLY from the URL query parameter 'ref'
+    const refCode = req.query.ref; 
+    console.log('Referral Code from URL:', refCode);
+
     username = username.trim().toLowerCase();
     email = email.trim().toLowerCase();
 
+    // 2. Initial Validation
     if (!COUNTRY_CODES.includes(country))
       return res.status(400).json({ message: 'Invalid country selection.' });
     if (password.length < 6)
@@ -74,7 +82,37 @@ router.post('/register', async (req, res) => {
     const existingEmail = await User.findOne({ email });
     if (existingEmail) return res.status(400).json({ message: 'Email already registered.' });
 
-    const newUser = new User({ username, email, password, country });
+    
+    // 3. Referral Logic Execution
+    let referredBy = undefined; // ID of the referrer
+    let referrerUser = null;
+
+    if (refCode) {
+      // Find the user who owns this referral code (it's a string like '7720564')
+      referrerUser = await User.findOne({ referralCode: refCode });
+
+      if (referrerUser) {
+        referredBy = referrerUser._id;
+        
+        // A. Increment the referrer's count and save the referrer
+        referrerUser.referralCount = (referrerUser.referralCount || 0) + 1;
+        await referrerUser.save(); 
+        console.log(`User ${username} successfully referred by ${referrerUser.username} (${refCode})`);
+      } else {
+        console.warn(`Attempted registration with invalid referral code in URL: ${refCode}`);
+      }
+    }
+
+
+    // 4. Create and Save New User
+    const newUser = new User({ 
+      username, 
+      email, 
+      password, 
+      country,
+      referredBy: referredBy // Link to the referrer (if found)
+    });
+    
     await newUser.save();
 
     res.status(200).json({ message: 'Registration successful! You can now log in.' });

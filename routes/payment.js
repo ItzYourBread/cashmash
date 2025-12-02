@@ -36,6 +36,43 @@ function formatCurrencyNetwork(cur) {
   return mapping[c] || cur.toUpperCase();
 }
 
+// Function to handle referral rewards (Add this outside the router posts, e.g., at the top of the file)
+async function rewardReferrer(referredUser, depositAmount) {
+  // Check if the user was referred by someone
+  if (!referredUser.referredBy) return;
+
+  const User = mongoose.model('User'); // Need to access the User model
+  
+  // Find the referrer using the stored ObjectId
+  const referrer = await User.findById(referredUser.referredBy);
+  
+  if (!referrer) {
+    console.warn(`⚠️ Referrer (ID: ${referredUser.referredBy}) not found for user ${referredUser.username}`);
+    return;
+  }
+
+  // Calculate commission (using the referrer's current rate)
+  const rate = referrer.referralCommissionRate || 5;
+  const commission = depositAmount * (rate / 100);
+
+  if (commission > 0) {
+    // 1. Update the referrer's balance and total earnings
+    referrer.balance += commission;
+    referrer.totalReferralEarnings += commission;
+
+    // 2. Log the transaction in referralHistory
+    referrer.referralHistory.push({
+      fromUser: referredUser._id, // The ID of the user who made the deposit
+      amount: commission,
+      date: new Date()
+    });
+
+    // 3. Save the referrer's updated document
+    await referrer.save();
+    console.log(`✅ Referral reward of $${commission.toFixed(2)} applied to referrer ${referrer.username}`);
+  }
+}
+
 // Load agent payments JSON
 const agentPaymentsPath = path.join(__dirname, '../agent-payments.json');
 const agentPayments = JSON.parse(fs.readFileSync(agentPaymentsPath, 'utf-8'));
@@ -153,6 +190,9 @@ router.get('/deposit', ensureAuth, async (req, res) => {
         console.log(`🎁 First-time deposit bonus of $${bonusAmount} applied to user ${req.user.username}`);
       }
 
+      // 🎁 NEW: REFERRAL REWARD (Assuming reward on PENDING for manual deposits)
+      await rewardReferrer(req.user, Number(amount));
+
       res.redirect('/dashboard?section=deposit&page=1');
     } catch (err) {
       console.error(err);
@@ -194,6 +234,9 @@ router.post('/deposit/binance', ensureAuth, async (req, res) => {
       await req.user.save();
       console.log(`🎁 First-time deposit bonus of $${bonusAmount} applied to user ${req.user.username}`);
     }
+
+    // 🎁 NEW: REFERRAL REWARD (Assuming reward on PENDING for BinancePay)
+    await rewardReferrer(req.user, parsedAmount);
 
     res.redirect('/dashboard?section=deposit&page=1');
   } catch (err) {
@@ -328,6 +371,8 @@ router.post(
           // 💰 Reward user with deposit amount
           const rewardAmount = deposit.amount || price_amount || 0;
           user.balance = (user.balance || 0) + rewardAmount;
+
+          await rewardReferrer(user, rewardAmount);
 
           // ✅ FIRST-TIME DEPOSIT BONUS
           const hasPreviousCompletedDeposit = user.deposits.some(
