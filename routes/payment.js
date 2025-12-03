@@ -8,6 +8,7 @@ const Withdraw = require('../models/Withdraw');
 const withdrawMethods = require('../config/withdrawMethods');
 const NowPaymentsApi = require('@nowpaymentsio/nowpayments-api-js');
 const npApi = new NowPaymentsApi({ apiKey: process.env.NOWPAYMENTS_API_KEY });
+const User = require("../models/User");
 const mongoose = require('mongoose'); // Mongoose is correctly imported
 
 function ensureAuth(req, res, next) {
@@ -84,7 +85,6 @@ router.get('/deposit', ensureAuth, async (req, res) => {
   try {
     const now = Date.now();
 
-    // Cache refresh every 10 minutes
     const CACHE_DURATION = 10 * 60 * 1000;
 
     if (!cachedCurrencies || now - lastFetch > CACHE_DURATION) {
@@ -94,17 +94,15 @@ router.get('/deposit', ensureAuth, async (req, res) => {
         headers: { 'x-api-key': process.env.NOWPAYMENTS_API_KEY }
       });
 
-      // Ensure we have data
       const currencies = Array.isArray(data.currencies) ? data.currencies : [];
 
       const allowedStablecoins = [
         'usdttrc20',
-        // 'usdterc20',
         'usdtbsc',
         'usdtsol',
         'usdtmatic',
         'usdtcelo',
-        'usdtarb',
+        'usdtarb'
       ];
 
       cachedCurrencies = currencies.filter(c =>
@@ -115,27 +113,37 @@ router.get('/deposit', ensureAuth, async (req, res) => {
       console.log(`✅ Cached ${cachedCurrencies.length} stablecoin networks`);
     }
 
+    // Fetch referral code of referrer
+    let usedReferralCode = null;
 
+    if (req.user?.referredBy) {
+      const referrer = await User.findById(req.user.referredBy).select("referralCode");
+      if (referrer) usedReferralCode = referrer.referralCode;
+    }
 
-    // Render deposit page
+    // SUCCESS RENDER
     res.render('deposit', {
       user: req.user,
       userCountry: req.user.country,
-      usdToBdtRate: 123,
+      usdToBdtRate: 123,           // <--- always pass
       agentPayments,
       availableCryptos: cachedCurrencies || [],
       currentPage: 'deposit',
+      usedReferralCode
     });
 
   } catch (err) {
     console.error("❌ Error fetching NOWPayments currencies:", err.message);
 
-    // Use cached data if available, otherwise fallback to empty
+    // FAILOVER RENDER
     res.render('deposit', {
       user: req.user,
+      userCountry: req.user.country,    // <--- always pass
+      usdToBdtRate: 123,                // <--- FIX ADDED
       agentPayments,
       availableCryptos: cachedCurrencies || [],
       currentPage: 'deposit',
+      usedReferralCode: null
     });
   }
 });

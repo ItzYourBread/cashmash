@@ -173,10 +173,11 @@
 
             <script src="/socket.io/socket.io.js"></script>
             <script>
-                const isLoggedIn = <%= user ? 'true' : 'false' %>;
-                const userCountry = "<%= userCountry %>";
-                const usdToBdt = <%= usdToBdtRate %>;
                 const agentData = <%- JSON.stringify(agentPayments || {}) %>;
+                const usedReferralCode = "<%= usedReferralCode || '' %>"; // code of the referrer, or empty string
+                const userCountry = "<%= userCountry || '' %>";
+                const isLoggedIn = <%= !!user ? 'true' : 'false' %>;
+                const usdToBdt = <%= usdToBdtRate || 1 %>;
             </script>
             <script src="/js/deposit.js"></script>
 </body>

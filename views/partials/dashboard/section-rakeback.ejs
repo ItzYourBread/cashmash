@@ -11,13 +11,19 @@
     </tr>
   </thead>
   <tbody>
-    <% rakebackHistory.forEach(rb => { %>
+    <% rakebackHistory.forEach(rb=> { %>
       <tr>
-        <td><%= rb.date.toLocaleDateString() %></td>
-        <td>$<%= rb.weeklyWagered.toLocaleString() %></td>
-        <td><%= rb.percent %>%</td>
-        <td>$<%= rb.rakeback.toLocaleString('en-US', { minimumFractionDigits: 2 }) %></td>
+        <td>
+          <%= rb.date.toLocaleDateString() %>
+        </td>
+        <td>$<%= rb.weeklyWagered.toLocaleString() %>
+        </td>
+        <td>
+          <%= rb.percent %>%
+        </td>
+        <td>$<%= rb.rakeback.toLocaleString('en-US', { minimumFractionDigits: 2 }) %>
+        </td>
       </tr>
-    <% }) %>
+      <% }) %>
   </tbody>
 </table>

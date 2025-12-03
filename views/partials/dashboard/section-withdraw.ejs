@@ -6,18 +6,26 @@
     <option value="">-- Select Method --</option>
 
     <optgroup label="E-Wallets">
-      <% if (availableMethods.includes("Bkash")) { %><option value="bkash">Bkash</option><% } %>
-      <% if (availableMethods.includes("Nagad")) { %><option value="nagad">Nagad</option><% } %>
-      <% if (availableMethods.includes("Upay")) { %><option value="upay">Upay</option><% } %>
-      <% if (availableMethods.includes("BinancePay")) { %><option value="binance">BinancePay</option><% } %>
+      <% if (availableMethods.includes("Bkash")) { %>
+        <option value="bkash">Bkash</option>
+        <% } %>
+          <% if (availableMethods.includes("Nagad")) { %>
+            <option value="nagad">Nagad</option>
+            <% } %>
+              <% if (availableMethods.includes("Upay")) { %>
+                <option value="upay">Upay</option>
+                <% } %>
+                  <% if (availableMethods.includes("BinancePay")) { %>
+                    <option value="binance">BinancePay</option>
+                    <% } %>
     </optgroup>
 
     <optgroup label="Crypto">
       <% if (availableMethods.includes("Crypto")) { %>
         <option value="crypto">Crypto Transfer</option>
-      <% } else { %>
-        <option value="crypto" disabled>Crypto Transfer (Coming Soon)</option>
-      <% } %>
+        <% } else { %>
+          <option value="crypto" disabled>Crypto Transfer (Coming Soon)</option>
+          <% } %>
     </optgroup>
 
     <optgroup label="Bank">
@@ -31,14 +39,14 @@
   <form id="walletForm" method="POST">
     <label>Full Name</label>
     <input type="text" name="fullName" required>
-    
+
     <label id="walletNumberLabel">Wallet Number</label>
     <input type="text" name="contact" required>
-    
+
     <label>Amount (USD)</label>
     <input type="number" name="amount" id="walletAmount" min="10" required>
     <div id="walletFeedback" class="amount-feedback"></div>
-    
+
     <button id="walletConfirmBtn" type="submit" disabled>Confirm</button>
   </form>
 </div>
@@ -48,11 +56,11 @@
   <form method="POST" action="/withdraw/binance">
     <label>Email or User ID</label>
     <input type="text" name="userIdOrEmail" required>
-    
+
     <label>Amount (USD)</label>
     <input type="number" name="amount" id="binanceAmount" min="10" required>
     <div id="binanceFeedback" class="amount-feedback"></div>
-    
+
     <button id="binanceConfirmBtn" type="submit" disabled>Confirm</button>
   </form>
 </div>
@@ -86,7 +94,7 @@
 
 <h2 style="margin-top: 40px;">Your Withdrawals</h2>
 
-<% if (withdrawals.length || withdrawalPages > 0) { %>
+<% if (withdrawals.length || withdrawalPages> 0) { %>
   <table class="table">
     <thead>
       <tr>
@@ -98,25 +106,33 @@
       </tr>
     </thead>
     <tbody>
-      <% withdrawals.forEach(w => { %>
+      <% withdrawals.forEach(w=> { %>
         <tr>
-          <td><%= new Date(w.createdAt).toLocaleDateString() %></td>
-          <td>$<%= parseFloat(w.amount.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits: 2 }) %></td>
-          <td><%= w.method %></td>
-          <td><%= w.status %></td>
           <td>
-            <% if (w.status === 'Pending') { %>
-              <form method="POST" action="/withdraw/cancel/<%= w._id %>" onsubmit="return confirm('Cancel this withdrawal?')">
+            <%= new Date(w.createdAt).toLocaleDateString() %>
+          </td>
+          <td>$<%= parseFloat(w.amount.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits: 2 }) %>
+          </td>
+          <td>
+            <%= w.method %>
+          </td>
+          <td>
+            <%= w.status %>
+          </td>
+          <td>
+            <% if (w.status==='Pending' ) { %>
+              <form method="POST" action="/withdraw/cancel/<%= w._id %>"
+                onsubmit="return confirm('Cancel this withdrawal?')">
                 <button type="submit" class="btn cancel">Cancel</button>
               </form>
-            <% } else { %>
-              <span class="text-dim">—</span>
-            <% } %>
+              <% } else { %>
+                <span class="text-dim">—</span>
+                <% } %>
           </td>
         </tr>
-      <% }) %>
+        <% }) %>
     </tbody>
   </table>
-<% } else { %>
-  <p>No withdrawals yet.</p>
-<% } %>
+  <% } else { %>
+    <p>No withdrawals yet.</p>
+    <% } %>

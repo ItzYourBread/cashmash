@@ -1,5 +1,5 @@
 <h2>Your Deposits</h2>
-<% if (deposits.length || depositPages > 0) { %>
+<% if (deposits.length || depositPages> 0) { %>
   <table class="table">
     <thead>
       <tr>
@@ -10,21 +10,26 @@
       </tr>
     </thead>
     <tbody>
-      <% for (let i = 0; i < deposits.length; i++) { %>
-        <% const dep = deposits[i]; %>
-        <tr>
-          <td><%= new Date(dep.createdAt).toLocaleDateString() %></td>
-          <td>
-            $<%= parseFloat(dep.amount.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits: 2 }) %>
-          </td>
-          <td><%= dep.method %></td>
-          <td style="font-weight: bold; color: <%= dep.status === 'Completed' ? '#28a745' : dep.status === 'Failed' ? '#dc3545' : '#ffc107' %>;">
-            <%= dep.status %>
-          </td>
-        </tr>
-      <% } %>
+      <% for (let i=0; i < deposits.length; i++) { %>
+        <% const dep=deposits[i]; %>
+          <tr>
+            <td>
+              <%= new Date(dep.createdAt).toLocaleDateString() %>
+            </td>
+            <td>
+              $<%= parseFloat(dep.amount.toFixed(2)).toLocaleString('en-US', { minimumFractionDigits: 2 }) %>
+            </td>
+            <td>
+              <%= dep.method %>
+            </td>
+            <td
+              style="font-weight: bold; color: <%= dep.status === 'Completed' ? '#28a745' : dep.status === 'Failed' ? '#dc3545' : '#ffc107' %>;">
+              <%= dep.status %>
+            </td>
+          </tr>
+          <% } %>
     </tbody>
   </table>
-<% } else { %>
-  <p>No deposits yet.</p>
-<% } %>
+  <% } else { %>
+    <p>No deposits yet.</p>
+    <% } %>

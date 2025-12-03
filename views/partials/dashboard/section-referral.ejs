@@ -1,35 +1,45 @@
 <h2>Referral Program 🤝</h2>
 <p class="section-description">
-  Invite your friends and earn money! You will receive <strong><%= user.referralCommissionRate %>%</strong> of every deposit they make.
+  Invite your friends and earn money! You will receive <strong>
+    <%= user.referralCommissionRate %>%
+  </strong> of every deposit they make.
 </p>
 
 <div class="referral-stats">
   <div class="stat-card">
     <span class="stat-label">Total Earnings</span>
-    <span class="stat-value gold">$<%= user.totalReferralEarnings.toLocaleString('en-US', { minimumFractionDigits: 2 }) %></span>
+    <span class="stat-value gold">$<%= user.totalReferralEarnings.toLocaleString('en-US', { minimumFractionDigits: 2 })
+        %></span>
   </div>
   <div class="stat-card">
     <span class="stat-label">Friends Invited</span>
-    <span class="stat-value"><%= user.referralCount %></span>
+    <span class="stat-value">
+      <%= user.referralCount %>
+    </span>
   </div>
   <div class="stat-card">
     <span class="stat-label">Commission Rate</span>
-    <span class="stat-value"><%= user.referralCommissionRate %>%</span>
+    <span class="stat-value">
+      <%= user.referralCommissionRate %>%
+    </span>
   </div>
 </div>
 
 <div class="referral-link-box">
   <label>Your Unique Referral Link</label>
   <div class="input-group">
-    <input type="text" id="referralLink" value="<%= process.env.SITE_URL || 'https://cashmash.watchnsfw.com' %>/register?ref=<%= user.referralCode %>" readonly>
+    <input type="text" id="referralLink"
+      value="<%= process.env.SITE_URL || 'https://cashmash.watchnsfw.com' %>/register?ref=<%= user.referralCode %>"
+      readonly>
     <button onclick="copyReferralLink()" class="btn-copy">Copy</button>
   </div>
-  <p id="copyMessage" class="text-success hidden" style="margin-top: 5px; font-size: 0.9em;">Link copied to clipboard!</p>
+  <p id="copyMessage" class="text-success hidden" style="margin-top: 5px; font-size: 0.9em;">Link copied to clipboard!
+  </p>
 </div>
 
 <h3 style="margin-top: 30px;">Your Referrals</h3>
 
-<% if (referrals && referrals.length > 0) { %>
+<% if (referrals && referrals.length> 0) { %>
   <table class="table">
     <thead>
       <tr>
@@ -39,31 +49,36 @@
       </tr>
     </thead>
     <tbody>
-      <% referrals.forEach(refUser => { %>
+      <% referrals.forEach(refUser=> { %>
         <tr>
-          <td><%= refUser.username %></td>
-          <td><%= new Date(refUser.createdAt).toLocaleDateString() %></td>
-          <td>$<%= refUser.totalWagered.toLocaleString() %></td>
+          <td>
+            <%= refUser.username %>
+          </td>
+          <td>
+            <%= new Date(refUser.createdAt).toLocaleDateString() %>
+          </td>
+          <td>$<%= refUser.totalWagered.toLocaleString() %>
+          </td>
         </tr>
-      <% }) %>
+        <% }) %>
     </tbody>
   </table>
-  
-  <% } else { %>
-  <div class="empty-state">
-    <p>You haven't invited anyone yet. Share your link above to start earning!</p>
-  </div>
-<% } %>
 
-<script>
-  function copyReferralLink() {
-    const copyText = document.getElementById("referralLink");
-    copyText.select();
-    copyText.setSelectionRange(0, 99999); // For mobile devices
-    navigator.clipboard.writeText(copyText.value);
-    
-    const msg = document.getElementById("copyMessage");
-    msg.classList.remove("hidden");
-    setTimeout(() => msg.classList.add("hidden"), 3000);
-  }
-</script>
+  <% } else { %>
+    <div class="empty-state">
+      <p>You haven't invited anyone yet. Share your link above to start earning!</p>
+    </div>
+    <% } %>
+
+      <script>
+        function copyReferralLink() {
+          const copyText = document.getElementById("referralLink");
+          copyText.select();
+          copyText.setSelectionRange(0, 99999); // For mobile devices
+          navigator.clipboard.writeText(copyText.value);
+
+          const msg = document.getElementById("copyMessage");
+          msg.classList.remove("hidden");
+          setTimeout(() => msg.classList.add("hidden"), 3000);
+        }
+      </script>
