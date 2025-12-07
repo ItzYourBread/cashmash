@@ -4,31 +4,31 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Classic Mines | CashMash</title>
+    <title>Boxes | CashMash</title>
+
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/header.css" />
     <link rel="stylesheet" href="/css/footer.css" />
-    <link rel="stylesheet" href="/css/mines.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/boxes.css" />
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
     <link rel="shortcut icon" href="/favicons/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="CashMash" />
-    <link rel="manifest" href="/favicons/site.webmanifest" />
 </head>
 
 <body>
     <%- include('partials/header') %>
         <%- include('partials/gameLoader') %>
 
-            <section class="mines-section">
+            <section class="boxes-section">
                 <div class="game-container">
 
                     <div class="game-header">
-                        <h2 class="neon-title">Mines</h2>
+                        <h2 class="neon-title">Boxes</h2>
                         <div class="balance-pill">
                             <i class="fas fa-dollar-sign"></i>
                             <span id="balance" data-raw-balance="<%= user.balance %>">
@@ -38,7 +38,7 @@
                     </div>
 
                     <div class="grid-wrapper">
-                        <div id="grid" class="grid locked"></div>
+                        <div id="pyramid" class="pyramid locked" aria-live="polite"></div>
 
                         <div class="hud-bar">
                             <div class="hud-item">
@@ -48,7 +48,7 @@
                             <div class="hud-divider"></div>
                             <div class="hud-item">
                                 <span class="label">Profit</span>
-                                <span class="value highlight" id="profitDisplay">0</span>
+                                <span class="value highlight" id="profitDisplay">0.00</span>
                             </div>
                         </div>
                     </div>
@@ -57,12 +57,12 @@
                         <div class="settings-group">
                             <button id="openBetModalBtn" class="setting-trigger">
                                 <span class="trigger-label">Bet Amount</span>
-                                <span class="trigger-value" id="displayBetValue">$1</span>
+                                <span class="trigger-value" id="displayBetValue">$1.00</span>
                             </button>
 
-                            <button id="openMinesModalBtn" class="setting-trigger">
-                                <span class="trigger-label">Mines</span>
-                                <span class="trigger-value" id="displayMineCount">3</span>
+                            <button id="openTrapModalBtn" class="setting-trigger">
+                                <span class="trigger-label">Traps</span>
+                                <span class="trigger-value" id="displayTrapCount">3</span>
                             </button>
                         </div>
 
@@ -98,22 +98,20 @@
                 </div>
             </div>
 
-            <div id="minesModal" class="modal-overlay">
+            <div id="trapModal" class="modal-overlay">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3>Number of Mines</h3>
+                        <h3>Select Traps</h3>
                         <button class="close-modal">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <div class="mines-grid">
-                            <button class="mine-option active" data-val="3">3</button>
-                            <button class="mine-option" data-val="5">5</button>
-                            <button class="mine-option" data-val="10">10</button>
-                            <button class="mine-option" data-val="15">15</button>
-                            <button class="mine-option" data-val="20">20</button>
-                            <button class="mine-option" data-val="24">24</button>
+                        <div class="traps-grid">
+                            <button class="trap-option" data-val="3">3</button>
+                            <button class="trap-option" data-val="4">4</button>
+                            <button class="trap-option" data-val="5">5</button>
+                            <button class="trap-option" data-val="6">6</button>
                         </div>
-                        <button class="btn-confirm" id="confirmMines">Confirm</button>
+                        <button class="btn-confirm" id="confirmTraps">Confirm</button>
                     </div>
                 </div>
             </div>
@@ -121,9 +119,10 @@
             <div id="popupMessage" class="popup-message"></div>
 
             <%- include('partials/footer') %>
+
                 <script src="/socket.io/socket.io.js"></script>
                 <script src="/js/formatBalance.js"></script>
-                <script src="/js/mines.js"></script>
+                <script src="/js/boxes.js"></script>
 </body>
 
 </html>

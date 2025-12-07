@@ -6,7 +6,8 @@ const minesController = require('../controllers/minesController');
 const baccaratController = require("../controllers/baccaratController");
 const blackjackController = require('../controllers/blackjackController');
 const aviatorController = require('../controllers/aviatorController');
-const formatBalance = require('../utils/formatBalance'); // <--- Ensure this path is correct
+const boxesController = require('../controllers/boxesController'); // <--- NEW IMPORT
+const formatBalance = require('../utils/formatBalance'); 
 
 // ensureAuth middleware
 function ensureAuth(req, res, next) {
@@ -20,13 +21,10 @@ function ensureAuth(req, res, next) {
 }
 
 // --- COMMON RENDER OBJECT ---
-// This object contains all the common variables and the utility function
-// to be passed to every single game view.
 function getCommonRenderData(req) {
     return {
         user: req.user,
         currentPage: 'games',
-        // Make the utility function available to the EJS template
         formatBalance: formatBalance
     };
 }
@@ -36,12 +34,10 @@ function getCommonRenderData(req) {
 router.get('/slot', ensureAuth, (req, res) => {
   const slotType = req.query.type || 'ClassicSlot';
 
-  // Validate slot type
   if (!slotsConfig[slotType]) {
     return res.redirect('/slot?type=ClassicSlot');
   }
 
-  // ✅ Renders the single dynamic slot view
   res.render('slots', {
     ...getCommonRenderData(req),
     slotType,
@@ -50,7 +46,6 @@ router.get('/slot', ensureAuth, (req, res) => {
 });
 
 router.post('/slots/spin', ensureAuth, spin);
-
 router.get('/slots/simulate', simulate);
 
 
@@ -70,23 +65,23 @@ router.post('/blackjack/start', ensureAuth, blackjackController.startGame);
 router.post('/blackjack/hit', ensureAuth, blackjackController.hit);
 router.post('/blackjack/stand', ensureAuth, blackjackController.stand);
 
-// Aviator page
+// --- AVIATOR ROUTES ---
 router.get('/aviator', ensureAuth, async (req, res) => {
-  // Get current round state for initial render
   const roundState = aviatorController.getRoundStateSync();
-  
-  // Merge the common data with the specific aviator data
   const renderData = {
-    ...getCommonRenderData(req), // Spread the common data first
+    ...getCommonRenderData(req), 
     roundState, 
   };
-  
   res.render('aviator', renderData);
 });
 router.post('/aviator/bet', ensureAuth, aviatorController.placeBet);
 router.post('/aviator/cashout', ensureAuth, aviatorController.cashOut);
 
-// router.get('/european-roulette', ensureAuth, (req, res) => res.render('european-roulette', getCommonRenderData(req)));
+// --- BOXES (TOWER) ROUTES --- 
+router.get('/boxes', ensureAuth, (req, res) => res.render('boxes', getCommonRenderData(req)));
+router.post('/boxes/start', ensureAuth, boxesController.start);     // <--- NEW
+router.post('/boxes/reveal', ensureAuth, boxesController.reveal);   // <--- NEW
+router.post('/boxes/cashout', ensureAuth, boxesController.cashout); // <--- NEW
 
 
 module.exports = router;
