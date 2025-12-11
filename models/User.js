@@ -116,16 +116,20 @@ const userSchema = new mongoose.Schema({
 // ----------------- PASSWORD HASHING -----------------
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
+
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 
-  // 2. ✅ Generate Referral Code if missing
-  if (!this.referralCode) {
-    // Generate a 7-digit random number (1000000–9999999)
-    const code = Math.floor(1000000 + Math.random() * 9000000);
-    this.referralCode = `${code}`;
-  }
+  next();
+});
 
+
+// ----------------- AUTO-GENERATE REFERRAL CODE -----------------
+userSchema.pre('save', async function (next) {
+  if (!this.referralCode) {
+    this.referralCode = Math.floor(1000000 + Math.random() * 9000000).toString();
+  }
+  
   next();
 });
 
